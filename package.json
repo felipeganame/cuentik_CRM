@@ -1,0 +1,28 @@
+{
+  "name": "locaria-crm",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed": "tsx scripts/seed.ts",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "16.3.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "@supabase/ssr": "0.12.4",
+    "@supabase/supabase-js": "2.112.3"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "tsx": "4.23.12",
+    "dotenv": "17.4.2",
+    "@playwright/test": "1.62.1"
+  }
+}

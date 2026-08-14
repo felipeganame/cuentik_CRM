@@ -1,1 +1,8 @@
 .worktrees/
+node_modules/
+.next/
+.vercel/
+.env*.local
+supabase/.temp/
+playwright-report/
+test-results/
