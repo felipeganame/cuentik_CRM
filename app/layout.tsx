@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Locaria — CRM de alquileres',
+  title: 'Cuentik CRM — CRM de alquileres',
   description: 'CRM de alquileres para inmobiliarias de Córdoba',
 };
 

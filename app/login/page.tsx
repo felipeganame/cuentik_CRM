@@ -13,7 +13,7 @@ export default function LoginPage() {
       <div style={{ width: 380, background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 14, padding: '36px 32px', boxShadow: '0 4px 24px rgba(20,20,30,.06)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
           <div style={{ width: 30, height: 30, borderRadius: 8, background: 'oklch(55% 0.16 250)' }} />
-          <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-.01em' }}>Locaria</div>
+          <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-.01em' }}>Cuentik CRM</div>
         </div>
         <div style={{ fontSize: 13, color: 'oklch(50% 0.01 255)', marginBottom: 28 }}>CRM de alquileres · Córdoba</div>
         <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
