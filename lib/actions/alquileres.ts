@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { mesActualLabel } from '@/lib/types';
 
@@ -219,5 +218,5 @@ export async function createAlquiler(input: {
   if (pagoError) throw pagoError;
 
   revalidatePath('/dashboard');
-  redirect('/dashboard');
+  return { id: alquiler.id as string };
 }

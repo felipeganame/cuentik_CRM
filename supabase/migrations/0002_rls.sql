@@ -102,10 +102,17 @@ alter table public.contactos enable row level security;
 
 create policy "contactos insert authenticated" on public.contactos
   for insert with check (auth.uid() is not null);
+-- The "not exists ... alquiler_partes" clause covers the moment right after
+-- INSERT ... RETURNING (Supabase's .insert().select()): Postgres re-checks the
+-- SELECT policy on the new row as part of RETURNING, and the alquiler_partes
+-- link for a just-created contacto doesn't exist yet (it's the very next
+-- insert in the same transaction). Orphaned contactos are otherwise harmless.
 create policy "contactos select tenant" on public.contactos
   for select using (public.is_superadmin() or exists (
     select 1 from public.alquiler_partes ap join public.alquileres a on a.id = ap.alquiler_id
       where ap.contacto_id = contactos.id and a.inmobiliaria_id = public.my_inmobiliaria_id()
+  ) or not exists (
+    select 1 from public.alquiler_partes ap where ap.contacto_id = contactos.id
   ));
 create policy "contactos update tenant" on public.contactos
   for update using (public.is_superadmin() or exists (
