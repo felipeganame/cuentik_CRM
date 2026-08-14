@@ -7,8 +7,8 @@ test('alquiler detail tabs and servicio toggle work', async ({ page }) => {
   await page.getByRole('button', { name: 'Ingresar' }).click();
   await page.getByRole('link', { name: 'Ver →' }).first().click();
 
-  await expect(page.getByText('Locador')).toBeVisible();
-  await expect(page.getByText('Locatario')).toBeVisible();
+  await expect(page.getByText('Locador', { exact: true })).toBeVisible();
+  await expect(page.getByText('Locatario', { exact: true })).toBeVisible();
 
   await page.getByRole('link', { name: 'Servicios' }).click();
   await expect(page).toHaveURL(/tab=servicios/);

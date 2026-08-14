@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { logout } from './actions';
+import { NavLinks } from './nav-links';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -34,9 +35,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Locaria</div>
         </div>
         <div style={{ fontSize: 12, color: 'oklch(55% 0.02 258)', padding: '0 6px 22px' }}>{inmobiliariaNombre}</div>
-        <div style={{ background: 'oklch(28% 0.03 255)', color: '#fff', fontSize: 13.5, fontWeight: 600, padding: '9px 10px', borderRadius: 8, marginBottom: 2 }}>
-          Alquileres
-        </div>
+        <NavLinks />
         <div style={{ flex: 1 }} />
         <form action={logout}>
           <button

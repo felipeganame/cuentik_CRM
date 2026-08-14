@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "seed": "tsx scripts/seed.ts",
+    "pretest:e2e": "supabase db reset --local && npm run seed",
     "test:e2e": "playwright test"
   },
   "dependencies": {
