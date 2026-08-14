@@ -1,0 +1,123 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { mesActualLabel, type Alquiler, type AlquilerParte, type Contacto, type PagoHistorial, type Propiedad, type Servicio } from './types';
+
+export type AlquilerListItem = Alquiler & {
+  propiedadPrincipal: Propiedad | null;
+  locador: Contacto | null;
+  locatario: Contacto | null;
+  estadoPagoMesActual: 'pagado' | 'pendiente' | 'vencido';
+  serviciosPendientes: number;
+};
+
+export async function listAlquileres(supabase: SupabaseClient): Promise<AlquilerListItem[]> {
+  const { data: alquileres, error } = await supabase
+    .from('alquileres')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  if (!alquileres || alquileres.length === 0) return [];
+
+  const alquilerIds = alquileres.map((a) => a.id);
+
+  const [{ data: propiedades }, { data: partes }, { data: historial }] = await Promise.all([
+    supabase.from('propiedades').select('*').in('alquiler_id', alquilerIds),
+    supabase
+      .from('alquiler_partes')
+      .select('*, contacto:contactos(*)')
+      .in('alquiler_id', alquilerIds),
+    supabase.from('pagos_historial').select('*').in('alquiler_id', alquilerIds).eq('mes', mesActualLabel()),
+  ]);
+
+  const propiedadesByAlquiler = new Map<string, Propiedad[]>();
+  for (const p of propiedades ?? []) {
+    const list = propiedadesByAlquiler.get(p.alquiler_id) ?? [];
+    list.push(p);
+    propiedadesByAlquiler.set(p.alquiler_id, list);
+  }
+
+  const partesByAlquiler = new Map<string, AlquilerParte[]>();
+  for (const parte of (partes ?? []) as AlquilerParte[]) {
+    const list = partesByAlquiler.get(parte.alquiler_id) ?? [];
+    list.push(parte);
+    partesByAlquiler.set(parte.alquiler_id, list);
+  }
+
+  const historialByAlquiler = new Map<string, PagoHistorial>();
+  for (const h of (historial ?? []) as PagoHistorial[]) {
+    historialByAlquiler.set(h.alquiler_id, h);
+  }
+
+  const propiedadIds = (propiedades ?? []).map((p) => p.id);
+  const { data: servicios } = propiedadIds.length
+    ? await supabase.from('servicios').select('propiedad_id, activo, pagado_mes_actual').in('propiedad_id', propiedadIds)
+    : { data: [] as { propiedad_id: string; activo: boolean; pagado_mes_actual: boolean }[] };
+
+  const propiedadToAlquiler = new Map<string, string>();
+  for (const p of propiedades ?? []) propiedadToAlquiler.set(p.id, p.alquiler_id);
+
+  const serviciosPendientesByAlquiler = new Map<string, number>();
+  for (const sv of servicios ?? []) {
+    if (!sv.activo || sv.pagado_mes_actual) continue;
+    const alquilerId = propiedadToAlquiler.get(sv.propiedad_id);
+    if (!alquilerId) continue;
+    serviciosPendientesByAlquiler.set(alquilerId, (serviciosPendientesByAlquiler.get(alquilerId) ?? 0) + 1);
+  }
+
+  return alquileres.map((a) => {
+    const propList = propiedadesByAlquiler.get(a.id) ?? [];
+    const parteList = partesByAlquiler.get(a.id) ?? [];
+    const locador = parteList.find((p) => p.rol === 'locador')?.contacto ?? null;
+    const locatario = parteList.find((p) => p.rol === 'locatario')?.contacto ?? null;
+    return {
+      ...a,
+      propiedadPrincipal: propList[0] ?? null,
+      locador,
+      locatario,
+      estadoPagoMesActual: historialByAlquiler.get(a.id)?.estado ?? 'pendiente',
+      serviciosPendientes: serviciosPendientesByAlquiler.get(a.id) ?? 0,
+    };
+  });
+}
+
+export type AlquilerDetail = Alquiler & {
+  propiedades: Propiedad[];
+  locador: Contacto | null;
+  locatario: Contacto | null;
+  garantes: Contacto[];
+  servicios: (Servicio & { propiedad: Propiedad | null })[];
+  historial: PagoHistorial[];
+  estadoPagoMesActual: 'pagado' | 'pendiente' | 'vencido';
+};
+
+export async function getAlquilerDetail(supabase: SupabaseClient, alquilerId: string): Promise<AlquilerDetail | null> {
+  const { data: alquiler, error } = await supabase.from('alquileres').select('*').eq('id', alquilerId).single();
+  if (error || !alquiler) return null;
+
+  const [{ data: propiedades }, { data: partes }, { data: historial }] = await Promise.all([
+    supabase.from('propiedades').select('*').eq('alquiler_id', alquilerId),
+    supabase.from('alquiler_partes').select('*, contacto:contactos(*)').eq('alquiler_id', alquilerId),
+    supabase.from('pagos_historial').select('*').eq('alquiler_id', alquilerId).order('mes', { ascending: true }),
+  ]);
+
+  const propiedadIds = (propiedades ?? []).map((p) => p.id);
+  const { data: servicios } = propiedadIds.length
+    ? await supabase.from('servicios').select('*').in('propiedad_id', propiedadIds)
+    : { data: [] as Servicio[] };
+
+  const propiedadById = new Map((propiedades ?? []).map((p) => [p.id, p]));
+  const parteList = (partes ?? []) as AlquilerParte[];
+
+  const mesActual = mesActualLabel();
+  const historialActual = (historial ?? []).find((h) => h.mes === mesActual);
+
+  return {
+    ...alquiler,
+    propiedades: propiedades ?? [],
+    locador: parteList.find((p) => p.rol === 'locador')?.contacto ?? null,
+    locatario: parteList.find((p) => p.rol === 'locatario')?.contacto ?? null,
+    garantes: parteList.filter((p) => p.rol === 'garante').map((p) => p.contacto).filter(Boolean) as Contacto[],
+    servicios: (servicios ?? []).map((sv) => ({ ...sv, propiedad: propiedadById.get(sv.propiedad_id) ?? null })),
+    historial: historial ?? [],
+    estadoPagoMesActual: historialActual?.estado ?? 'pendiente',
+  };
+}
