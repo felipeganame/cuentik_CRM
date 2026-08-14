@@ -79,6 +79,8 @@ export async function listAlquileres(supabase: SupabaseClient): Promise<Alquiler
   });
 }
 
+export type FotoConUrl = { id: string; propiedadId: string; url: string };
+
 export type AlquilerDetail = Alquiler & {
   propiedades: Propiedad[];
   locador: Contacto | null;
@@ -87,6 +89,8 @@ export type AlquilerDetail = Alquiler & {
   servicios: (Servicio & { propiedad: Propiedad | null })[];
   historial: PagoHistorial[];
   estadoPagoMesActual: 'pagado' | 'pendiente' | 'vencido';
+  fotos: FotoConUrl[];
+  contratoUrl: string | null;
 };
 
 export async function getAlquilerDetail(supabase: SupabaseClient, alquilerId: string): Promise<AlquilerDetail | null> {
@@ -110,12 +114,30 @@ export async function getAlquilerDetail(supabase: SupabaseClient, alquilerId: st
   const mesActual = mesActualLabel();
   const historialActual = (historial ?? []).find((h) => h.mes === mesActual);
 
+  const { data: fotoRows } = propiedadIds.length
+    ? await supabase.from('propiedad_fotos').select('*').in('propiedad_id', propiedadIds)
+    : { data: [] as { id: string; propiedad_id: string; storage_path: string }[] };
+
+  const fotos: FotoConUrl[] = [];
+  for (const foto of fotoRows ?? []) {
+    const { data: signed } = await supabase.storage.from('propiedad-fotos').createSignedUrl(foto.storage_path, 3600);
+    if (signed?.signedUrl) fotos.push({ id: foto.id, propiedadId: foto.propiedad_id, url: signed.signedUrl });
+  }
+
+  let contratoUrl: string | null = null;
+  if (alquiler.contrato_pdf_path) {
+    const { data: signed } = await supabase.storage.from('contratos').createSignedUrl(alquiler.contrato_pdf_path, 3600);
+    contratoUrl = signed?.signedUrl ?? null;
+  }
+
   return {
     ...alquiler,
     propiedades: propiedades ?? [],
     locador: parteList.find((p) => p.rol === 'locador')?.contacto ?? null,
     locatario: parteList.find((p) => p.rol === 'locatario')?.contacto ?? null,
     garantes: parteList.filter((p) => p.rol === 'garante').map((p) => p.contacto).filter(Boolean) as Contacto[],
+    fotos,
+    contratoUrl,
     servicios: (servicios ?? []).map((sv) => ({ ...sv, propiedad: propiedadById.get(sv.propiedad_id) ?? null })),
     historial: historial ?? [],
     estadoPagoMesActual: historialActual?.estado ?? 'pendiente',

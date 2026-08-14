@@ -4,6 +4,28 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { mesActualLabel } from '@/lib/types';
 
+export async function recordFotoUpload(propiedadId: string, alquilerId: string, storagePath: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from('propiedad_fotos').insert({ propiedad_id: propiedadId, storage_path: storagePath });
+  if (error) throw error;
+  revalidatePath(`/dashboard/alquileres/${alquilerId}`);
+}
+
+export async function deleteFoto(fotoId: string, storagePath: string, alquilerId: string) {
+  const supabase = await createClient();
+  await supabase.storage.from('propiedad-fotos').remove([storagePath]);
+  const { error } = await supabase.from('propiedad_fotos').delete().eq('id', fotoId);
+  if (error) throw error;
+  revalidatePath(`/dashboard/alquileres/${alquilerId}`);
+}
+
+export async function recordContratoUpload(alquilerId: string, storagePath: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from('alquileres').update({ contrato_pdf_path: storagePath }).eq('id', alquilerId);
+  if (error) throw error;
+  revalidatePath(`/dashboard/alquileres/${alquilerId}`);
+}
+
 export async function toggleServicioActivo(servicioId: string, alquilerId: string) {
   const supabase = await createClient();
   const { data: servicio, error: fetchError } = await supabase

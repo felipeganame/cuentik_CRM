@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getAlquilerDetail } from '@/lib/queries';
 import { estadoPagoLabel, statusStyle } from '@/lib/types';
 import { cambiarPagaServicio, toggleMesActual, toggleServicioActivo, toggleServicioPagado, updateCondiciones } from '@/lib/actions/alquileres';
+import { ContratoUploader, FotosUploader } from './fotos-uploader';
 
 const TABS = [
   { key: 'resumen', label: 'Resumen' },
@@ -73,7 +74,7 @@ export default async function AlquilerDetailPage({
       {tab === 'resumen' && <TabResumen alquilerId={id} detalle={detalle} />}
       {tab === 'servicios' && <TabServicios alquilerId={id} detalle={detalle} />}
       {tab === 'pagos' && <TabPagos alquilerId={id} detalle={detalle} />}
-      {tab === 'fotos' && <TabFotos />}
+      {tab === 'fotos' && <TabFotos alquilerId={id} detalle={detalle} />}
     </div>
   );
 }
@@ -262,10 +263,23 @@ function TabPagos({ alquilerId, detalle }: { alquilerId: string; detalle: Awaite
   );
 }
 
-function TabFotos() {
+function TabFotos({ alquilerId, detalle }: { alquilerId: string; detalle: Awaited<ReturnType<typeof getAlquilerDetail>> & object }) {
+  const propiedadPrincipal = detalle.propiedades[0];
   return (
-    <div style={{ fontSize: 13.5, color: 'oklch(52% 0.01 255)' }}>
-      Carga de fotos y contrato próximamente.
+    <div>
+      <div style={{ fontSize: 11.5, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', marginBottom: 4 }}>
+        Fotos de la propiedad
+      </div>
+      <div style={{ fontSize: 11.5, color: 'oklch(55% 0.01 255)', marginBottom: 12 }}>Hasta 15 imágenes JPEG, máximo 1 MB cada una</div>
+      <div style={{ marginBottom: 26 }}>
+        {propiedadPrincipal ? (
+          <FotosUploader alquilerId={alquilerId} propiedadId={propiedadPrincipal.id} inmobiliariaId={detalle.inmobiliaria_id} fotos={detalle.fotos} />
+        ) : (
+          <div style={{ fontSize: 13, color: 'oklch(55% 0.01 255)' }}>Este alquiler no tiene una propiedad asociada.</div>
+        )}
+      </div>
+      <div style={{ fontSize: 11.5, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', marginBottom: 12 }}>Contrato</div>
+      <ContratoUploader alquilerId={alquilerId} inmobiliariaId={detalle.inmobiliaria_id} contratoUrl={detalle.contratoUrl} />
     </div>
   );
 }
