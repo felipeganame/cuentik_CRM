@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body{margin:0;font-family:'Source Sans 3',system-ui,sans-serif;background:oklch(97% 0.004 250);-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:oklch(85% 0.006 250);border-radius:4px}
+a{color:oklch(55% 0.16 250)}
+a:hover{color:oklch(46% 0.16 250)}
+</style>
+</helmet>
+
+<div style="position:relative;min-height:100vh;color:oklch(23% 0.012 255);font-size:14px">
+
+<div style="position:fixed;top:14px;right:14px;z-index:999;display:flex;gap:6px;background:oklch(100% 0 0);border:1px solid oklch(88% 0.007 250);border-radius:8px;padding:5px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+<button onClick="{{ goToLogin }}" style="border:none;background:none;padding:6px 10px;border-radius:6px;font-size:11.5px;color:oklch(50% 0.01 255);cursor:pointer">Login</button>
+<button onClick="{{ goToSuperadmin }}" style="border:none;background:none;padding:6px 10px;border-radius:6px;font-size:11.5px;color:oklch(50% 0.01 255);cursor:pointer">Superadmin</button>
+<button onClick="{{ goToDashboard }}" style="border:none;background:none;padding:6px 10px;border-radius:6px;font-size:11.5px;color:oklch(50% 0.01 255);cursor:pointer">Inmobiliaria</button>
+</div>
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px">
+<div style="width:380px;background:oklch(100% 0 0);border:1px solid oklch(90% 0.007 250);border-radius:14px;padding:36px 32px;box-shadow:0 4px 24px rgba(20,20,30,.06)">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:6px">
+<div style="width:30px;height:30px;border-radius:8px;background:oklch(55% 0.16 250)"></div>
+<div style="font-size:19px;font-weight:700;letter-spacing:-.01em">Locaria</div>
+</div>
+<div style="font-size:13px;color:oklch(50% 0.01 255);margin-bottom:28px">CRM de alquileres · Córdoba</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px;color:oklch(35% 0.01 255)">Email</div>
+<input type="text" value="marina@delcentro.com.ar" style="width:100%;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px;color:oklch(30% 0.01 255)"/>
+</div>
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px;color:oklch(35% 0.01 255)">Contraseña</div>
+<input type="password" value="********" style="width:100%;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px;color:oklch(30% 0.01 255)"/>
+</div>
+<button onClick="{{ goToDashboard }}" style="margin-top:6px;width:100%;padding:11px;border:none;border-radius:8px;background:oklch(55% 0.16 250);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Ingresar</button>
+</div>
+<div style="display:flex;align-items:center;gap:10px;margin:22px 0 16px">
+<div style="flex:1;height:1px;background:oklch(90% 0.007 250)"></div>
+<div style="font-size:11px;color:oklch(65% 0.008 255)">acceso demo</div>
+<div style="flex:1;height:1px;background:oklch(90% 0.007 250)"></div>
+</div>
+<div style="display:flex;gap:8px">
+<button onClick="{{ goToSuperadmin }}" style="flex:1;padding:9px;border:1px solid oklch(87% 0.007 250);border-radius:8px;background:#fff;font-size:12.5px;font-weight:600;color:oklch(35% 0.01 255);cursor:pointer">Como Superadmin</button>
+<button onClick="{{ goToDashboard }}" style="flex:1;padding:9px;border:1px solid oklch(87% 0.007 250);border-radius:8px;background:#fff;font-size:12.5px;font-weight:600;color:oklch(35% 0.01 255);cursor:pointer">Como Inmobiliaria</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSuperadmin }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;min-height:100vh">
+<div style="width:230px;flex:none;background:oklch(19% 0.02 258);color:oklch(85% 0.01 258);display:flex;flex-direction:column;padding:22px 16px">
+<div style="display:flex;align-items:center;gap:9px;padding:0 6px 24px">
+<div style="width:26px;height:26px;border-radius:7px;background:oklch(55% 0.16 250)"></div>
+<div style="font-size:16px;font-weight:700;color:#fff">Locaria</div>
+</div>
+<div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:oklch(55% 0.02 258);text-transform:uppercase;padding:0 6px 8px">Superadmin</div>
+<div style="background:oklch(28% 0.03 255);color:#fff;font-size:13.5px;font-weight:600;padding:9px 10px;border-radius:8px;margin-bottom:2px">Inmobiliarias</div>
+<div style="font-size:13.5px;color:oklch(50% 0.02 258);padding:9px 10px;border-radius:8px">Facturación <span style="font-size:10px;background:oklch(28% 0.02 258);padding:2px 6px;border-radius:10px;margin-left:4px">pronto</span></div>
+<div style="font-size:13.5px;color:oklch(50% 0.02 258);padding:9px 10px;border-radius:8px">Configuración</div>
+<div style="flex:1"></div>
+<div style="border-top:1px solid oklch(28% 0.02 258);padding-top:14px;display:flex;align-items:center;gap:9px">
+<div style="width:28px;height:28px;border-radius:50%;background:oklch(40% 0.02 258);flex:none"></div>
+<div style="font-size:12.5px;color:oklch(75% 0.01 258)">Vos (superadmin)</div>
+</div>
+</div>
+<div style="flex:1;padding:36px 40px;overflow:auto">
+<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px">
+<div>
+<div style="font-size:22px;font-weight:700">Inmobiliarias</div>
+<div style="font-size:13.5px;color:oklch(50% 0.01 255);margin-top:4px">Gestioná las cuentas que usan Locaria</div>
+</div>
+<button onClick="{{ goToCrearInmobiliaria }}" style="padding:10px 16px;border:none;border-radius:8px;background:oklch(55% 0.16 250);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer">+ Nueva inmobiliaria</button>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px">
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:16px 18px">
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);font-weight:600;text-transform:uppercase;letter-spacing:.03em">Inmobiliarias activas</div>
+<div style="font-size:26px;font-weight:700;margin-top:6px">{{ kpiActivas }}</div>
+</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:16px 18px">
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);font-weight:600;text-transform:uppercase;letter-spacing:.03em">Propiedades gestionadas</div>
+<div style="font-size:26px;font-weight:700;margin-top:6px">{{ kpiPropiedades }}</div>
+</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:16px 18px">
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);font-weight:600;text-transform:uppercase;letter-spacing:.03em">Alquileres activos</div>
+<div style="font-size:26px;font-weight:700;margin-top:6px">{{ kpiAlquileres }}</div>
+</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:16px 18px">
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);font-weight:600;text-transform:uppercase;letter-spacing:.03em">Cobros pendientes (vencen día 20)</div>
+<div style="font-size:26px;font-weight:700;margin-top:6px;color:oklch(56% 0.19 25)">{{ kpiCobrosPendientes }}</div>
+</div>
+</div>
+
+<div style="font-size:12.5px;color:oklch(50% 0.01 255);margin-bottom:10px">Cobro mensual a cada inmobiliaria: $1.000 por propiedad gestionada. Vence el día 20 de cada mes. Por ahora se registra manualmente.</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;overflow:hidden">
+<div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr 1.1fr 0.9fr 0.9fr 0.7fr;gap:12px;padding:12px 18px;font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid oklch(92% 0.006 250)">
+<div>Inmobiliaria</div><div>Contacto</div><div>Propiedades / alquileres</div><div>Cobro mensual</div><div>Pago</div><div>Cuenta</div><div></div>
+</div>
+<sc-for list="{{ inmobiliarias }}" as="i" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr 1.1fr 0.9fr 0.9fr 0.7fr;gap:12px;align-items:center;padding:14px 18px;border-bottom:1px solid oklch(94% 0.005 250);font-size:13.5px">
+<div style="font-weight:600">{{ i.nombre }}</div>
+<div style="color:oklch(48% 0.01 255)">{{ i.contacto }}</div>
+<div>
+<div>{{ i.propiedadesUsadas }} propiedades</div>
+<div style="font-size:12px;color:oklch(52% 0.01 255)">{{ i.alquileresActivos }} alquileres</div>
+</div>
+<div>
+<div style="font-weight:600">{{ i.cobroTexto }}</div>
+<div style="font-size:12px;color:oklch(52% 0.01 255)">vence día 20</div>
+</div>
+<div><button onClick="{{ i.toggleCobro }}" style="border:none;cursor:pointer;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:{{ i.cobroBg }};color:{{ i.cobroColor }}">{{ i.cobroEstado }}</button></div>
+<div><span style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:{{ i.estadoBg }};color:{{ i.estadoColor }}">{{ i.estado }}</span></div>
+<div style="text-align:right"><button onClick="{{ i.abrirEdicion }}" style="border:none;background:none;color:oklch(55% 0.16 250);font-weight:600;font-size:13px;cursor:pointer">Editar</button></div>
+</div>
+</sc-for>
+</div>
+
+<sc-if value="{{ mostrarEdicionInmobiliaria }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(20,20,30,.35);display:flex;align-items:center;justify-content:center;z-index:1000">
+<div style="width:440px;background:#fff;border-radius:14px;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.2)">
+<div style="font-size:17px;font-weight:700;margin-bottom:4px">Editar {{ edicionInmobiliaria.nombre }}</div>
+<div style="font-size:12.5px;color:oklch(50% 0.01 255);margin-bottom:20px">Ajustes administrativos de la cuenta</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Restablecer contraseña</div>
+<div style="display:flex;gap:8px">
+<input type="text" value="{{ edicionInmobiliaria.nuevaPassword }}" style="flex:1;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px"/>
+<button onClick="{{ edicionInmobiliaria.generarPassword }}" style="padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Generar</button>
+</div>
+<div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-top:5px">Se le compartirá a la inmobiliaria por fuera del sistema.</div>
+</div>
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Límite de propiedades</div>
+<input type="number" value="{{ edicionInmobiliaria.limitePropiedades }}" onChange="{{ edicionInmobiliaria.cambiarLimite }}" style="width:100%;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px"/>
+<div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-top:5px">Actualmente usa {{ edicionInmobiliaria.propiedadesUsadas }} de {{ edicionInmobiliaria.limitePropiedades }}.</div>
+</div>
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Estado de la cuenta</div>
+<div style="display:flex;gap:8px">
+<button onClick="{{ edicionInmobiliaria.marcarActivo }}" style="flex:1;padding:9px;border:1px solid {{ edicionInmobiliaria.bordeActivo }};border-radius:8px;background:{{ edicionInmobiliaria.bgActivo }};color:{{ edicionInmobiliaria.fgActivo }};font-size:13px;font-weight:600;cursor:pointer">Activo</button>
+<button onClick="{{ edicionInmobiliaria.marcarSuspendido }}" style="flex:1;padding:9px;border:1px solid {{ edicionInmobiliaria.bordeSuspendido }};border-radius:8px;background:{{ edicionInmobiliaria.bgSuspendido }};color:{{ edicionInmobiliaria.fgSuspendido }};font-size:13px;font-weight:600;cursor:pointer">Suspendido</button>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:10px;margin-top:26px">
+<button onClick="{{ cerrarEdicionInmobiliaria }}" style="flex:1;padding:11px;border:1px solid oklch(87% 0.007 250);border-radius:8px;background:#fff;font-size:14px;font-weight:600;cursor:pointer">Cancelar</button>
+<button onClick="{{ cerrarEdicionInmobiliaria }}" style="flex:1;padding:11px;border:none;border-radius:8px;background:oklch(55% 0.16 250);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Guardar cambios</button>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCrearInmobiliaria }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:60px 24px;background:oklch(97% 0.004 250)">
+<div style="width:520px;background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:14px;padding:32px">
+<button onClick="{{ goToSuperadmin }}" style="border:none;background:none;color:oklch(50% 0.01 255);font-size:13px;cursor:pointer;padding:0;margin-bottom:18px">← Volver a inmobiliarias</button>
+<div style="font-size:19px;font-weight:700;margin-bottom:22px">Nueva inmobiliaria</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Nombre de la inmobiliaria</div>
+<input type="text" placeholder="Ej: Inmobiliaria del Centro" style="width:100%;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px"/>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Email de contacto</div>
+<input type="text" placeholder="contacto@inmobiliaria.com" style="width:100%;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px"/>
+</div>
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Teléfono</div>
+<input type="text" placeholder="351 555 0000" style="width:100%;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px"/>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Límite de propiedades</div>
+<input type="number" value="20" style="width:100%;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px"/>
+</div>
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Vencimiento de cuenta</div>
+<input type="date" value="2027-01-01" style="width:100%;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px"/>
+</div>
+</div>
+<div>
+<div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Estado</div>
+<select style="width:100%;padding:10px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:14px">
+<option>Activo</option>
+<option>Suspendido</option>
+</select>
+</div>
+</div>
+<div style="display:flex;gap:10px;margin-top:26px">
+<button onClick="{{ goToSuperadmin }}" style="flex:1;padding:11px;border:1px solid oklch(87% 0.007 250);border-radius:8px;background:#fff;font-size:14px;font-weight:600;cursor:pointer">Cancelar</button>
+<button onClick="{{ crearInmobiliaria }}" style="flex:1;padding:11px;border:none;border-radius:8px;background:oklch(55% 0.16 250);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Crear inmobiliaria</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;min-height:100vh">
+<div style="width:230px;flex:none;background:oklch(19% 0.02 258);color:oklch(85% 0.01 258);display:flex;flex-direction:column;padding:22px 16px">
+<div style="display:flex;align-items:center;gap:9px;padding:0 6px 4px">
+<div style="width:26px;height:26px;border-radius:7px;background:oklch(55% 0.16 250)"></div>
+<div style="font-size:16px;font-weight:700;color:#fff">Locaria</div>
+</div>
+<div style="font-size:12px;color:oklch(55% 0.02 258);padding:0 6px 22px">{{ perfilInmobiliaria }}</div>
+<div onClick="{{ goToDashboard }}" style="background:{{ navAlquileresBg }};color:{{ navAlquileresColor }};font-size:13.5px;font-weight:600;padding:9px 10px;border-radius:8px;margin-bottom:2px;cursor:pointer">Alquileres</div>
+<div onClick="{{ goToConfiguracion }}" style="background:{{ navConfigBg }};color:{{ navConfigColor }};font-size:13.5px;padding:9px 10px;border-radius:8px;cursor:pointer">Configuración</div>
+<div style="flex:1"></div>
+<div onClick="{{ goToLogin }}" style="border-top:1px solid oklch(28% 0.02 258);padding-top:14px;display:flex;align-items:center;gap:9px;cursor:pointer" title="Cerrar sesión">
+<image-slot id="inmobiliaria-logo" shape="circle" placeholder="Logo" style="width:28px;height:28px;flex:none"></image-slot>
+<div style="font-size:12.5px;color:oklch(75% 0.01 258)">{{ perfilNombre }}</div>
+</div>
+</div>
+<div style="flex:1;padding:36px 40px;overflow:auto">
+<sc-if value="{{ isDashboardHome }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px">
+<div>
+<div style="font-size:22px;font-weight:700">Tus alquileres</div>
+<div style="font-size:13.5px;color:oklch(50% 0.01 255);margin-top:4px">Todos los contratos que administrás</div>
+</div>
+<button onClick="{{ goToNuevoAlquiler }}" style="padding:10px 16px;border:none;border-radius:8px;background:oklch(55% 0.16 250);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer">+ Nuevo alquiler</button>
+</div>
+
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:18px">
+<input type="text" value="{{ dashboardSearch }}" onChange="{{ cambiarDashboardSearch }}" placeholder="Buscar por dirección, locatario o locador…" style="flex:1;max-width:360px;padding:9px 12px;border:1px solid oklch(87% 0.007 250);border-radius:8px;font-size:13.5px;background:#fff"/>
+<sc-for list="{{ filtrosEstado }}" as="f" hint-placeholder-count="4">
+<button onClick="{{ f.aplicar }}" style="padding:8px 14px;border:1px solid {{ f.borde }};border-radius:20px;background:{{ f.bg }};color:{{ f.color }};font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap">{{ f.label }}</button>
+</sc-for>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px">
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:16px 18px">
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);font-weight:600;text-transform:uppercase;letter-spacing:.03em">Alquileres activos</div>
+<div style="font-size:26px;font-weight:700;margin-top:6px">6</div>
+</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:16px 18px">
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);font-weight:600;text-transform:uppercase;letter-spacing:.03em">Con deuda</div>
+<div style="font-size:26px;font-weight:700;margin-top:6px;color:oklch(56% 0.19 25)">2</div>
+</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:16px 18px">
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);font-weight:600;text-transform:uppercase;letter-spacing:.03em">Servicios pendientes</div>
+<div style="font-size:26px;font-weight:700;margin-top:6px;color:oklch(72% 0.14 80)">6</div>
+</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:16px 18px">
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);font-weight:600;text-transform:uppercase;letter-spacing:.03em">Contratos por vencer</div>
+<div style="font-size:26px;font-weight:700;margin-top:6px">1</div>
+</div>
+</div>
+
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;overflow:hidden">
+<div style="display:grid;grid-template-columns:1.8fr 1.2fr 1.2fr 1fr 1fr 1.1fr 0.9fr;padding:12px 18px;font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid oklch(92% 0.006 250)">
+<div>Propiedad</div><div>Locatario</div><div>Locador</div><div>Monto</div><div>Estado</div><div>Servicios</div><div></div>
+</div>
+<sc-for list="{{ alquileres }}" as="a" hint-placeholder-count="6">
+<div style="display:grid;grid-template-columns:1.8fr 1.2fr 1.2fr 1fr 1fr 1.1fr 0.9fr;align-items:center;padding:14px 18px;border-bottom:1px solid oklch(94% 0.005 250);font-size:13.5px;background:{{ a.rowBg }}">
+<div>
+<div style="font-weight:600">{{ a.direccion }}</div>
+<div style="font-size:12px;color:oklch(52% 0.01 255)">{{ a.localidad }}</div>
+</div>
+<div>{{ a.locatarioInfo.nombre }}</div>
+<div>{{ a.locadorInfo.nombre }}</div>
+<div style="font-weight:600">{{ a.montoTexto }}</div>
+<div><span style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:{{ a.estadoBg }};color:{{ a.estadoColor }}">{{ a.estadoPago }}</span></div>
+<div style="color:{{ a.serviciosColor }};font-size:13px">{{ a.serviciosTexto }}</div>
+<div style="text-align:right"><button onClick="{{ a.verDetalle }}" style="border:none;background:none;color:oklch(55% 0.16 250);font-weight:600;font-size:13px;cursor:pointer">Ver →</button></div>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ sinResultados }}" hint-placeholder-val="{{ false }}">
+<div style="text-align:center;padding:40px;color:oklch(52% 0.01 255);font-size:13.5px">No encontramos alquileres que coincidan con la búsqueda o el filtro.</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ isDashboardConfig }}" hint-placeholder-val="{{ false }}">
+<div style="font-size:22px;font-weight:700;margin-bottom:22px">Configuración</div>
+<div style="display:flex;flex-direction:column;gap:20px;max-width:520px">
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:20px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:14px">Perfil de la inmobiliaria</div>
+<div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">
+<image-slot id="inmobiliaria-logo" shape="circle" placeholder="Logo" style="width:64px;height:64px"></image-slot>
+<div style="font-size:12px;color:oklch(55% 0.01 255)">Se muestra en el menú lateral y en tus documentos.</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Nombre de la inmobiliaria</div><input type="text" value="{{ perfilInmobiliaria }}" onChange="{{ cambiarPerfilInmobiliaria }}" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Nombre de contacto</div><input type="text" value="{{ perfilNombre }}" onChange="{{ cambiarPerfilNombre }}" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Email de contacto</div><input type="text" value="marina@delcentro.com.ar" disabled="true" style="width:100%;padding:9px 11px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px;background:oklch(96% 0.004 250);color:oklch(50% 0.01 255)"/><div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-top:5px">Es el email con el que iniciás sesión, no se puede modificar acá.</div></div>
+<div>
+<div style="font-size:12px;font-weight:600;margin-bottom:6px">Teléfono</div>
+<div style="display:flex;gap:8px">
+<select style="padding:9px 8px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px;width:120px">
+<option>🇦🇷 +54</option>
+<option>🇺🇾 +598</option>
+<option>🇨🇱 +56</option>
+<option>🇧🇷 +55</option>
+</select>
+<input type="text" value="351" placeholder="Cód. área" style="width:80px;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+<input type="text" value="5550000" placeholder="Número" style="flex:1;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+</div>
+</div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:20px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:14px">Seguridad</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Contraseña actual</div><input type="password" placeholder="••••••••" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Nueva contraseña</div><input type="password" placeholder="Elegí una nueva contraseña" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+</div>
+<button style="margin-top:16px;padding:10px 16px;border:none;border-radius:8px;background:oklch(55% 0.16 250);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer">Guardar cambios</button>
+</div>
+<button onClick="{{ goToLogin }}" style="align-self:flex-start;padding:10px 16px;border:1px solid oklch(87% 0.007 250);border-radius:8px;background:#fff;font-size:13.5px;font-weight:600;color:oklch(56% 0.19 25);cursor:pointer">Cerrar sesión</button>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isNuevoAlquiler }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;padding:36px 40px;background:oklch(97% 0.004 250)">
+<div style="max-width:840px;margin:0 auto">
+<button onClick="{{ goToDashboard }}" style="border:none;background:none;color:oklch(50% 0.01 255);font-size:13px;cursor:pointer;padding:0;margin-bottom:14px">← Cancelar y volver</button>
+<div style="font-size:22px;font-weight:700;margin-bottom:22px">Nuevo alquiler</div>
+
+<div style="display:flex;gap:0;margin-bottom:26px">
+<sc-for list="{{ steps }}" as="st" hint-placeholder-count="5">
+<div onClick="{{ st.goTo }}" style="flex:1;cursor:pointer;padding-bottom:10px;border-bottom:3px solid {{ st.lineColor }};text-align:center">
+<div style="font-size:11px;font-weight:700;color:{{ st.textColor }}">PASO {{ st.numero }}</div>
+<div style="font-size:12.5px;font-weight:600;color:{{ st.textColor }};margin-top:2px">{{ st.nombre }}</div>
+</div>
+</sc-for>
+</div>
+
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:14px;padding:30px;min-height:360px">
+
+<sc-if value="{{ isStep0 }}" hint-placeholder-val="{{ true }}">
+<div style="font-size:16px;font-weight:700;margin-bottom:18px">Propiedad(es) del alquiler</div>
+<div style="font-size:12.5px;color:oklch(50% 0.01 255);margin-bottom:18px">Un contrato puede incluir más de una propiedad (ej: depto + cochera) cuando tienen escrituras o servicios separados.</div>
+<sc-for list="{{ wizardPropiedades }}" as="p" hint-placeholder-count="2">
+<div style="border:1px solid oklch(90% 0.007 250);border-radius:10px;padding:18px;margin-bottom:14px">
+<div style="font-size:13px;font-weight:700;margin-bottom:12px;color:oklch(52% 0.01 255)">{{ p.etiqueta }}</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px">
+<div>
+<div style="font-size:12px;font-weight:600;margin-bottom:6px">Dirección</div>
+<input type="text" value="{{ p.direccion }}" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+</div>
+<div>
+<div style="font-size:12px;font-weight:600;margin-bottom:6px">Localidad</div>
+<select style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px">
+<option>{{ p.localidad }}</option>
+<option>Nueva Córdoba</option><option>Cerro de las Rosas</option><option>Centro</option><option>Alta Córdoba</option><option>Güemes</option>
+</select>
+</div>
+<div>
+<div style="font-size:12px;font-weight:600;margin-bottom:6px">Tipo</div>
+<select style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px">
+<option>{{ p.tipo }}</option>
+<option>Departamento</option><option>Casa</option><option>Cochera</option><option>Local</option><option>Oficina</option>
+</select>
+</div>
+</div>
+<div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:8px">Fotos de esta propiedad — hasta 15 imágenes JPEG, máximo 1 MB cada una</div>
+<image-slot id="{{ p.slotA }}" shape="rounded" radius="8" placeholder="Arrastrá o seleccioná hasta 15 fotos" style="width:100%;height:140px"></image-slot>
+</div>
+</sc-for>
+<button onClick="{{ agregarPropiedad }}" style="padding:9px 14px;border:1px dashed oklch(80% 0.01 250);border-radius:8px;background:none;font-size:12.5px;font-weight:600;color:oklch(52% 0.01 255);cursor:pointer">+ Agregar otra propiedad al mismo contrato</button>
+</sc-if>
+
+<sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ false }}">
+<div style="font-size:16px;font-weight:700;margin-bottom:18px">Locador y locatario</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+<div>
+<div style="font-size:12.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:12px">Locador (propietario)</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<input type="text" placeholder="Nombre completo" value="Elena Suárez" style="padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+<input type="text" placeholder="DNI / CUIT" value="27.451.902" style="padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+<div style="display:flex;gap:6px"><select style="padding:9px 6px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13px;width:76px"><option>🇦🇷 +54</option><option>🇺🇾 +598</option><option>🇨🇱 +56</option><option>🇧🇷 +55</option></select><input type="text" placeholder="Cod. área" value="351" style="width:64px;padding:9px 8px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/><input type="text" placeholder="Número" value="555 2210" style="flex:1;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<input type="text" placeholder="Email" value="elena.suarez@mail.com" style="padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+<input type="text" placeholder="Domicilio" value="Bv. Illia 245, Centro" style="padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+</div>
+</div>
+<div>
+<div style="font-size:12.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:12px">Locatario (inquilino)</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<input type="text" placeholder="Nombre completo" value="Fabián Torres" style="padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+<input type="text" placeholder="DNI / CUIT" value="33.980.114" style="padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+<div style="display:flex;gap:6px"><select style="padding:9px 6px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13px;width:76px"><option>🇦🇷 +54</option><option>🇺🇾 +598</option><option>🇨🇱 +56</option><option>🇧🇷 +55</option></select><input type="text" placeholder="Cod. área" value="351" style="width:64px;padding:9px 8px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/><input type="text" placeholder="Número" value="555 7788" style="flex:1;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<input type="text" placeholder="Email" value="fabian.torres@mail.com" style="padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+<input type="text" placeholder="Domicilio" value="Av. Colón 890, Alta Córdoba" style="padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+</div>
+</div>
+</div>
+<button style="margin-top:16px;padding:8px 12px;border:1px dashed oklch(80% 0.01 250);border-radius:8px;background:none;font-size:12.5px;font-weight:600;color:oklch(52% 0.01 255);cursor:pointer">+ Agregar otro locatario / garante</button>
+</sc-if>
+
+<sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+<div style="font-size:16px;font-weight:700;margin-bottom:18px">Condiciones de pago</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Monto del alquiler</div><input type="text" value="$185.000" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Día de pago</div><input type="number" value="10" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Método de pago</div><select style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"><option>Transferencia bancaria</option><option>Efectivo</option><option>Otro</option></select></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">CBU / Alias</div><input type="text" value="LOCARIA.CENTRO.3B" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Frecuencia de pago</div><select style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"><option>Mensual</option><option>Cada 2 meses</option><option>Cada 3 meses</option><option>Cada 4 meses</option><option>Anual</option></select></div>
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Duración (meses)</div><input type="number" value="24" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Fecha de inicio</div><input type="date" value="2025-03-10" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">Fecha de fin</div><input type="date" value="2027-03-10" style="width:100%;padding:9px 11px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+</div>
+<div style="margin-bottom:20px;border:1px solid oklch(90% 0.007 250);border-radius:10px;padding:16px">
+<div style="font-size:12px;font-weight:600;margin-bottom:10px">Actualización del monto</div>
+<div style="display:flex;gap:8px;margin-bottom:12px">
+<button onClick="{{ wizActualizacion.elegirPorcentaje }}" style="flex:1;padding:8px;border:1px solid {{ wizActualizacion.bordePorcentaje }};border-radius:7px;background:{{ wizActualizacion.bgPorcentaje }};color:{{ wizActualizacion.fgPorcentaje }};font-size:12.5px;font-weight:600;cursor:pointer">Porcentaje fijo</button>
+<button onClick="{{ wizActualizacion.elegirIndice }}" style="flex:1;padding:8px;border:1px solid {{ wizActualizacion.bordeIndice }};border-radius:7px;background:{{ wizActualizacion.bgIndice }};color:{{ wizActualizacion.fgIndice }};font-size:12.5px;font-weight:600;cursor:pointer">Índice</button>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+<div>
+<div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">{{ wizActualizacion.labelValor }}</div>
+<input type="text" value="{{ wizActualizacion.valor }}" onChange="{{ wizActualizacion.cambiarValor }}" placeholder="{{ wizActualizacion.placeholderValor }}" style="width:100%;padding:8px 10px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"/>
+</div>
+<div>
+<div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">Cada cuánto se actualiza</div>
+<select style="width:100%;padding:8px 10px;border:1px solid oklch(87% 0.007 250);border-radius:7px;font-size:13.5px"><option>Trimestral</option><option>Cuatrimestral</option><option>Semestral</option><option>Anual</option></select>
+</div>
+</div>
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);background:{{ wizActualizacion.notaBg }};padding:9px 12px;border-radius:7px">{{ wizActualizacion.nota }}</div>
+</div>
+<div style="font-size:12.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px">Contrato firmado</div>
+<div style="display:flex;align-items:center;gap:12px;border:1px solid oklch(88% 0.007 250);border-radius:10px;padding:14px 16px">
+<div style="width:36px;height:36px;border-radius:8px;background:oklch(94% 0.03 250);color:oklch(50% 0.14 250);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none">PDF</div>
+<div style="flex:1">
+<div style="font-size:13px;font-weight:600">Contrato_Alquiler_Depto3B.pdf</div>
+<div style="font-size:11.5px;color:oklch(55% 0.01 255)">Subido el 08/03/2025 · 1.2 MB</div>
+</div>
+<button style="padding:7px 12px;border:1px solid oklch(87% 0.007 250);border-radius:7px;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Reemplazar</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+<div style="font-size:16px;font-weight:700;margin-bottom:6px">Servicios de las propiedades</div>
+<div style="font-size:12.5px;color:oklch(50% 0.01 255);margin-bottom:18px">Definí qué servicios corresponden a cada propiedad, quién los paga y el número de referencia para identificarlos.</div>
+<div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1.3fr 0.6fr;padding:10px 4px;font-size:11px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid oklch(92% 0.006 250)">
+<div>Servicio</div><div>Propiedad</div><div>Paga</div><div>N° de referencia</div><div>Aplica</div>
+</div>
+<sc-for list="{{ wizardServicios }}" as="sv" hint-placeholder-count="6">
+<div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1.3fr 0.6fr;align-items:center;padding:10px 4px;border-bottom:1px solid oklch(94% 0.005 250)">
+<div style="font-size:13.5px;font-weight:600">{{ sv.nombre }}</div>
+<select style="padding:7px 9px;border:1px solid oklch(87% 0.007 250);border-radius:6px;font-size:12.5px"><option>{{ sv.propiedad }}</option><option>Depto 3B</option><option>Cochera 3B</option><option>Todas</option></select>
+<select style="padding:7px 9px;border:1px solid oklch(87% 0.007 250);border-radius:6px;font-size:12.5px"><option>{{ sv.paga }}</option><option>Locador</option><option>Locatario</option></select>
+<input type="text" value="{{ sv.referencia }}" placeholder="N° de cuenta / cliente" style="padding:7px 9px;border:1px solid oklch(87% 0.007 250);border-radius:6px;font-size:12.5px"/>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" checked="{{ sv.activo }}" onChange="{{ sv.toggleActivo }}"/></label>
+</div>
+</sc-for>
+
+<sc-if value="{{ isAddingServicio }}" hint-placeholder-val="{{ false }}">
+<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr auto auto;gap:10px;align-items:end;margin-top:14px;padding:14px;border:1px dashed oklch(80% 0.01 250);border-radius:8px">
+<div><div style="font-size:11.5px;font-weight:600;margin-bottom:5px">Nombre del servicio</div><input type="text" value="{{ servicioDraft.nombre }}" onChange="{{ cambiarServicioDraftNombre }}" placeholder="Ej: Internet" style="width:100%;padding:8px 9px;border:1px solid oklch(87% 0.007 250);border-radius:6px;font-size:12.5px"/></div>
+<div><div style="font-size:11.5px;font-weight:600;margin-bottom:5px">Dato identificador</div><input type="text" value="{{ servicioDraft.dato1 }}" onChange="{{ cambiarServicioDraftDato1 }}" placeholder="Ej: N° de cliente" style="width:100%;padding:8px 9px;border:1px solid oklch(87% 0.007 250);border-radius:6px;font-size:12.5px"/></div>
+<div><div style="font-size:11.5px;font-weight:600;margin-bottom:5px">Otro dato (opcional)</div><input type="text" value="{{ servicioDraft.dato2 }}" onChange="{{ cambiarServicioDraftDato2 }}" placeholder="Ej: usuario web" style="width:100%;padding:8px 9px;border:1px solid oklch(87% 0.007 250);border-radius:6px;font-size:12.5px"/></div>
+<button onClick="{{ cancelarServicioDraft }}" style="padding:8px 12px;border:1px solid oklch(87% 0.007 250);border-radius:6px;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Cancelar</button>
+<button onClick="{{ confirmarServicioDraft }}" style="padding:8px 12px;border:none;border-radius:6px;background:oklch(55% 0.16 250);color:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Agregar</button>
+</div>
+</sc-if>
+<sc-if value="{{ isAddingServicio }}" hint-placeholder-val="{{ true }}">
+</sc-if>
+<button onClick="{{ abrirServicioForm }}" style="display:{{ addServicioBtnDisplay }};margin-top:14px;padding:9px 14px;border:1px dashed oklch(80% 0.01 250);border-radius:8px;background:none;font-size:12.5px;font-weight:600;color:oklch(52% 0.01 255);cursor:pointer">+ Agregar servicio personalizado</button>
+<div style="margin-top:14px;font-size:11.5px;color:oklch(55% 0.01 255)">Los servicios que sigan marcados como pendientes pasan a "impago" automáticamente el día 5 de cada mes.</div>
+</sc-if>
+
+<sc-if value="{{ isStep4 }}" hint-placeholder-val="{{ false }}">
+<div style="font-size:16px;font-weight:700;margin-bottom:18px">Revisión final</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13.5px">
+<div style="border:1px solid oklch(90% 0.007 250);border-radius:10px;padding:16px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;margin-bottom:8px">Propiedad</div>
+<div>Depto 3B, Nueva Córdoba</div><div style="color:oklch(52% 0.01 255)">+ Cochera 3B (mismo contrato)</div>
+</div>
+<div style="border:1px solid oklch(90% 0.007 250);border-radius:10px;padding:16px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;margin-bottom:8px">Partes</div>
+<div>Locador: Elena Suárez</div><div>Locatario: Fabián Torres</div>
+</div>
+<div style="border:1px solid oklch(90% 0.007 250);border-radius:10px;padding:16px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;margin-bottom:8px">Pago</div>
+<div>$185.000 · día 10 · Transferencia</div><div style="color:oklch(52% 0.01 255)">Actualización trimestral · 24 meses</div>
+</div>
+<div style="border:1px solid oklch(90% 0.007 250);border-radius:10px;padding:16px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;margin-bottom:8px">Servicios activos</div>
+<div>Agua, Luz, Gas, Municipalidad, Rentas</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+
+<div style="display:flex;justify-content:space-between;margin-top:20px">
+<button onClick="{{ prevStep }}" style="padding:10px 18px;border:1px solid oklch(87% 0.007 250);border-radius:8px;background:#fff;font-size:13.5px;font-weight:600;cursor:pointer;visibility:{{ prevVisibility }}">← Atrás</button>
+<sc-if value="{{ isLastStep }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{ crearAlquiler }}" style="padding:10px 20px;border:none;border-radius:8px;background:oklch(55% 0.16 250);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer">Crear alquiler</button>
+</sc-if>
+<sc-if value="{{ isLastStep }}" hint-placeholder-val="{{ true }}">
+</sc-if>
+<button onClick="{{ nextStep }}" style="display:{{ nextDisplay }};padding:10px 20px;border:none;border-radius:8px;background:oklch(55% 0.16 250);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer">Siguiente →</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDetalle }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;min-height:100vh">
+<div style="width:230px;flex:none;background:oklch(19% 0.02 258);color:oklch(85% 0.01 258);display:flex;flex-direction:column;padding:22px 16px">
+<div style="display:flex;align-items:center;gap:9px;padding:0 6px 4px">
+<div style="width:26px;height:26px;border-radius:7px;background:oklch(55% 0.16 250)"></div>
+<div style="font-size:16px;font-weight:700;color:#fff">Locaria</div>
+</div>
+<div style="font-size:12px;color:oklch(55% 0.02 258);padding:0 6px 22px">{{ perfilInmobiliaria }}</div>
+<div style="background:oklch(28% 0.03 255);color:#fff;font-size:13.5px;font-weight:600;padding:9px 10px;border-radius:8px;margin-bottom:2px">Alquileres</div>
+<div style="flex:1"></div>
+<div onClick="{{ goToLogin }}" style="border-top:1px solid oklch(28% 0.02 258);padding-top:14px;display:flex;align-items:center;gap:9px;cursor:pointer" title="Cerrar sesión">
+<image-slot id="inmobiliaria-logo" shape="circle" placeholder="Logo" style="width:28px;height:28px;flex:none"></image-slot>
+<div style="font-size:12.5px;color:oklch(75% 0.01 258)">{{ perfilNombre }}</div>
+</div>
+</div>
+</div>
+<div style="flex:1;padding:32px 40px;overflow:auto">
+<button onClick="{{ goToDashboard }}" style="border:none;background:none;color:oklch(50% 0.01 255);font-size:13px;cursor:pointer;padding:0;margin-bottom:16px">← Volver a alquileres</button>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px">
+<div>
+<div style="display:flex;align-items:center;gap:10px">
+<div style="font-size:21px;font-weight:700">{{ detalle.direccion }}</div>
+<span style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:{{ detalle.estadoBg }};color:{{ detalle.estadoColor }}">{{ detalle.estadoPago }}</span>
+</div>
+<div style="font-size:13px;color:oklch(50% 0.01 255);margin-top:4px">{{ detalle.localidad }} · {{ detalle.tipo }}</div>
+</div>
+<div style="display:flex;gap:8px">
+<button style="padding:9px 14px;border:1px solid oklch(87% 0.007 250);border-radius:8px;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Descargar contrato</button>
+</div>
+</div>
+
+<div style="display:flex;gap:4px;border-bottom:1px solid oklch(90% 0.007 250);margin-bottom:24px">
+<div onClick="{{ tabResumen }}" style="padding:10px 16px;font-size:13.5px;font-weight:600;cursor:pointer;color:{{ tabResumenColor }};border-bottom:2px solid {{ tabResumenLine }}">Resumen</div>
+<div onClick="{{ tabServicios }}" style="padding:10px 16px;font-size:13.5px;font-weight:600;cursor:pointer;color:{{ tabServiciosColor }};border-bottom:2px solid {{ tabServiciosLine }}">Servicios</div>
+<div onClick="{{ tabPagos }}" style="padding:10px 16px;font-size:13.5px;font-weight:600;cursor:pointer;color:{{ tabPagosColor }};border-bottom:2px solid {{ tabPagosLine }}">Pagos</div>
+<div onClick="{{ tabFotos }}" style="padding:10px 16px;font-size:13.5px;font-weight:600;cursor:pointer;color:{{ tabFotosColor }};border-bottom:2px solid {{ tabFotosLine }}">Fotos y contrato</div>
+</div>
+
+<sc-if value="{{ isTabResumen }}" hint-placeholder-val="{{ true }}">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:20px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:14px">Locador</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<input type="text" value="{{ detalle.locadorInfo.nombre }}" style="padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px;font-weight:600"/>
+<input type="text" value="{{ detalle.locadorInfo.dni }}" style="padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13px"/>
+<div style="display:flex;gap:8px"><input type="text" value="{{ detalle.locadorInfo.tel }}" style="flex:1;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13px"/><a href="{{ detalle.locadorInfo.waLink }}" target="_blank" style="display:flex;align-items:center;gap:5px;padding:8px 12px;border:1px solid oklch(85% 0.06 150);border-radius:7px;background:oklch(94% 0.05 150);color:oklch(38% 0.1 150);font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap">WhatsApp</a></div>
+<input type="text" value="{{ detalle.locadorInfo.email }}" style="padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13px"/>
+<input type="text" value="{{ detalle.locadorInfo.domicilio }}" style="padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13px"/>
+</div>
+</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:20px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:14px">Locatario</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<input type="text" value="{{ detalle.locatarioInfo.nombre }}" style="padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px;font-weight:600"/>
+<input type="text" value="{{ detalle.locatarioInfo.dni }}" style="padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13px"/>
+<div style="display:flex;gap:8px"><input type="text" value="{{ detalle.locatarioInfo.tel }}" style="flex:1;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13px"/><a href="{{ detalle.locatarioInfo.waLink }}" target="_blank" style="display:flex;align-items:center;gap:5px;padding:8px 12px;border:1px solid oklch(85% 0.06 150);border-radius:7px;background:oklch(94% 0.05 150);color:oklch(38% 0.1 150);font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap">WhatsApp</a></div>
+<input type="text" value="{{ detalle.locatarioInfo.email }}" style="padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13px"/>
+<input type="text" value="{{ detalle.locatarioInfo.domicilio }}" style="padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13px"/>
+</div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:20px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:14px">Condiciones de pago</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+<div><div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">Monto</div><input type="text" value="{{ detalle.condiciones.monto }}" style="width:100%;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px;font-weight:600"/></div>
+<div><div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">Día de pago</div><input type="text" value="{{ detalle.condiciones.diaPago }}" style="width:100%;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">Método</div><input type="text" value="{{ detalle.condiciones.metodoPago }}" style="width:100%;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">Cuenta / Alias</div><input type="text" value="{{ detalle.condiciones.cuenta }}" style="width:100%;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">Vigencia</div><input type="text" value="{{ detalle.condiciones.vigencia }}" style="width:100%;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">Frecuencia de pago</div><input type="text" value="{{ detalle.condiciones.frecuenciaPago }}" style="width:100%;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+</div>
+<div style="border:1px solid oklch(90% 0.007 250);border-radius:10px;padding:16px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px">Actualización del monto</div>
+<div style="display:flex;gap:8px;margin-bottom:12px">
+<button onClick="{{ detalle.actualizacion.elegirPorcentaje }}" style="flex:1;padding:8px;border:1px solid {{ detalle.actualizacion.bordePorcentaje }};border-radius:7px;background:{{ detalle.actualizacion.bgPorcentaje }};color:{{ detalle.actualizacion.fgPorcentaje }};font-size:12.5px;font-weight:600;cursor:pointer">Porcentaje fijo</button>
+<button onClick="{{ detalle.actualizacion.elegirIndice }}" style="flex:1;padding:8px;border:1px solid {{ detalle.actualizacion.bordeIndice }};border-radius:7px;background:{{ detalle.actualizacion.bgIndice }};color:{{ detalle.actualizacion.fgIndice }};font-size:12.5px;font-weight:600;cursor:pointer">Índice</button>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+<div><div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">{{ detalle.actualizacion.labelValor }}</div><input type="text" value="{{ detalle.actualizacion.valor }}" onChange="{{ detalle.actualizacion.cambiarValor }}" style="width:100%;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+<div><div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:5px">Cada cuánto</div><input type="text" value="{{ detalle.condiciones.frecuenciaActualizacion }}" style="width:100%;padding:8px 10px;border:1px solid oklch(90% 0.007 250);border-radius:7px;font-size:13.5px"/></div>
+</div>
+<div style="font-size:11.5px;color:oklch(52% 0.01 255);background:{{ detalle.actualizacion.notaBg }};padding:9px 12px;border-radius:7px">{{ detalle.actualizacion.nota }}</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isTabServicios }}" hint-placeholder-val="{{ false }}">
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;overflow:hidden">
+<div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1.3fr 0.7fr 1fr;padding:12px 18px;font-size:11px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid oklch(92% 0.006 250)">
+<div>Servicio</div><div>Propiedad</div><div>Paga</div><div>N° de referencia</div><div>Aplica</div><div>Este mes</div>
+</div>
+<sc-for list="{{ detalle.servicios }}" as="sv" hint-placeholder-count="6">
+<div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1.3fr 0.7fr 1fr;align-items:center;padding:12px 18px;border-bottom:1px solid oklch(94% 0.005 250);font-size:13.5px">
+<div style="font-weight:600">{{ sv.nombre }}</div>
+<div style="color:oklch(48% 0.01 255)">{{ sv.propiedad }}</div>
+<div>
+<select style="padding:6px 8px;border:1px solid oklch(87% 0.007 250);border-radius:6px;font-size:12.5px" onChange="{{ sv.cambiarPaga }}">
+<option selected="{{ sv.pagaLocador }}">Locador</option>
+<option selected="{{ sv.pagaLocatario }}">Locatario</option>
+</select>
+</div>
+<input type="text" value="{{ sv.referencia }}" style="padding:6px 8px;border:1px solid oklch(87% 0.007 250);border-radius:6px;font-size:12.5px"/>
+<label style="display:flex;align-items:center;cursor:pointer"><input type="checkbox" checked="{{ sv.activo }}" onChange="{{ sv.toggleActivo }}"/></label>
+<sc-if value="{{ sv.activo }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ sv.togglePagado }}" style="font-size:12px;font-weight:600;padding:5px 10px;border-radius:20px;border:none;cursor:pointer;background:{{ sv.pagadoBg }};color:{{ sv.pagadoColor }}">{{ sv.pagadoTexto }}</button>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isTabPagos }}" hint-placeholder-val="{{ false }}">
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;padding:20px;margin-bottom:16px">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:12px">Mes actual — {{ detalle.mesActual }}</div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div>
+<div style="font-size:18px;font-weight:700">{{ detalle.condiciones.monto }}</div>
+<div style="font-size:12.5px;color:oklch(52% 0.01 255)">Vence el día {{ detalle.condiciones.diaPago }}</div>
+</div>
+<button onClick="{{ detalle.toggleMesActual }}" style="font-size:13px;font-weight:600;padding:9px 16px;border-radius:20px;border:none;cursor:pointer;background:{{ detalle.mesActualBg }};color:{{ detalle.mesActualColor }}">{{ detalle.mesActualEstado }}</button>
+</div>
+</div>
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px">Historial</div>
+<div style="background:#fff;border:1px solid oklch(90% 0.007 250);border-radius:12px;overflow:hidden">
+<sc-for list="{{ detalle.historial }}" as="h" hint-placeholder-count="5">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid oklch(94% 0.005 250);font-size:13.5px">
+<div>{{ h.mes }}</div>
+<span style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:{{ h.bg }};color:{{ h.color }}">{{ h.estado }}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isTabFotos }}" hint-placeholder-val="{{ false }}">
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px">Fotos de la propiedad</div>
+<div style="font-size:11.5px;color:oklch(55% 0.01 255);margin-bottom:12px">Hasta 15 imágenes JPEG, máximo 1 MB cada una</div>
+<div style="margin-bottom:26px">
+<image-slot id="detalle-fotos" shape="rounded" radius="10" placeholder="Arrastrá o seleccioná hasta 15 fotos" style="width:100%;height:180px"></image-slot>
+</div>
+<div style="font-size:11.5px;font-weight:700;color:oklch(52% 0.01 255);text-transform:uppercase;letter-spacing:.03em;margin-bottom:12px">Contrato</div>
+<div style="display:flex;align-items:center;gap:12px;border:1px solid oklch(88% 0.007 250);border-radius:10px;padding:14px 16px;max-width:480px">
+<div style="width:36px;height:36px;border-radius:8px;background:oklch(94% 0.03 250);color:oklch(50% 0.14 250);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none">PDF</div>
+<div style="flex:1">
+<div style="font-size:13px;font-weight:600">Contrato_Alquiler_Depto3B.pdf</div>
+<div style="font-size:11.5px;color:oklch(55% 0.01 255)">Subido el 08/03/2025 · 1.2 MB</div>
+</div>
+<button style="padding:7px 12px;border:1px solid oklch(87% 0.007 250);border-radius:7px;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Reemplazar</button>
+</div>
+</sc-if>
+
+</div>
+</div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SERVICIO_NOMBRES = ['Agua','Luz','Gas','Municipalidad','Rentas','Expensas'];
+const MESES = ['Marzo 2026','Abril 2026','Mayo 2026','Junio 2026','Julio 2026'];
+const ACCENT = 'oklch(55% 0.16 250)';
+const SUCCESS_BG = 'oklch(94% 0.05 150)', SUCCESS_FG = 'oklch(45% 0.13 150)';
+const WARNING_BG = 'oklch(95% 0.05 80)', WARNING_FG = 'oklch(48% 0.11 80)';
+const DANGER_BG = 'oklch(94% 0.06 25)', DANGER_FG = 'oklch(50% 0.17 25)';
+
+function statusStyle(estado) {
+  if (estado === 'Al día' || estado === 'Pagado' || estado === 'Activo') return { bg: SUCCESS_BG, color: SUCCESS_FG };
+  if (estado === 'Pendiente') return { bg: WARNING_BG, color: WARNING_FG };
+  return { bg: DANGER_BG, color: DANGER_FG };
+}
+
+class Component extends DCLogic {
+  state = {
+    view: 'login',
+    wizardStep: 0,
+    detailTab: 'resumen',
+    inmobiliariasBase: [
+      { nombre: 'Inmobiliaria del Centro', contacto: 'Marina Ríos', propiedadesUsadas: 42, limitePropiedades: 50, alquileresActivos: 38, vencimiento: '20/08/2026', estado: 'Activo', cobroEstado: 'Pagado' },
+      { nombre: 'Sur Propiedades', contacto: 'Diego Paz', propiedadesUsadas: 18, limitePropiedades: 20, alquileresActivos: 15, vencimiento: '20/08/2026', estado: 'Activo', cobroEstado: 'Pendiente' },
+      { nombre: 'Norte Alquileres', contacto: 'Lucía Funes', propiedadesUsadas: 65, limitePropiedades: 100, alquileresActivos: 58, vencimiento: '20/08/2026', estado: 'Activo', cobroEstado: 'Pagado' },
+      { nombre: 'Cba Rentals', contacto: 'Martín Ibáñez', propiedadesUsadas: 10, limitePropiedades: 10, alquileresActivos: 9, vencimiento: '20/08/2026', estado: 'Activo', cobroEstado: 'Pendiente' },
+      { nombre: 'Inmobiliaria San Martín', contacto: 'Rocío Vega', propiedadesUsadas: 5, limitePropiedades: 30, alquileresActivos: 4, vencimiento: '20/08/2026', estado: 'Suspendido', cobroEstado: 'Pendiente' }
+    ],
+    dashboardTab: 'home',
+    dashboardSearch: '',
+    dashboardFilterEstado: 'Todos',
+    perfilInmobiliaria: 'Inmobiliaria del Centro',
+    perfilNombre: 'Marina Ríos',
+    isAddingServicio: false,
+    servicioDraft: { nombre: '', dato1: '', dato2: '' },
+    wizActualizacionTipo: 'porcentaje',
+    wizActualizacionValor: '10%',
+    actualizacionTipoById: {},
+    actualizacionValorById: {},
+    wizardPropiedades: [
+      { etiqueta: 'Propiedad 1', direccion: 'Bv. Illia 245, 3B', localidad: 'Nueva Córdoba', tipo: 'Departamento', slotA: 'wp1a', slotB: 'wp1b', slotC: 'wp1c', slotD: 'wp1d', slotE: 'wp1e' }
+    ],
+    wizardServicios: SERVICIO_NOMBRES.map((n, i) => ({ nombre: n, propiedad: 'Depto 3B', paga: i < 3 ? 'Locatario' : 'Locador', referencia: '—', activo: n !== 'Expensas' })),
+    alquileresBase: [
+      { id: 1, direccion: 'Depto 3B, Nueva Córdoba', localidad: 'Nueva Córdoba', tipo: 'Departamento', monto: 185000, estadoPago: 'Al día', serviciosPendientes: 0,
+        locadorInfo: { nombre: 'Elena Suárez', dni: '27.451.902', tel: '351 555 2210', email: 'elena.suarez@mail.com', domicilio: 'Bv. Illia 245, Centro' },
+        locatarioInfo: { nombre: 'Fabián Torres', dni: '33.980.114', tel: '351 555 7788', email: 'fabian.torres@mail.com', domicilio: 'Av. Colón 890, Alta Córdoba' },
+        condiciones: { monto: '$185.000', diaPago: '10', metodoPago: 'Transferencia bancaria', cuenta: 'LOCARIA.CENTRO.3B', frecuenciaPago: 'Mensual', actualizacionTipo: 'indice', actualizacionValor: 'ICL', frecuenciaActualizacion: 'Trimestral', vigencia: '10/03/2025 – 10/03/2027' } },
+      { id: 2, direccion: 'Casa 12, Cerro de las Rosas', localidad: 'Cerro de las Rosas', tipo: 'Casa', monto: 310000, estadoPago: 'Deuda', serviciosPendientes: 2,
+        locadorInfo: { nombre: 'Raúl Medina', dni: '20.115.774', tel: '351 555 3321', email: 'raul.medina@mail.com', domicilio: 'Rondeau 512, Nueva Córdoba' },
+        locatarioInfo: { nombre: 'Gimena Ortiz', dni: '35.220.887', tel: '351 555 9012', email: 'gimena.ortiz@mail.com', domicilio: 'Av. Rafael Núñez 4500' },
+        condiciones: { monto: '$310.000', diaPago: '5', metodoPago: 'Transferencia bancaria', cuenta: 'LOCARIA.CDLR.12', frecuenciaPago: 'Mensual', actualizacionTipo: 'indice', actualizacionValor: 'ICL', frecuenciaActualizacion: 'Trimestral', vigencia: '05/06/2024 – 05/06/2026' } },
+      { id: 3, direccion: 'Local 4, Centro', localidad: 'Centro', tipo: 'Local', monto: 420000, estadoPago: 'Al día', serviciosPendientes: 0,
+        locadorInfo: { nombre: 'Jorge Bianchi', dni: '18.902.331', tel: '351 555 4410', email: 'jorge.bianchi@mail.com', domicilio: '27 de Abril 210' },
+        locatarioInfo: { nombre: 'Comercial Andes SRL', dni: '30-71234567-9', tel: '351 555 6789', email: 'administracion@andes.com.ar', domicilio: 'San Jerónimo 890' },
+        condiciones: { monto: '$420.000', diaPago: '1', metodoPago: 'Transferencia bancaria', cuenta: 'LOCARIA.CENTRO.L4', frecuenciaPago: 'Mensual', actualizacionTipo: 'porcentaje', actualizacionValor: '8%', frecuenciaActualizacion: 'Semestral', vigencia: '01/01/2025 – 01/01/2028' } },
+      { id: 4, direccion: 'Depto 1A, Alta Córdoba', localidad: 'Alta Córdoba', tipo: 'Departamento', monto: 150000, estadoPago: 'Pendiente', serviciosPendientes: 1,
+        locadorInfo: { nombre: 'Elena Suárez', dni: '27.451.902', tel: '351 555 2210', email: 'elena.suarez@mail.com', domicilio: 'Bv. Illia 245, Centro' },
+        locatarioInfo: { nombre: 'Sabrina Luna', dni: '38.660.220', tel: '351 555 1122', email: 'sabrina.luna@mail.com', domicilio: 'Av. Colón 1200' },
+        condiciones: { monto: '$150.000', diaPago: '15', metodoPago: 'Efectivo', cuenta: '—', frecuenciaPago: 'Mensual', actualizacionTipo: 'indice', actualizacionValor: 'ICL', frecuenciaActualizacion: 'Trimestral', vigencia: '15/07/2025 – 15/07/2027' } },
+      { id: 5, direccion: 'Oficina 2, Güemes', localidad: 'Güemes', tipo: 'Oficina', monto: 260000, estadoPago: 'Al día', serviciosPendientes: 0,
+        locadorInfo: { nombre: 'Marcelo Ríos', dni: '22.334.556', tel: '351 555 8802', email: 'marcelo.rios@mail.com', domicilio: 'Belgrano 340' },
+        locatarioInfo: { nombre: 'Estudio Bravo', dni: '30-70998821-4', tel: '351 555 2244', email: 'contacto@estudiobravo.com', domicilio: 'Achaval Rodríguez 150' },
+        condiciones: { monto: '$260.000', diaPago: '10', metodoPago: 'Transferencia bancaria', cuenta: 'LOCARIA.GUEMES.O2', frecuenciaPago: 'Anual', actualizacionTipo: 'porcentaje', actualizacionValor: '12%', frecuenciaActualizacion: 'Anual', vigencia: '10/02/2025 – 10/02/2027' } },
+      { id: 6, direccion: 'Casa 7, Villa Belgrano', localidad: 'Villa Belgrano', tipo: 'Casa', monto: 290000, estadoPago: 'Deuda', serviciosPendientes: 3,
+        locadorInfo: { nombre: 'Elena Suárez', dni: '27.451.902', tel: '351 555 2210', email: 'elena.suarez@mail.com', domicilio: 'Bv. Illia 245, Centro' },
+        locatarioInfo: { nombre: 'Nicolás Paz', dni: '31.556.902', tel: '351 555 3390', email: 'nicolas.paz@mail.com', domicilio: 'Av. Vélez Sarsfield 2200' },
+        condiciones: { monto: '$290.000', diaPago: '8', metodoPago: 'Transferencia bancaria', cuenta: 'LOCARIA.VBEL.C7', frecuenciaPago: 'Mensual', actualizacionTipo: 'indice', actualizacionValor: 'ICL', frecuenciaActualizacion: 'Trimestral', vigencia: '08/04/2024 – 08/04/2026' } }
+    ],
+    detalleId: 1,
+    serviciosById: {},
+    mesActualById: {},
+    historialById: {},
+    editandoInmobiliariaIdx: null,
+    passwordDrafts: {}
+  };
+
+  getServiciosFor(id, item) {
+    if (!this.state.serviciosById[id]) {
+      const n = item.serviciosPendientes;
+      const list = SERVICIO_NOMBRES.map((nombre, i) => ({
+        nombre, propiedad: item.tipo === 'Casa' && nombre === 'Expensas' ? 'No aplica' : 'Propiedad principal',
+        pagaLocador: i >= 3, referencia: nombre === 'Expensas' && item.tipo === 'Casa' ? '—' : (1000 + i * 37).toString() + '-' + (item.id * 11),
+        activo: !(item.tipo === 'Casa' && nombre === 'Expensas'),
+        pagado: i >= n
+      }));
+      this.state.serviciosById[id] = list;
+    }
+    return this.state.serviciosById[id];
+  }
+
+  getMesActualFor(id, item) {
+    if (this.state.mesActualById[id] === undefined) {
+      this.state.mesActualById[id] = item.estadoPago === 'Al día' ? 'Pagado' : (item.estadoPago === 'Pendiente' ? 'Pendiente' : 'Vencido');
+    }
+    return this.state.mesActualById[id];
+  }
+
+  getHistorialFor(id, item) {
+    if (!this.state.historialById[id]) {
+      this.state.historialById[id] = MESES.map(mes => ({ mes, estado: 'Pagado' }));
+    }
+    return this.state.historialById[id];
+  }
+
+  goTo(view) { this.setState({ view }); }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.view !== this.state.view || prevState.detailTab !== this.state.detailTab || prevState.wizardStep !== this.state.wizardStep) {
+      window.scrollTo(0, 0);
+    }
+  }
+  generarPassword(idx) {
+    const pass = Math.random().toString(36).slice(-8);
+    this.state.passwordDrafts[idx] = pass;
+    this.forceUpdate();
+  }
+  cambiarLimiteInmobiliaria(idx, val) {
+    this.state.inmobiliariasBase[idx].limitePropiedades = Math.max(1, parseInt(val) || 1);
+    this.forceUpdate();
+  }
+  marcarEstadoInmobiliaria(idx, estado) {
+    this.state.inmobiliariasBase[idx].estado = estado;
+    this.forceUpdate();
+  }
+  toggleCobroInmobiliaria(idx) {
+    const i = this.state.inmobiliariasBase[idx];
+    i.cobroEstado = i.cobroEstado === 'Pagado' ? 'Pendiente' : 'Pagado';
+    this.forceUpdate();
+  }
+  toggleServicioActivo(id, idx) {
+    const list = this.state.serviciosById[id];
+    list[idx].activo = !list[idx].activo;
+    this.forceUpdate();
+  }
+  cambiarPagaServicio(id, idx) {
+    const list = this.state.serviciosById[id];
+    list[idx].pagaLocador = !list[idx].pagaLocador;
+    this.forceUpdate();
+  }
+  togglePagadoServicio(id, idx) {
+    const list = this.state.serviciosById[id];
+    list[idx].pagado = !list[idx].pagado;
+    this.forceUpdate();
+  }
+  toggleMesActual(id) {
+    const cur = this.state.mesActualById[id];
+    this.state.mesActualById[id] = cur === 'Pagado' ? 'Vencido' : 'Pagado';
+    this.forceUpdate();
+  }
+  abrirServicioForm() { this.setState({ isAddingServicio: true }); }
+  cancelarServicioDraft() { this.setState({ isAddingServicio: false, servicioDraft: { nombre: '', dato1: '', dato2: '' } }); }
+  confirmarServicioDraft() {
+    const d = this.state.servicioDraft;
+    if (!d.nombre.trim()) { this.setState({ isAddingServicio: false }); return; }
+    const referencia = [d.dato1, d.dato2].filter(Boolean).join(' · ') || '—';
+    this.state.wizardServicios = [...this.state.wizardServicios, { nombre: d.nombre, propiedad: 'Todas', paga: 'Locatario', referencia, activo: true }];
+    this.setState({ isAddingServicio: false, servicioDraft: { nombre: '', dato1: '', dato2: '' } });
+  }
+  cambiarServicioDraft(field, val) { this.state.servicioDraft = { ...this.state.servicioDraft, [field]: val }; this.forceUpdate(); }
+  setActualizacionTipo(idKey, tipo, defaultValor) {
+    if (idKey === 'wizard') { this.setState({ wizActualizacionTipo: tipo, wizActualizacionValor: defaultValor }); return; }
+    this.state.actualizacionTipoById[idKey] = tipo;
+    this.state.actualizacionValorById[idKey] = defaultValor;
+    this.forceUpdate();
+  }
+  cambiarActualizacionValor(idKey, val) {
+    if (idKey === 'wizard') { this.setState({ wizActualizacionValor: val }); return; }
+    this.state.actualizacionValorById[idKey] = val;
+    this.forceUpdate();
+  }
+
+  buildActualizacion(idKey, tipo, valor) {
+    const isPct = tipo === 'porcentaje';
+    return {
+      elegirPorcentaje: () => this.setActualizacionTipo(idKey, 'porcentaje', isPct ? valor : '10%'),
+      elegirIndice: () => this.setActualizacionTipo(idKey, 'indice', !isPct ? valor : 'ICL'),
+      bordePorcentaje: isPct ? ACCENT : 'oklch(87% 0.007 250)', bgPorcentaje: isPct ? 'oklch(94% 0.03 250)' : '#fff', fgPorcentaje: isPct ? ACCENT : 'oklch(45% 0.01 255)',
+      bordeIndice: !isPct ? ACCENT : 'oklch(87% 0.007 250)', bgIndice: !isPct ? 'oklch(94% 0.03 250)' : '#fff', fgIndice: !isPct ? ACCENT : 'oklch(45% 0.01 255)',
+      labelValor: isPct ? 'Porcentaje' : 'Nombre del índice',
+      valor, placeholderValor: isPct ? 'Ej: 10%' : 'Ej: ICL, IPC',
+      cambiarValor: (e) => this.cambiarActualizacionValor(idKey, e && e.target ? e.target.value : valor),
+      nota: isPct ? 'El monto se ajustará automáticamente este porcentaje en cada actualización.' : 'Este monto no se ajusta solo: te vamos a recordar actualizarlo manualmente cuando salga el índice.',
+      notaBg: isPct ? SUCCESS_BG : WARNING_BG
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const wizardTitles = ['Propiedad', 'Partes', 'Pago', 'Servicios', 'Confirmar'];
+    const steps = wizardTitles.map((nombre, i) => ({
+      numero: i + 1, nombre,
+      lineColor: i === s.wizardStep ? ACCENT : (i < s.wizardStep ? 'oklch(80% 0.03 250)' : 'oklch(92% 0.006 250)'),
+      textColor: i === s.wizardStep ? ACCENT : 'oklch(55% 0.01 255)',
+      goTo: () => this.setState({ wizardStep: i })
+    }));
+
+    const inmobiliarias = s.inmobiliariasBase.map((i, idx) => {
+      const st = statusStyle(i.estado);
+      return {
+        ...i,
+        limiteTexto: i.propiedadesUsadas + ' / ' + i.limitePropiedades,
+        progresoPct: Math.round((i.propiedadesUsadas / i.limitePropiedades) * 100),
+        barColor: i.propiedadesUsadas / i.limitePropiedades >= 0.9 ? DANGER_FG : ACCENT,
+        estadoBg: st.bg, estadoColor: st.color,
+        cobroTexto: '$' + (i.propiedadesUsadas * 1000).toLocaleString('es-AR'),
+        cobroEstado: i.cobroEstado,
+        cobroBg: statusStyle(i.cobroEstado === 'Pagado' ? 'Al día' : 'Pendiente').bg,
+        cobroColor: statusStyle(i.cobroEstado === 'Pagado' ? 'Al día' : 'Pendiente').color,
+        toggleCobro: () => this.toggleCobroInmobiliaria(idx),
+        abrirEdicion: () => this.setState({ editandoInmobiliariaIdx: idx })
+      };
+    });
+
+    let edicionInmobiliaria = null;
+    if (s.editandoInmobiliariaIdx !== null) {
+      const idx = s.editandoInmobiliariaIdx;
+      const i = s.inmobiliariasBase[idx];
+      const activoOn = i.estado === 'Activo';
+      edicionInmobiliaria = {
+        ...i,
+        nuevaPassword: s.passwordDrafts[idx] || '••••••••',
+        generarPassword: () => this.generarPassword(idx),
+        cambiarLimite: (e) => this.cambiarLimiteInmobiliaria(idx, e && e.target ? e.target.value : i.limitePropiedades),
+        marcarActivo: () => this.marcarEstadoInmobiliaria(idx, 'Activo'),
+        marcarSuspendido: () => this.marcarEstadoInmobiliaria(idx, 'Suspendido'),
+        bordeActivo: activoOn ? ACCENT : 'oklch(87% 0.007 250)', bgActivo: activoOn ? 'oklch(94% 0.03 250)' : '#fff', fgActivo: activoOn ? ACCENT : 'oklch(45% 0.01 255)',
+        bordeSuspendido: !activoOn ? DANGER_FG : 'oklch(87% 0.007 250)', bgSuspendido: !activoOn ? DANGER_BG : '#fff', fgSuspendido: !activoOn ? DANGER_FG : 'oklch(45% 0.01 255)'
+      };
+    }
+
+    const query = s.dashboardSearch.trim().toLowerCase();
+    const alquileres = s.alquileresBase
+      .filter(a => s.dashboardFilterEstado === 'Todos' || a.estadoPago === s.dashboardFilterEstado)
+      .filter(a => !query || [a.direccion, a.localidad, a.locatarioInfo.nombre, a.locadorInfo.nombre].join(' ').toLowerCase().includes(query))
+      .map(a => {
+        const st = statusStyle(a.estadoPago);
+        return {
+          ...a,
+          montoTexto: '$' + a.monto.toLocaleString('es-AR'),
+          estadoBg: st.bg, estadoColor: st.color,
+          rowBg: a.estadoPago === 'Deuda' ? 'oklch(98% 0.015 25)' : 'transparent',
+          serviciosTexto: a.serviciosPendientes > 0 ? a.serviciosPendientes + ' pendiente' + (a.serviciosPendientes > 1 ? 's' : '') : 'Al día',
+          serviciosColor: a.serviciosPendientes > 0 ? DANGER_FG : 'oklch(55% 0.01 255)',
+          verDetalle: () => this.setState({ view: 'detalle', detalleId: a.id, detailTab: 'resumen' })
+        };
+      });
+    const filtrosEstadoDefs = ['Todos', 'Al día', 'Pendiente', 'Deuda'];
+    const filtrosEstado = filtrosEstadoDefs.map(f => {
+      const active = s.dashboardFilterEstado === f;
+      return {
+        label: f, aplicar: () => this.setState({ dashboardFilterEstado: f }),
+        borde: active ? ACCENT : 'oklch(87% 0.007 250)', bg: active ? 'oklch(94% 0.03 250)' : '#fff', color: active ? ACCENT : 'oklch(45% 0.01 255)'
+      };
+    });
+
+    const item = s.alquileresBase.find(a => a.id === s.detalleId) || s.alquileresBase[0];
+    const serviciosRaw = this.getServiciosFor(item.id, item);
+    const servicios = serviciosRaw.map((sv, idx) => {
+      const pagadoTexto = sv.pagado ? 'Pagado' : 'Pendiente';
+      const pst = statusStyle(pagadoTexto === 'Pagado' ? 'Al día' : 'Pendiente');
+      return {
+        ...sv, paga: sv.pagaLocador ? 'Locador' : 'Locatario',
+        pagadoTexto, pagadoBg: pst.bg, pagadoColor: pst.color,
+        toggleActivo: () => this.toggleServicioActivo(item.id, idx),
+        cambiarPaga: () => this.cambiarPagaServicio(item.id, idx),
+        togglePagado: () => this.togglePagadoServicio(item.id, idx)
+      };
+    });
+    const mesActualEstado = this.getMesActualFor(item.id, item);
+    const mst = statusStyle(mesActualEstado === 'Pagado' ? 'Al día' : mesActualEstado === 'Pendiente' ? 'Pendiente' : 'Vencido');
+    const historial = this.getHistorialFor(item.id, item).map(h => {
+      const hst = statusStyle(h.estado);
+      return { ...h, bg: hst.bg, color: hst.color };
+    });
+    const dst = statusStyle(item.estadoPago);
+    const detalleActualizacionTipo = s.actualizacionTipoById[item.id] || item.condiciones.actualizacionTipo;
+    const detalleActualizacionValor = s.actualizacionValorById[item.id] !== undefined ? s.actualizacionValorById[item.id] : item.condiciones.actualizacionValor;
+
+    const toWaLink = (tel) => 'https://wa.me/54' + String(tel).replace(/\D/g, '');
+    const detalle = {
+      ...item,
+      locadorInfo: { ...item.locadorInfo, waLink: toWaLink(item.locadorInfo.tel) },
+      locatarioInfo: { ...item.locatarioInfo, waLink: toWaLink(item.locatarioInfo.tel) },
+      estadoBg: dst.bg, estadoColor: dst.color,
+      servicios, mesActual: 'Agosto 2026',
+      mesActualEstado, mesActualBg: mst.bg, mesActualColor: mst.color,
+      toggleMesActual: () => this.toggleMesActual(item.id),
+      historial,
+      actualizacion: this.buildActualizacion(item.id, detalleActualizacionTipo, detalleActualizacionValor)
+    };
+
+    const inmobiliariaLimit = s.inmobiliariasBase.reduce((a, b) => a + b.propiedadesUsadas, 0);
+    const alquileresTotal = s.inmobiliariasBase.reduce((a, b) => a + b.alquileresActivos, 0);
+
+    const tabActive = { color: ACCENT, line: ACCENT };
+    const tabInactive = { color: 'oklch(52% 0.01 255)', line: 'transparent' };
+    const tR = s.detailTab === 'resumen' ? tabActive : tabInactive;
+    const tS = s.detailTab === 'servicios' ? tabActive : tabInactive;
+    const tP = s.detailTab === 'pagos' ? tabActive : tabInactive;
+    const tF = s.detailTab === 'fotos' ? tabActive : tabInactive;
+
+    return {
+      isLogin: s.view === 'login', isSuperadmin: s.view === 'superadmin', isCrearInmobiliaria: s.view === 'crear-inmobiliaria',
+      isDashboard: s.view === 'dashboard', isNuevoAlquiler: s.view === 'nuevo-alquiler', isDetalle: s.view === 'detalle',
+      goToLogin: () => this.goTo('login'), goToSuperadmin: () => this.goTo('superadmin'), goToDashboard: () => this.setState({ view: 'dashboard', dashboardTab: 'home' }),
+      goToCrearInmobiliaria: () => this.goTo('crear-inmobiliaria'), goToNuevoAlquiler: () => this.setState({ view: 'nuevo-alquiler', wizardStep: 0 }),
+      isDashboardHome: s.view === 'dashboard' && s.dashboardTab === 'home',
+      isDashboardConfig: s.view === 'dashboard' && s.dashboardTab === 'config',
+      goToConfiguracion: () => this.setState({ view: 'dashboard', dashboardTab: 'config' }),
+      navAlquileresBg: s.dashboardTab === 'home' ? 'oklch(28% 0.03 255)' : 'transparent',
+      navAlquileresColor: s.dashboardTab === 'home' ? '#fff' : 'oklch(50% 0.02 258)',
+      navConfigBg: s.dashboardTab === 'config' ? 'oklch(28% 0.03 255)' : 'transparent',
+      navConfigColor: s.dashboardTab === 'config' ? '#fff' : 'oklch(50% 0.02 258)',
+      perfilInmobiliaria: s.perfilInmobiliaria, perfilNombre: s.perfilNombre,
+      cambiarPerfilInmobiliaria: (e) => this.setState({ perfilInmobiliaria: e && e.target ? e.target.value : s.perfilInmobiliaria }),
+      cambiarPerfilNombre: (e) => this.setState({ perfilNombre: e && e.target ? e.target.value : s.perfilNombre }),
+      crearInmobiliaria: () => this.setState({
+        inmobiliariasBase: [...s.inmobiliariasBase, { nombre: 'Nueva Inmobiliaria', contacto: 'Sin definir', propiedadesUsadas: 0, limitePropiedades: 20, alquileresActivos: 0, vencimiento: '01/01/2027', estado: 'Activo' }],
+        view: 'superadmin'
+      }),
+      crearAlquiler: () => this.setState({ view: 'dashboard' }),
+      agregarPropiedad: () => this.setState({
+        wizardPropiedades: [...s.wizardPropiedades, { etiqueta: 'Propiedad ' + (s.wizardPropiedades.length + 1), direccion: 'Bv. Illia 245, cochera 3', localidad: 'Nueva Córdoba', tipo: 'Cochera', slotA: 'wp' + (s.wizardPropiedades.length + 1) + 'a', slotB: 'wp' + (s.wizardPropiedades.length + 1) + 'b', slotC: 'wp' + (s.wizardPropiedades.length + 1) + 'c', slotD: 'wp' + (s.wizardPropiedades.length + 1) + 'd', slotE: 'wp' + (s.wizardPropiedades.length + 1) + 'e' }]
+      }),
+      kpiActivas: s.inmobiliariasBase.filter(i => i.estado === 'Activo').length,
+      kpiPropiedades: inmobiliariaLimit, kpiAlquileres: alquileresTotal,
+      kpiCobrosPendientes: s.inmobiliariasBase.filter(i => i.cobroEstado === 'Pendiente').length,
+      inmobiliarias, alquileres, filtrosEstado, sinResultados: alquileres.length === 0,
+      dashboardSearch: s.dashboardSearch,
+      cambiarDashboardSearch: (e) => this.setState({ dashboardSearch: e && e.target ? e.target.value : '' }),
+      mostrarEdicionInmobiliaria: s.editandoInmobiliariaIdx !== null,
+      edicionInmobiliaria: edicionInmobiliaria || {},
+      cerrarEdicionInmobiliaria: () => this.setState({ editandoInmobiliariaIdx: null }),
+      wizardStep: s.wizardStep, steps,
+      isStep0: s.wizardStep === 0, isStep1: s.wizardStep === 1, isStep2: s.wizardStep === 2, isStep3: s.wizardStep === 3, isStep4: s.wizardStep === 4,
+      isLastStep: s.wizardStep === 4,
+      prevVisibility: s.wizardStep === 0 ? 'hidden' : 'visible',
+      nextDisplay: s.wizardStep === 4 ? 'none' : 'inline-block',
+      prevStep: () => this.setState({ wizardStep: Math.max(0, s.wizardStep - 1) }),
+      nextStep: () => this.setState({ wizardStep: Math.min(4, s.wizardStep + 1) }),
+      wizardPropiedades: s.wizardPropiedades, wizardServicios: s.wizardServicios,
+      isAddingServicio: s.isAddingServicio, addServicioBtnDisplay: s.isAddingServicio ? 'none' : 'inline-block',
+      servicioDraft: s.servicioDraft,
+      abrirServicioForm: () => this.abrirServicioForm(),
+      cancelarServicioDraft: () => this.cancelarServicioDraft(),
+      confirmarServicioDraft: () => this.confirmarServicioDraft(),
+      cambiarServicioDraftNombre: (e) => this.cambiarServicioDraft('nombre', e && e.target ? e.target.value : ''),
+      cambiarServicioDraftDato1: (e) => this.cambiarServicioDraft('dato1', e && e.target ? e.target.value : ''),
+      cambiarServicioDraftDato2: (e) => this.cambiarServicioDraft('dato2', e && e.target ? e.target.value : ''),
+      wizActualizacion: this.buildActualizacion('wizard', s.wizActualizacionTipo, s.wizActualizacionValor),
+      detalle,
+      isTabResumen: s.detailTab === 'resumen', isTabServicios: s.detailTab === 'servicios', isTabPagos: s.detailTab === 'pagos', isTabFotos: s.detailTab === 'fotos',
+      tabResumen: () => this.setState({ detailTab: 'resumen' }), tabServicios: () => this.setState({ detailTab: 'servicios' }),
+      tabPagos: () => this.setState({ detailTab: 'pagos' }), tabFotos: () => this.setState({ detailTab: 'fotos' }),
+      tabResumenColor: tR.color, tabResumenLine: tR.line, tabServiciosColor: tS.color, tabServiciosLine: tS.line,
+      tabPagosColor: tP.color, tabPagosLine: tP.line, tabFotosColor: tF.color, tabFotosLine: tF.line
+    };
+  }
+}
+</script>
+</body>
+</html>
