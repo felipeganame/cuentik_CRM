@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import styles from '../marketing.module.css';
 import { MechanismScroller } from './mechanism-scroller';
-import { WHATSAPP_HREF } from '../contact-info';
 
 export const metadata: Metadata = {
   title: 'Cómo funciona — Cuentik CRM',
@@ -67,7 +66,7 @@ export default function ComoFuncionaPage() {
           <p className={styles.sectionSub} style={{ margin: '0 auto' }}>Tu primer alquiler es gratis, sin tarjeta.</p>
         </div>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer" className={styles.btnPrimary}>Empezar gratis</a>
+          <Link href="/registro" className={styles.btnPrimary}>Empezar gratis</Link>
           <Link href="/precios" className={styles.btnGhost}>Ver precios</Link>
         </div>
       </section>

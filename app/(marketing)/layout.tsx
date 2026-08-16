@@ -12,9 +12,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             Cuentik CRM
           </span>
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(16px, 3vw, 32px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(12px, 2.4vw, 24px)' }}>
           <MarketingNavLinks />
-          <Link href="/login" className={styles.btnGhost}>Iniciar sesión</Link>
+          <Link href="/login" className={styles.navLink} style={{ whiteSpace: 'nowrap' }}>Iniciar sesión</Link>
+          <Link href="/registro" className={styles.btnPrimary} style={{ padding: '9px 16px', fontSize: 13.5, whiteSpace: 'nowrap' }}>
+            Empezar gratis
+          </Link>
         </div>
       </header>
 

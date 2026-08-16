@@ -57,5 +57,4 @@ Direct, specific, no generic SaaS language ("streamline your workflow"). Names t
 ## Known gaps / next work
 
 - Mobile-viewport screenshots were not captured across any of the three palette passes (browser-automation tooling was unreliable in this session); responsive rules are authored and build-clean but not visually re-verified on a real narrow viewport.
-- The primary CTA ("Empezar gratis") currently links to WhatsApp, not a self-serve `/registro` flow — that flow doesn't exist yet. Rewire once it ships.
 - No customer testimonials, logos, or case studies exist yet and none were fabricated — the page relies on mechanism demonstration instead of social proof by design, not by omission.

@@ -12,6 +12,7 @@ export type Inmobiliaria = {
   fecha_proximo_cobro: string | null;
   logo_url: string | null;
   exento_cobro: boolean;
+  metodo_pago_preferido: string | null;
 };
 
 export type Alquiler = {

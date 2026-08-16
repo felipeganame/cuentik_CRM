@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import styles from '../marketing.module.css';
-import { WHATSAPP_HREF } from '../contact-info';
 
 export const metadata: Metadata = {
   title: 'Precios — Cuentik CRM',
@@ -34,9 +34,9 @@ export default function PreciosPage() {
             costo — no va a cambiar de golpe lo que ya estás pagando.
           </p>
           <div style={{ marginTop: 24 }}>
-            <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer" className={styles.btnPrimary}>
+            <Link href="/registro" className={styles.btnPrimary}>
               Empezar gratis
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -62,12 +62,22 @@ function validateServicios(servicios: WizardServicioInput[]): string | null {
   return null;
 }
 
-export function NuevoAlquilerForm({ localidadesSugeridas, inmobiliariaId }: { localidadesSugeridas: string[]; inmobiliariaId: string }) {
+export function NuevoAlquilerForm({
+  localidadesSugeridas,
+  inmobiliariaId,
+  mostrarAvisoPago,
+}: {
+  localidadesSugeridas: string[];
+  inmobiliariaId: string;
+  mostrarAvisoPago: boolean;
+}) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [stepError, setStepError] = useState<string | null>(null);
+  const [avisoPagoConfirmado, setAvisoPagoConfirmado] = useState(false);
+  const [metodoPagoPreferido, setMetodoPagoPreferido] = useState('Transferencia bancaria');
 
   const [propiedades, setPropiedades] = useState<WizardPropiedadInput[]>([emptyPropiedad()]);
   const [fotosPorPropiedad, setFotosPorPropiedad] = useState<File[][]>([[]]);
@@ -144,6 +154,7 @@ export function NuevoAlquilerForm({ localidadesSugeridas, inmobiliariaId }: { lo
         fechaInicio,
         fechaFin,
         servicios,
+        metodoPagoPreferido: mostrarAvisoPago ? metodoPagoPreferido : undefined,
       });
 
       if ('error' in result) {
@@ -168,6 +179,43 @@ export function NuevoAlquilerForm({ localidadesSugeridas, inmobiliariaId }: { lo
       setErrorMsg('No se pudo crear el alquiler. Revisá los datos e intentá de nuevo.');
       setSubmitting(false);
     }
+  }
+
+  if (mostrarAvisoPago && !avisoPagoConfirmado) {
+    return (
+      <div style={{ maxWidth: 560, margin: '40px auto 0' }}>
+        <Link href="/dashboard" style={{ border: 'none', background: 'none', color: 'oklch(50% 0.01 255)', fontSize: 13, textDecoration: 'none', display: 'inline-block', marginBottom: 14 }}>
+          ← Cancelar y volver
+        </Link>
+        <div style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 14, padding: 30 }}>
+          <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 10 }}>Este va a ser tu segundo alquiler</div>
+          <p style={{ fontSize: 13.5, lineHeight: 1.6, color: 'oklch(45% 0.01 255)', marginBottom: 20 }}>
+            Tu primer alquiler fue gratis. A partir de este, el plan pasa a costar <strong>$1.000 ARS por alquiler
+            activo, todos los meses</strong>. No te vamos a cobrar acá — el cobro sigue siendo manual y coordinado
+            aparte, pero necesitamos saber cómo preferís pagarlo.
+          </p>
+          <Field label="Método de pago preferido">
+            <select
+              value={metodoPagoPreferido}
+              onChange={(e) => setMetodoPagoPreferido(e.target.value)}
+              style={fieldStyle()}
+            >
+              <option>Transferencia bancaria</option>
+              <option>Mercado Pago</option>
+              <option>Efectivo a coordinar</option>
+              <option>Otro</option>
+            </select>
+          </Field>
+          <button
+            type="button"
+            onClick={() => setAvisoPagoConfirmado(true)}
+            style={{ marginTop: 22, padding: '10px 20px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Entendido, continuar
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -187,6 +187,7 @@ export async function createAlquiler(input: {
   fechaInicio: string;
   fechaFin: string;
   servicios: WizardServicioInput[];
+  metodoPagoPreferido?: string;
 }): Promise<{ error: string } | { id: string; propiedadIds: string[] }> {
   const supabase = await createClient();
 
@@ -240,7 +241,13 @@ export async function createAlquiler(input: {
   // its 2nd (alquileresActuales counted BEFORE this insert, so ===1 means
   // this new one is the 2nd overall).
   if (inmobiliaria && !inmobiliaria.exento_cobro && !inmobiliaria.fecha_proximo_cobro && (alquileresActuales ?? 0) === 1) {
-    await createAdminClient().from('inmobiliarias').update({ fecha_proximo_cobro: proximoCicloDesdeHoy() }).eq('id', profile.inmobiliaria_id);
+    await createAdminClient()
+      .from('inmobiliarias')
+      .update({
+        fecha_proximo_cobro: proximoCicloDesdeHoy(),
+        ...(input.metodoPagoPreferido ? { metodo_pago_preferido: input.metodoPagoPreferido } : {}),
+      })
+      .eq('id', profile.inmobiliaria_id);
   }
 
   const propiedadesCreadas: { id: string }[] = [];

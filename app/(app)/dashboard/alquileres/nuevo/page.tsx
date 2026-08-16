@@ -11,7 +11,7 @@ export default async function NuevoAlquilerPage() {
   const { data: profile } = await supabase.from('profiles').select('inmobiliaria_id').eq('id', user!.id).single();
   const inmobiliariaId = profile?.inmobiliaria_id ?? '';
 
-  const { usados, limite } = await getUsoAlquileres(supabase, inmobiliariaId);
+  const { usados, limite, exentoCobro } = await getUsoAlquileres(supabase, inmobiliariaId);
   if (usados >= limite) {
     return (
       <div style={{ maxWidth: 480, margin: '60px auto', textAlign: 'center' }}>
@@ -27,6 +27,13 @@ export default async function NuevoAlquilerPage() {
   }
 
   const localidadesSugeridas = await listLocalidadesUsadas(supabase);
+  const mostrarAvisoPago = usados === 1 && !exentoCobro;
 
-  return <NuevoAlquilerForm localidadesSugeridas={localidadesSugeridas} inmobiliariaId={inmobiliariaId} />;
+  return (
+    <NuevoAlquilerForm
+      localidadesSugeridas={localidadesSugeridas}
+      inmobiliariaId={inmobiliariaId}
+      mostrarAvisoPago={mostrarAvisoPago}
+    />
+  );
 }

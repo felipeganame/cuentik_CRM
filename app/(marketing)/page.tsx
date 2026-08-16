@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import styles from './marketing.module.css';
-import { WHATSAPP_HREF } from './contact-info';
 
 export default async function LandingPage() {
   const supabase = await createClient();
@@ -28,9 +27,9 @@ export default async function LandingPage() {
             y vencimientos, todo en un solo lugar — sin planillas sueltas ni carpetas de papel.
           </p>
           <div className={styles.heroCtas}>
-            <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer" className={styles.btnPrimary}>
+            <Link href="/registro" className={styles.btnPrimary}>
               Empezar gratis
-            </a>
+            </Link>
             <Link href="/como-funciona" className={styles.btnGhost}>Ver cómo funciona</Link>
           </div>
           <div className={`${styles.mono} ${styles.heroFinePrint}`}>
