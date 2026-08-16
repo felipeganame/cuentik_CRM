@@ -1,5 +1,17 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { mesActualLabel, type Alquiler, type AlquilerParte, type Contacto, type PagoHistorial, type Propiedad, type Servicio } from './types';
+import { mesActualLabel, type Alquiler, type AlquilerParte, type Contacto, type Inmobiliaria, type PagoHistorial, type Propiedad, type Servicio } from './types';
+
+export async function listInmobiliarias(supabase: SupabaseClient): Promise<Inmobiliaria[]> {
+  const { data, error } = await supabase.from('inmobiliarias').select('*').order('nombre', { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getInmobiliaria(supabase: SupabaseClient, id: string): Promise<Inmobiliaria | null> {
+  const { data, error } = await supabase.from('inmobiliarias').select('*').eq('id', id).single();
+  if (error || !data) return null;
+  return data;
+}
 
 export type AlquilerListItem = Alquiler & {
   propiedadPrincipal: Propiedad | null;

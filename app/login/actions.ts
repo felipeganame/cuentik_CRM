@@ -10,11 +10,12 @@ export async function login(_prevState: LoginState, formData: FormData): Promise
   const password = String(formData.get('password') || '');
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
+  if (error || !data.user) {
     return { error: 'Email o contraseña incorrectos.' };
   }
 
-  redirect('/dashboard');
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+  redirect(profile?.role === 'superadmin' ? '/superadmin' : '/dashboard');
 }

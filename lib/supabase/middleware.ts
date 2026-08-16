@@ -28,18 +28,24 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isLoginPage = request.nextUrl.pathname === '/login';
-  const isProtected = request.nextUrl.pathname.startsWith('/dashboard');
+  const isDashboard = request.nextUrl.pathname.startsWith('/dashboard');
+  const isSuperadmin = request.nextUrl.pathname.startsWith('/superadmin');
 
-  if (!user && isProtected) {
+  if (!user && (isDashboard || isSuperadmin)) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  if (user && isLoginPage) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/dashboard';
-    return NextResponse.redirect(url);
+  if (user && (isLoginPage || isDashboard || isSuperadmin)) {
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    const home = profile?.role === 'superadmin' ? '/superadmin' : '/dashboard';
+
+    if (isLoginPage || (isDashboard && profile?.role === 'superadmin') || (isSuperadmin && profile?.role !== 'superadmin')) {
+      const url = request.nextUrl.clone();
+      url.pathname = home;
+      return NextResponse.redirect(url);
+    }
   }
 
   return response;
