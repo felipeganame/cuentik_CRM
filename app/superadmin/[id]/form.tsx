@@ -24,9 +24,13 @@ export function InmobiliariaForm({ inmobiliaria }: { inmobiliaria: Inmobiliaria 
     setSaved(false);
     setError(null);
     try {
-      await updateInmobiliaria(inmobiliaria.id, formData);
-      setSaved(true);
-      router.refresh();
+      const result = await updateInmobiliaria(inmobiliaria.id, formData);
+      if ('error' in result) {
+        setError(result.error);
+      } else {
+        setSaved(true);
+        router.refresh();
+      }
     } catch {
       setError('No se pudo guardar.');
     } finally {
@@ -39,10 +43,14 @@ export function InmobiliariaForm({ inmobiliaria }: { inmobiliaria: Inmobiliaria 
     setResetError(null);
     setNewPassword(null);
     try {
-      const password = await resetInmobiliariaPassword(inmobiliaria.id);
-      setNewPassword(password);
-    } catch (err) {
-      setResetError(err instanceof Error ? err.message : 'No se pudo restablecer la contraseña.');
+      const result = await resetInmobiliariaPassword(inmobiliaria.id);
+      if ('error' in result) {
+        setResetError(result.error);
+      } else {
+        setNewPassword(result.password);
+      }
+    } catch {
+      setResetError('No se pudo restablecer la contraseña.');
     } finally {
       setResetting(false);
     }

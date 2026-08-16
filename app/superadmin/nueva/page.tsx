@@ -18,10 +18,15 @@ export default function NuevaInmobiliariaPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const { id } = await createInmobiliaria(formData);
-      router.push(`/superadmin/${id}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo crear la inmobiliaria.');
+      const result = await createInmobiliaria(formData);
+      if ('error' in result) {
+        setError(result.error);
+        setSubmitting(false);
+        return;
+      }
+      router.push(`/superadmin/${result.id}`);
+    } catch {
+      setError('No se pudo crear la inmobiliaria. Intentá de nuevo.');
       setSubmitting(false);
     }
   }

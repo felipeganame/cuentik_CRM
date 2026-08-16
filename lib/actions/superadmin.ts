@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireSuperadmin } from '@/lib/auth';
 
-export async function createInmobiliaria(formData: FormData) {
+export async function createInmobiliaria(formData: FormData): Promise<{ error: string } | { id: string }> {
   const supabase = await createClient();
   await requireSuperadmin(supabase);
 
@@ -18,7 +18,7 @@ export async function createInmobiliaria(formData: FormData) {
   const montoMensual = Number(formData.get('monto_mensual')) || 0;
 
   if (!nombre || !emailContacto || password.length < 8) {
-    throw new Error('Datos incompletos: nombre, email y contraseña (mín. 8 caracteres) son obligatorios.');
+    return { error: 'Datos incompletos: nombre, email y contraseña (mín. 8 caracteres) son obligatorios.' };
   }
 
   const admin = createAdminClient();
@@ -28,7 +28,9 @@ export async function createInmobiliaria(formData: FormData) {
     password,
     email_confirm: true,
   });
-  if (userError) throw userError;
+  if (userError || !userData?.user) {
+    return { error: `No se pudo crear el usuario: ${userError?.message ?? 'error desconocido'}` };
+  }
 
   const { data: inmobiliaria, error: inmobiliariaError } = await admin
     .from('inmobiliarias')
@@ -42,7 +44,10 @@ export async function createInmobiliaria(formData: FormData) {
     })
     .select()
     .single();
-  if (inmobiliariaError) throw inmobiliariaError;
+  if (inmobiliariaError || !inmobiliaria) {
+    await admin.auth.admin.deleteUser(userData.user.id);
+    return { error: `No se pudo crear la inmobiliaria: ${inmobiliariaError?.message ?? 'error desconocido'}` };
+  }
 
   const { error: profileError } = await admin.from('profiles').insert({
     id: userData.user.id,
@@ -50,13 +55,17 @@ export async function createInmobiliaria(formData: FormData) {
     inmobiliaria_id: inmobiliaria.id,
     nombre,
   });
-  if (profileError) throw profileError;
+  if (profileError) {
+    await admin.auth.admin.deleteUser(userData.user.id);
+    await admin.from('inmobiliarias').delete().eq('id', inmobiliaria.id);
+    return { error: `No se pudo crear el perfil: ${profileError.message}` };
+  }
 
   revalidatePath('/superadmin');
   return { id: inmobiliaria.id as string };
 }
 
-export async function updateInmobiliaria(id: string, formData: FormData) {
+export async function updateInmobiliaria(id: string, formData: FormData): Promise<{ error: string } | { ok: true }> {
   const supabase = await createClient();
   await requireSuperadmin(supabase);
 
@@ -80,10 +89,11 @@ export async function updateInmobiliaria(id: string, formData: FormData) {
       monto_mensual: montoMensual,
     })
     .eq('id', id);
-  if (error) throw error;
+  if (error) return { error: error.message };
 
   revalidatePath('/superadmin');
   revalidatePath(`/superadmin/${id}`);
+  return { ok: true };
 }
 
 export async function toggleEstadoInmobiliaria(id: string, nuevoEstado: 'Activo' | 'Suspendido') {
@@ -91,7 +101,7 @@ export async function toggleEstadoInmobiliaria(id: string, nuevoEstado: 'Activo'
   await requireSuperadmin(supabase);
 
   const { error } = await supabase.from('inmobiliarias').update({ estado: nuevoEstado }).eq('id', id);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 
   revalidatePath('/superadmin');
 }
@@ -100,7 +110,7 @@ function randomPassword() {
   return Array.from({ length: 12 }, () => Math.random().toString(36)[2] || '0').join('');
 }
 
-export async function resetInmobiliariaPassword(id: string): Promise<string> {
+export async function resetInmobiliariaPassword(id: string): Promise<{ error: string } | { password: string }> {
   const supabase = await createClient();
   await requireSuperadmin(supabase);
 
@@ -110,12 +120,12 @@ export async function resetInmobiliariaPassword(id: string): Promise<string> {
     .eq('inmobiliaria_id', id)
     .eq('role', 'inmobiliaria')
     .single();
-  if (profileError || !profile) throw new Error('No se encontró la cuenta de esta inmobiliaria.');
+  if (profileError || !profile) return { error: 'No se encontró la cuenta de esta inmobiliaria.' };
 
   const password = randomPassword();
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.updateUserById(profile.id, { password });
-  if (error) throw error;
+  if (error) return { error: error.message };
 
-  return password;
+  return { password };
 }
