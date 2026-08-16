@@ -41,7 +41,7 @@ export default async function AlquilerDetailPage({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 22 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ fontSize: 21, fontWeight: 700 }}>{propiedadPrincipal?.direccion ?? '—'}</div>
+            <div style={{ fontSize: 21, fontWeight: 700, fontFamily: 'Vollkorn, serif' }}>{propiedadPrincipal?.direccion ?? '—'}</div>
             <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20, background: st.bg, color: st.color }}>{estadoLabel}</span>
           </div>
           <div style={{ fontSize: 13, color: 'oklch(50% 0.01 255)', marginTop: 4 }}>
@@ -63,8 +63,8 @@ export default async function AlquilerDetailPage({
                 fontSize: 13.5,
                 fontWeight: 600,
                 cursor: 'pointer',
-                color: active ? 'oklch(55% 0.16 250)' : 'oklch(52% 0.01 255)',
-                borderBottom: `2px solid ${active ? 'oklch(55% 0.16 250)' : 'transparent'}`,
+                color: active ? 'var(--accent)' : 'oklch(52% 0.01 255)',
+                borderBottom: `2px solid ${active ? 'var(--accent)' : 'transparent'}`,
                 textDecoration: 'none',
               }}
             >
@@ -129,7 +129,7 @@ function TabResumen({ alquilerId, detalle }: { alquilerId: string; detalle: Awai
         </div>
         <button
           type="submit"
-          style={{ padding: '9px 16px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
+          style={{ padding: '9px 16px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
         >
           Guardar cambios
         </button>

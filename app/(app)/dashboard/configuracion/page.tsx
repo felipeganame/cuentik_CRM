@@ -28,7 +28,7 @@ export default async function ConfiguracionPage() {
 
   return (
     <div>
-      <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 22 }}>Configuración</div>
+      <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 22, fontFamily: 'Vollkorn, serif' }}>Configuración</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 520 }}>
         <LogoForm inmobiliariaId={profile?.inmobiliaria_id ?? ''} logoUrl={logoUrl} />
         <PerfilForm

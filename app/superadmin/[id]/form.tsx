@@ -131,7 +131,7 @@ export function InmobiliariaForm({ inmobiliaria, montoMensual, estadoCobro }: { 
         <button
           type="submit"
           disabled={saving}
-          style={{ marginTop: 6, padding: '10px 16px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: saving ? 'default' : 'pointer' }}
+          style={{ marginTop: 6, padding: '10px 16px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: saving ? 'default' : 'pointer' }}
         >
           {saving ? 'Guardando…' : 'Guardar cambios'}
         </button>

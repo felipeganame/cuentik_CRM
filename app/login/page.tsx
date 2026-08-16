@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useActionState } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { login, verifyMfaCode, type LoginState } from './actions';
 
@@ -18,8 +19,8 @@ function LoginForm() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <div style={{ width: 380, background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 14, padding: '36px 32px', boxShadow: '0 4px 24px rgba(20,20,30,.06)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: 'oklch(55% 0.16 250)' }} />
-          <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-.01em' }}>Cuentik CRM</div>
+          <div style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent)' }} />
+          <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-.01em', fontFamily: 'Vollkorn, serif' }}>Cuentik CRM</div>
         </div>
         <div style={{ fontSize: 13, color: 'oklch(50% 0.01 255)', marginBottom: 28 }}>CRM de alquileres · Córdoba</div>
         {suspendido && (
@@ -48,7 +49,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={mfaPending}
-              style={{ marginTop: 6, width: '100%', padding: 11, border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 14, fontWeight: 600, cursor: mfaPending ? 'default' : 'pointer' }}
+              style={{ marginTop: 6, width: '100%', padding: 11, border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 14, fontWeight: 600, cursor: mfaPending ? 'default' : 'pointer' }}
             >
               {mfaPending ? 'Verificando…' : 'Verificar'}
             </button>
@@ -79,10 +80,16 @@ function LoginForm() {
             <button
               type="submit"
               disabled={pending}
-              style={{ marginTop: 6, width: '100%', padding: 11, border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 14, fontWeight: 600, cursor: pending ? 'default' : 'pointer' }}
+              style={{ marginTop: 6, width: '100%', padding: 11, border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 14, fontWeight: 600, cursor: pending ? 'default' : 'pointer' }}
             >
               {pending ? 'Ingresando…' : 'Ingresar'}
             </button>
+            <div style={{ textAlign: 'center', fontSize: 13, color: 'oklch(50% 0.01 255)' }}>
+              ¿No tenés cuenta?{' '}
+              <Link href="/registro" style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}>
+                Registrate gratis
+              </Link>
+            </div>
           </form>
         )}
       </div>

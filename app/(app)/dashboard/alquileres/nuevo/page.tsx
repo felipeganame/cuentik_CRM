@@ -19,7 +19,7 @@ export default async function NuevoAlquilerPage() {
         <div style={{ fontSize: 13.5, color: 'oklch(50% 0.01 255)', marginBottom: 20 }}>
           Tenés {usados} de {limite} alquileres permitidos. Contactá a Cuentik CRM para ampliar tu plan y seguir cargando.
         </div>
-        <Link href="/dashboard" style={{ color: 'oklch(55% 0.16 250)', fontWeight: 600, fontSize: 13.5, textDecoration: 'none' }}>
+        <Link href="/dashboard" style={{ color: 'var(--accent)', fontWeight: 600, fontSize: 13.5, textDecoration: 'none' }}>
           ← Volver a alquileres
         </Link>
       </div>

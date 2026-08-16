@@ -45,12 +45,12 @@ export default async function SuperadminPage() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
         <div>
-          <div style={{ fontSize: 22, fontWeight: 700 }}>Inmobiliarias</div>
+          <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Vollkorn, serif' }}>Inmobiliarias</div>
           <div style={{ fontSize: 13, color: 'oklch(50% 0.01 255)', marginTop: 4 }}>Panel de clientes de Cuentik CRM</div>
         </div>
         <Link
           href="/superadmin/nueva"
-          style={{ padding: '10px 18px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, textDecoration: 'none' }}
+          style={{ padding: '10px 18px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 600, textDecoration: 'none' }}
         >
           + Nueva inmobiliaria
         </Link>
@@ -108,7 +108,7 @@ export default async function SuperadminPage() {
               <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...badgeStyle(i.estado === 'Activo' ? 'ok' : 'bad') }}>{i.estado}</span>
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-              <Link href={`/superadmin/${i.id}`} style={{ fontSize: 12.5, fontWeight: 600, color: 'oklch(55% 0.16 250)', textDecoration: 'none' }}>
+              <Link href={`/superadmin/${i.id}`} style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>
                 Ver
               </Link>
               {i.estadoCobro !== 'Pagado' && (

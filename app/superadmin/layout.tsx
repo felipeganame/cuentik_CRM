@@ -15,8 +15,8 @@ export default async function SuperadminLayout({ children }: { children: React.R
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <div style={{ width: 230, flex: 'none', background: 'oklch(19% 0.02 258)', color: 'oklch(85% 0.01 258)', display: 'flex', flexDirection: 'column', padding: '22px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '0 6px 4px' }}>
-          <div style={{ width: 26, height: 26, borderRadius: 7, background: 'oklch(55% 0.16 250)' }} />
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Cuentik CRM</div>
+          <div style={{ width: 26, height: 26, borderRadius: 7, background: 'var(--accent)' }} />
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', fontFamily: 'Vollkorn, serif' }}>Cuentik CRM</div>
         </div>
         <div style={{ fontSize: 12, color: 'oklch(55% 0.02 258)', padding: '0 6px 22px' }}>Superadmin</div>
         <SuperadminNavLinks />

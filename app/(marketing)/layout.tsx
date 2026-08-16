@@ -14,7 +14,9 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(12px, 2.4vw, 24px)' }}>
           <MarketingNavLinks />
-          <Link href="/login" className={styles.navLink} style={{ whiteSpace: 'nowrap' }}>Iniciar sesión</Link>
+          <Link href="/login" className={styles.btnGhost} style={{ padding: '9px 16px', fontSize: 13.5, whiteSpace: 'nowrap' }}>
+            Iniciar sesión
+          </Link>
           <Link href="/registro" className={styles.btnPrimary} style={{ padding: '9px 16px', fontSize: 13.5, whiteSpace: 'nowrap' }}>
             Empezar gratis
           </Link>

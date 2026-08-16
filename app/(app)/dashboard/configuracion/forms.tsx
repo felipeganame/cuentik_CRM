@@ -149,7 +149,7 @@ export function PerfilForm({
       <button
         type="submit"
         disabled={pending}
-        style={{ marginTop: 16, padding: '10px 16px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: pending ? 'default' : 'pointer' }}
+        style={{ marginTop: 16, padding: '10px 16px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: pending ? 'default' : 'pointer' }}
       >
         {pending ? 'Guardando…' : 'Guardar cambios'}
       </button>
@@ -174,7 +174,7 @@ export function PasswordForm() {
       <button
         type="submit"
         disabled={pending}
-        style={{ marginTop: 16, padding: '10px 16px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: pending ? 'default' : 'pointer' }}
+        style={{ marginTop: 16, padding: '10px 16px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: pending ? 'default' : 'pointer' }}
       >
         {pending ? 'Guardando…' : 'Guardar cambios'}
       </button>

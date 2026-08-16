@@ -1,7 +1,15 @@
-body{margin:0;font-family:'Source Sans 3',system-ui,sans-serif;background:oklch(97% 0.004 250);-webkit-font-smoothing:antialiased}
+:root{
+  --accent: oklch(64% 0.16 40);
+  --accent-bright: oklch(70% 0.17 42);
+  --accent-deep: oklch(48% 0.14 36);
+  --bg: oklch(97% 0.014 80);
+  --card: oklch(99.5% 0.004 90);
+  --ink-text: oklch(26% 0.025 255);
+}
+body{margin:0;font-family:'Source Sans 3',system-ui,sans-serif;background:var(--bg);color:var(--ink-text);-webkit-font-smoothing:antialiased}
 *{box-sizing:border-box}
 input,select,textarea{font-family:inherit}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-thumb{background:oklch(85% 0.006 250);border-radius:4px}
-a{color:oklch(55% 0.16 250)}
-a:hover{color:oklch(46% 0.16 250)}
+a{color:var(--accent)}
+a:hover{color:var(--accent-bright)}

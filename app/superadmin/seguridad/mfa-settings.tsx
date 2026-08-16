@@ -128,7 +128,7 @@ export function MfaSettings() {
             type="button"
             onClick={handleEnroll}
             disabled={enrolling}
-            style={{ padding: '9px 14px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+            style={{ padding: '9px 14px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
           >
             {enrolling ? 'Generando…' : 'Activar verificación en dos pasos'}
           </button>
@@ -161,7 +161,7 @@ export function MfaSettings() {
               type="button"
               onClick={handleVerify}
               disabled={verifying || code.length !== 6}
-              style={{ padding: '9px 16px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: verifying ? 'default' : 'pointer' }}
+              style={{ padding: '9px 16px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: verifying ? 'default' : 'pointer' }}
             >
               {verifying ? 'Verificando…' : 'Verificar y activar'}
             </button>

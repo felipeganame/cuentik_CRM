@@ -188,7 +188,7 @@ export function NuevoAlquilerForm({
           ← Cancelar y volver
         </Link>
         <div style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 14, padding: 30 }}>
-          <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 10 }}>Este va a ser tu segundo alquiler</div>
+          <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 10, fontFamily: 'Vollkorn, serif' }}>Este va a ser tu segundo alquiler</div>
           <p style={{ fontSize: 13.5, lineHeight: 1.6, color: 'oklch(45% 0.01 255)', marginBottom: 20 }}>
             Tu primer alquiler fue gratis. A partir de este, el plan pasa a costar <strong>$1.000 ARS por alquiler
             activo, todos los meses</strong>. No te vamos a cobrar acá — el cobro sigue siendo manual y coordinado
@@ -209,7 +209,7 @@ export function NuevoAlquilerForm({
           <button
             type="button"
             onClick={() => setAvisoPagoConfirmado(true)}
-            style={{ marginTop: 22, padding: '10px 20px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
+            style={{ marginTop: 22, padding: '10px 20px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
           >
             Entendido, continuar
           </button>
@@ -223,14 +223,14 @@ export function NuevoAlquilerForm({
       <Link href="/dashboard" style={{ border: 'none', background: 'none', color: 'oklch(50% 0.01 255)', fontSize: 13, textDecoration: 'none', display: 'inline-block', marginBottom: 14 }}>
         ← Cancelar y volver
       </Link>
-      <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 22 }}>Nuevo alquiler</div>
+      <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 22, fontFamily: 'Vollkorn, serif' }}>Nuevo alquiler</div>
 
       <div style={{ display: 'flex', marginBottom: 26 }}>
         {STEP_NOMBRES.map((nombre, i) => {
           const active = i === step;
           const done = i < step;
-          const color = active ? 'oklch(55% 0.16 250)' : 'oklch(55% 0.01 255)';
-          const line = active ? 'oklch(55% 0.16 250)' : done ? 'oklch(80% 0.03 250)' : 'oklch(92% 0.006 250)';
+          const color = active ? 'var(--accent)' : 'oklch(55% 0.01 255)';
+          const line = active ? 'var(--accent)' : done ? 'oklch(80% 0.03 250)' : 'oklch(92% 0.006 250)';
           return (
             <button
               key={nombre}
@@ -301,7 +301,7 @@ export function NuevoAlquilerForm({
             type="button"
             disabled={submitting}
             onClick={handleSubmit}
-            style={{ padding: '10px 20px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: submitting ? 'default' : 'pointer' }}
+            style={{ padding: '10px 20px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: submitting ? 'default' : 'pointer' }}
           >
             {submitting ? 'Creando…' : 'Crear alquiler'}
           </button>
@@ -309,7 +309,7 @@ export function NuevoAlquilerForm({
           <button
             type="button"
             onClick={() => goToStep(Math.min(4, step + 1))}
-            style={{ padding: '10px 20px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
+            style={{ padding: '10px 20px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
           >
             Siguiente →
           </button>
@@ -442,7 +442,7 @@ function StepPropiedades({
               }}
               style={{
                 display: 'inline-block', padding: '7px 12px',
-                border: `1px dashed ${dragOverIndex === i ? 'oklch(55% 0.16 250)' : 'oklch(80% 0.01 250)'}`,
+                border: `1px dashed ${dragOverIndex === i ? 'var(--accent)' : 'oklch(80% 0.01 250)'}`,
                 borderRadius: 7, background: dragOverIndex === i ? 'oklch(96% 0.02 250)' : 'none',
                 fontSize: 12, fontWeight: 600, color: 'oklch(52% 0.01 255)', cursor: 'pointer',
               }}
@@ -642,14 +642,14 @@ function StepPago(props: {
           <button
             type="button"
             onClick={() => { props.setActualizacionTipo('porcentaje'); props.setActualizacionValor('10%'); }}
-            style={{ flex: 1, padding: 8, border: `1px solid ${isPct ? 'oklch(55% 0.16 250)' : 'oklch(87% 0.007 250)'}`, borderRadius: 7, background: isPct ? 'oklch(94% 0.03 250)' : '#fff', color: isPct ? 'oklch(55% 0.16 250)' : 'oklch(45% 0.01 255)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}
+            style={{ flex: 1, padding: 8, border: `1px solid ${isPct ? 'var(--accent)' : 'oklch(87% 0.007 250)'}`, borderRadius: 7, background: isPct ? 'oklch(94% 0.03 250)' : '#fff', color: isPct ? 'var(--accent)' : 'oklch(45% 0.01 255)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}
           >
             Porcentaje fijo
           </button>
           <button
             type="button"
             onClick={() => { props.setActualizacionTipo('indice'); props.setActualizacionValor('ICL'); }}
-            style={{ flex: 1, padding: 8, border: `1px solid ${!isPct ? 'oklch(55% 0.16 250)' : 'oklch(87% 0.007 250)'}`, borderRadius: 7, background: !isPct ? 'oklch(94% 0.03 250)' : '#fff', color: !isPct ? 'oklch(55% 0.16 250)' : 'oklch(45% 0.01 255)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}
+            style={{ flex: 1, padding: 8, border: `1px solid ${!isPct ? 'var(--accent)' : 'oklch(87% 0.007 250)'}`, borderRadius: 7, background: !isPct ? 'oklch(94% 0.03 250)' : '#fff', color: !isPct ? 'var(--accent)' : 'oklch(45% 0.01 255)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}
           >
             Índice
           </button>

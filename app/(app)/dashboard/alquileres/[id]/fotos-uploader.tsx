@@ -121,7 +121,7 @@ export function FotosUploader({
         }}
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: 100,
-          border: `1px dashed ${dragOver ? 'oklch(55% 0.16 250)' : 'oklch(80% 0.01 250)'}`, borderRadius: 10, cursor: uploading ? 'default' : 'pointer',
+          border: `1px dashed ${dragOver ? 'var(--accent)' : 'oklch(80% 0.01 250)'}`, borderRadius: 10, cursor: uploading ? 'default' : 'pointer',
           background: dragOver ? 'oklch(96% 0.02 250)' : 'none',
           fontSize: 12.5, color: 'oklch(52% 0.01 255)', fontWeight: 600,
         }}

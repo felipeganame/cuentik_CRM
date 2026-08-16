@@ -69,7 +69,7 @@ export default async function DashboardPage({
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 26 }}>
         <div>
-          <div style={{ fontSize: 22, fontWeight: 700 }}>Tus alquileres</div>
+          <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Vollkorn, serif' }}>Tus alquileres</div>
           <div style={{ fontSize: 13.5, color: 'oklch(50% 0.01 255)', marginTop: 4 }}>
             Todos los contratos que administrás ·{' '}
             <span style={{ fontWeight: 600, color: alLimite ? 'oklch(56% 0.19 25)' : 'oklch(45% 0.01 255)' }}>
@@ -91,7 +91,7 @@ export default async function DashboardPage({
         ) : (
           <Link
             href="/dashboard/alquileres/nuevo"
-            style={{ padding: '10px 16px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', textDecoration: 'none' }}
+            style={{ padding: '10px 16px', border: 'none', borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', textDecoration: 'none' }}
           >
             + Nuevo alquiler
           </Link>
@@ -116,10 +116,10 @@ export default async function DashboardPage({
               value={f}
               style={{
                 padding: '8px 14px',
-                border: `1px solid ${active ? 'oklch(55% 0.16 250)' : 'oklch(87% 0.007 250)'}`,
+                border: `1px solid ${active ? 'var(--accent)' : 'oklch(87% 0.007 250)'}`,
                 borderRadius: 20,
                 background: active ? 'oklch(94% 0.03 250)' : '#fff',
-                color: active ? 'oklch(55% 0.16 250)' : 'oklch(45% 0.01 255)',
+                color: active ? 'var(--accent)' : 'oklch(45% 0.01 255)',
                 fontSize: 12.5,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -192,7 +192,7 @@ export default async function DashboardPage({
                 {a.serviciosPendientes > 0 ? `${a.serviciosPendientes} pendiente${a.serviciosPendientes > 1 ? 's' : ''}` : 'Al día'}
               </div>
               <div style={{ textAlign: 'right' }}>
-                <Link href={`/dashboard/alquileres/${a.id}`} style={{ color: 'oklch(55% 0.16 250)', fontWeight: 600, fontSize: 13, textDecoration: 'none' }}>
+                <Link href={`/dashboard/alquileres/${a.id}`} style={{ color: 'var(--accent)', fontWeight: 600, fontSize: 13, textDecoration: 'none' }}>
                   Ver →
                 </Link>
               </div>

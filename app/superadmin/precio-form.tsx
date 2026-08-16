@@ -42,7 +42,7 @@ export function PrecioForm({ precioActual }: { precioActual: number }) {
       <button
         type="submit"
         disabled={saving}
-        style={{ padding: '7px 14px', border: 'none', borderRadius: 7, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: saving ? 'default' : 'pointer' }}
+        style={{ padding: '7px 14px', border: 'none', borderRadius: 7, background: 'var(--accent)', color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: saving ? 'default' : 'pointer' }}
       >
         {saving ? 'Guardando…' : 'Guardar'}
       </button>
