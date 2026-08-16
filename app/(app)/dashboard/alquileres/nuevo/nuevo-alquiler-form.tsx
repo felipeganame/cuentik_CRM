@@ -293,6 +293,7 @@ function StepPropiedades({
   fotosPorPropiedad: File[][]; setFotosPorPropiedad: (f: File[][]) => void;
 }) {
   const [fotoError, setFotoError] = useState<string | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   function update(i: number, field: keyof WizardPropiedadInput, value: string) {
     setPropiedades(propiedades.map((p, idx) => (idx === i ? { ...p, [field]: value } : p)));
@@ -372,8 +373,22 @@ function StepPropiedades({
                 </div>
               ))}
             </div>
-            <label style={{ display: 'inline-block', padding: '7px 12px', border: '1px dashed oklch(80% 0.01 250)', borderRadius: 7, background: 'none', fontSize: 12, fontWeight: 600, color: 'oklch(52% 0.01 255)', cursor: 'pointer' }}>
-              + Agregar fotos
+            <label
+              onDragOver={(e) => { e.preventDefault(); setDragOverIndex(i); }}
+              onDragLeave={() => setDragOverIndex(null)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOverIndex(null);
+                addFotos(i, e.dataTransfer.files);
+              }}
+              style={{
+                display: 'inline-block', padding: '7px 12px',
+                border: `1px dashed ${dragOverIndex === i ? 'oklch(55% 0.16 250)' : 'oklch(80% 0.01 250)'}`,
+                borderRadius: 7, background: dragOverIndex === i ? 'oklch(96% 0.02 250)' : 'none',
+                fontSize: 12, fontWeight: 600, color: 'oklch(52% 0.01 255)', cursor: 'pointer',
+              }}
+            >
+              + Agregar o arrastrá fotos
               <input type="file" accept="image/jpeg" multiple onChange={(e) => { addFotos(i, e.target.files); e.target.value = ''; }} style={{ display: 'none' }} />
             </label>
           </Field>

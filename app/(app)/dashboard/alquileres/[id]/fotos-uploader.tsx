@@ -24,6 +24,7 @@ export function FotosUploader({
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
 
   async function handleFiles(fileList: FileList | null) {
     if (!fileList || fileList.length === 0) return;
@@ -64,6 +65,17 @@ export function FotosUploader({
     }
   }
 
+  async function handleDownload(url: string, index: number) {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    a.download = `foto-${index + 1}.jpg`;
+    a.click();
+    URL.revokeObjectURL(objectUrl);
+  }
+
   async function handleDelete(fotoId: string, url: string) {
     const path = new URL(url).pathname.split(`/propiedad-fotos/`).pop()?.split('?')[0];
     if (!path) return;
@@ -74,9 +86,20 @@ export function FotosUploader({
   return (
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10, marginBottom: 12 }}>
-        {fotos.map((foto) => (
+        {fotos.map((foto, i) => (
           <div key={foto.id} style={{ position: 'relative' }}>
-            <img src={foto.url} alt="" style={{ width: '100%', height: 100, objectFit: 'cover', borderRadius: 8, border: '1px solid oklch(90% 0.007 250)' }} />
+            <a href={foto.url} target="_blank" rel="noreferrer">
+              <img src={foto.url} alt="" style={{ width: '100%', height: 100, objectFit: 'cover', borderRadius: 8, border: '1px solid oklch(90% 0.007 250)', display: 'block' }} />
+            </a>
+            <button
+              type="button"
+              onClick={() => handleDownload(foto.url, i)}
+              style={{ position: 'absolute', top: 4, right: 30, width: 22, height: 22, borderRadius: '50%', border: 'none', background: 'rgba(0,0,0,.6)', color: '#fff', cursor: 'pointer', fontSize: 12, lineHeight: 1 }}
+              aria-label="Descargar foto"
+              title="Descargar"
+            >
+              ⬇
+            </button>
             <button
               type="button"
               onClick={() => handleDelete(foto.id, foto.url)}
@@ -89,9 +112,17 @@ export function FotosUploader({
         ))}
       </div>
       <label
+        onDragOver={(e) => { e.preventDefault(); if (!uploading) setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          if (!uploading) handleFiles(e.dataTransfer.files);
+        }}
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: 100,
-          border: '1px dashed oklch(80% 0.01 250)', borderRadius: 10, cursor: uploading ? 'default' : 'pointer',
+          border: `1px dashed ${dragOver ? 'oklch(55% 0.16 250)' : 'oklch(80% 0.01 250)'}`, borderRadius: 10, cursor: uploading ? 'default' : 'pointer',
+          background: dragOver ? 'oklch(96% 0.02 250)' : 'none',
           fontSize: 12.5, color: 'oklch(52% 0.01 255)', fontWeight: 600,
         }}
       >
