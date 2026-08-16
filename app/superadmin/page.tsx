@@ -21,8 +21,8 @@ function formatMoney(n: number) {
   return `$${n.toLocaleString('es-AR')}`;
 }
 
-function proximoCobroLabel(dias: number | null, estado: EstadoCobro) {
-  if (dias === null) return '—';
+function proximoCobroLabel(dias: number | null, estado: EstadoCobro, alquileresActivos: number) {
+  if (dias === null) return alquileresActivos === 0 ? 'Sin alquileres' : '1er alquiler gratis';
   if (estado === 'En mora') return `Vencido hace ${Math.abs(dias)}d`;
   if (dias === 0) return 'Vence hoy';
   if (dias < 0) return `En gracia (${Math.abs(dias)}d)`;
@@ -97,10 +97,12 @@ export default async function SuperadminPage() {
             </div>
             <div>{formatMoney(i.montoMensual)}</div>
             <div>
-              <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...badgeStyle(cobroTone(i.estadoCobro)) }}>{i.estadoCobro}</span>
+              <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...badgeStyle(cobroTone(i.estadoCobro)) }}>
+                {i.exento_cobro ? 'Exento' : i.estadoCobro}
+              </span>
             </div>
             <div style={{ color: i.estadoCobro === 'En mora' ? 'oklch(56% 0.19 25)' : i.estadoCobro === 'Pendiente' ? 'oklch(55% 0.15 70)' : 'oklch(48% 0.01 255)', fontWeight: i.estadoCobro === 'Pagado' ? 400 : 700 }}>
-              {proximoCobroLabel(i.diasParaProximoCobro, i.estadoCobro)}
+              {proximoCobroLabel(i.diasParaProximoCobro, i.estadoCobro, i.alquileresActivos)}
             </div>
             <div>
               <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...badgeStyle(i.estado === 'Activo' ? 'ok' : 'bad') }}>{i.estado}</span>

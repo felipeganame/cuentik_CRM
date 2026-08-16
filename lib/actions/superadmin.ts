@@ -16,7 +16,8 @@ export async function createInmobiliaria(formData: FormData): Promise<{ error: s
   const password = String(formData.get('password') || '');
   const telefono = formatTelefono(String(formData.get('telefono_dial') || ''), String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
-  const fechaProximoCobro = String(formData.get('fecha_proximo_cobro') || '') || proximoCicloDesdeHoy();
+  const fechaProximoCobro = String(formData.get('fecha_proximo_cobro') || '') || null;
+  const exentoCobro = formData.get('exento_cobro') === 'on';
 
   if (!nombre || !emailContacto || password.length < 8) {
     return { error: 'Datos incompletos: nombre, email y contraseña (mín. 8 caracteres) son obligatorios.' };
@@ -41,6 +42,7 @@ export async function createInmobiliaria(formData: FormData): Promise<{ error: s
       telefono,
       limite_alquileres: limiteAlquileres,
       fecha_proximo_cobro: fechaProximoCobro,
+      exento_cobro: exentoCobro,
     })
     .select()
     .single();
@@ -74,6 +76,7 @@ export async function updateInmobiliaria(id: string, formData: FormData): Promis
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
   const fechaProximoCobro = String(formData.get('fecha_proximo_cobro') || '') || null;
   const estado = String(formData.get('estado') || 'Activo');
+  const exentoCobro = formData.get('exento_cobro') === 'on';
 
   const { error } = await supabase
     .from('inmobiliarias')
@@ -83,6 +86,7 @@ export async function updateInmobiliaria(id: string, formData: FormData): Promis
       limite_alquileres: limiteAlquileres,
       fecha_proximo_cobro: fechaProximoCobro,
       estado,
+      exento_cobro: exentoCobro,
     })
     .eq('id', id);
   if (error) return { error: error.message };

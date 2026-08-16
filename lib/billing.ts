@@ -2,7 +2,8 @@ export type EstadoCobro = 'Pagado' | 'Pendiente' | 'En mora';
 
 const DIAS_GRACIA = 2;
 
-export function estadoCobro(fechaProximoCobro: string | null, hoy: Date = new Date()): EstadoCobro {
+export function estadoCobro(fechaProximoCobro: string | null, exento: boolean = false, hoy: Date = new Date()): EstadoCobro {
+  if (exento) return 'Pagado';
   if (!fechaProximoCobro) return 'Pagado';
   const due = new Date(fechaProximoCobro + 'T00:00:00');
   const graceEnd = new Date(due);

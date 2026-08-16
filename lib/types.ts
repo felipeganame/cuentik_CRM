@@ -11,6 +11,7 @@ export type Inmobiliaria = {
   estado: 'Activo' | 'Suspendido';
   fecha_proximo_cobro: string | null;
   logo_url: string | null;
+  exento_cobro: boolean;
 };
 
 export type Alquiler = {

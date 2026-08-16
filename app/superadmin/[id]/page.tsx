@@ -24,8 +24,8 @@ export default async function InmobiliariaDetailPage({ params }: { params: Promi
       <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 22 }}>{inmobiliaria.nombre}</div>
       <InmobiliariaForm
         inmobiliaria={inmobiliaria}
-        montoMensual={precioPorAlquiler * usados}
-        estadoCobro={estadoCobro(inmobiliaria.fecha_proximo_cobro)}
+        montoMensual={precioPorAlquiler * Math.max(0, usados - 1)}
+        estadoCobro={estadoCobro(inmobiliaria.fecha_proximo_cobro, inmobiliaria.exento_cobro)}
       />
     </div>
   );

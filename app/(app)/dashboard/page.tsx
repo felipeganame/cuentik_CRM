@@ -21,17 +21,17 @@ export default async function DashboardPage({
   } = await supabase.auth.getUser();
   const { data: profile } = await supabase
     .from('profiles')
-    .select('inmobiliarias(limite_alquileres, fecha_proximo_cobro)')
+    .select('inmobiliarias(limite_alquileres, fecha_proximo_cobro, exento_cobro)')
     .eq('id', user!.id)
     .single();
   const inmobiliariaRel = profile?.inmobiliarias as unknown as
-    | { limite_alquileres: number; fecha_proximo_cobro: string | null }
-    | { limite_alquileres: number; fecha_proximo_cobro: string | null }[]
+    | { limite_alquileres: number; fecha_proximo_cobro: string | null; exento_cobro: boolean }
+    | { limite_alquileres: number; fecha_proximo_cobro: string | null; exento_cobro: boolean }[]
     | null;
   const inmobiliaria = Array.isArray(inmobiliariaRel) ? inmobiliariaRel[0] : inmobiliariaRel;
   const limiteAlquileres = inmobiliaria?.limite_alquileres ?? 0;
   const alLimite = all.length >= limiteAlquileres;
-  const enMora = estadoCobro(inmobiliaria?.fecha_proximo_cobro ?? null) === 'En mora';
+  const enMora = estadoCobro(inmobiliaria?.fecha_proximo_cobro ?? null, inmobiliaria?.exento_cobro ?? false) === 'En mora';
 
   const query = q.trim().toLowerCase();
   const filtered = all

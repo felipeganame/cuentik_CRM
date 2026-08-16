@@ -109,6 +109,9 @@ export function InmobiliariaForm({ inmobiliaria, montoMensual, estadoCobro }: { 
         <div>
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Próximo cobro</div>
           <input name="fecha_proximo_cobro" type="date" defaultValue={inmobiliaria.fecha_proximo_cobro ?? ''} style={fieldStyle()} />
+          <div style={{ fontSize: 11.5, color: 'oklch(55% 0.01 255)', marginTop: 5 }}>
+            Vacío = sin ciclo activo (todavía no pasó del primer alquiler gratis).
+          </div>
         </div>
         <div>
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Estado</div>
@@ -117,6 +120,10 @@ export function InmobiliariaForm({ inmobiliaria, montoMensual, estadoCobro }: { 
             <option value="Suspendido">Suspendido</option>
           </select>
         </div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+          <input type="checkbox" name="exento_cobro" defaultChecked={inmobiliaria.exento_cobro} />
+          Cuenta de prueba (exenta de cobro)
+        </label>
 
         {error && <div style={{ fontSize: 12.5, color: 'oklch(56% 0.19 25)' }}>{error}</div>}
         {saved && <div style={{ fontSize: 12.5, color: 'oklch(45% 0.13 150)' }}>Guardado.</div>}
@@ -136,7 +143,9 @@ export function InmobiliariaForm({ inmobiliaria, montoMensual, estadoCobro }: { 
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
           <div style={{ fontSize: 18, fontWeight: 700 }}>${montoMensual.toLocaleString('es-AR')}/mes</div>
-          <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...cobroBadgeStyle(estadoCobro) }}>{estadoCobro}</span>
+          <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...cobroBadgeStyle(estadoCobro) }}>
+            {inmobiliaria.exento_cobro ? 'Exento' : estadoCobro}
+          </span>
         </div>
         {estadoCobro !== 'Pagado' && (
           <button

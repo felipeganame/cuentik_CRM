@@ -73,8 +73,8 @@ export async function listInmobiliariasConMetricas(supabase: SupabaseClient): Pr
       ...i,
       alquileresActivos: activos,
       propiedadesActuales: propiedadesPorInmobiliaria.get(i.id) ?? 0,
-      montoMensual: precioPorAlquiler * activos,
-      estadoCobro: estadoCobro(i.fecha_proximo_cobro, hoy),
+      montoMensual: precioPorAlquiler * Math.max(0, activos - 1),
+      estadoCobro: estadoCobro(i.fecha_proximo_cobro, i.exento_cobro, hoy),
       diasParaProximoCobro: i.fecha_proximo_cobro
         ? Math.round((new Date(i.fecha_proximo_cobro + 'T00:00:00').getTime() - hoy.getTime()) / 86400000)
         : null,

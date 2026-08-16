@@ -2,7 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { mesActualLabel } from '@/lib/types';
+import { proximoCicloDesdeHoy } from '@/lib/billing';
 
 export async function deleteAlquiler(alquilerId: string) {
   const supabase = await createClient();
@@ -202,7 +204,7 @@ export async function createAlquiler(input: {
 
   const { data: inmobiliaria } = await supabase
     .from('inmobiliarias')
-    .select('limite_alquileres')
+    .select('limite_alquileres, fecha_proximo_cobro, exento_cobro')
     .eq('id', profile.inmobiliaria_id)
     .single();
 
@@ -233,6 +235,13 @@ export async function createAlquiler(input: {
     .select()
     .single();
   if (alquilerError) throw alquilerError;
+
+  // First alquiler is free; the billing cycle starts once an agency creates
+  // its 2nd (alquileresActuales counted BEFORE this insert, so ===1 means
+  // this new one is the 2nd overall).
+  if (inmobiliaria && !inmobiliaria.exento_cobro && !inmobiliaria.fecha_proximo_cobro && (alquileresActuales ?? 0) === 1) {
+    await createAdminClient().from('inmobiliarias').update({ fecha_proximo_cobro: proximoCicloDesdeHoy() }).eq('id', profile.inmobiliaria_id);
+  }
 
   const propiedadesCreadas: { id: string }[] = [];
   for (const p of input.propiedades) {

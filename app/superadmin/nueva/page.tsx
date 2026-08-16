@@ -70,10 +70,12 @@ export default function NuevaInmobiliariaPage() {
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Límite de alquileres</div>
           <input name="limite_alquileres" type="number" defaultValue={20} style={fieldStyle()} />
         </div>
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Próximo cobro</div>
-          <input name="fecha_proximo_cobro" type="date" style={fieldStyle()} />
-          <div style={{ fontSize: 11.5, color: 'oklch(55% 0.01 255)', marginTop: 5 }}>Si lo dejás vacío, se pone a un mes desde hoy.</div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+          <input type="checkbox" name="exento_cobro" />
+          Cuenta de prueba (exenta de cobro)
+        </label>
+        <div style={{ fontSize: 11.5, color: 'oklch(55% 0.01 255)' }}>
+          El primer alquiler es gratis para todos. A partir del segundo se cobra automáticamente, salvo que marques esta cuenta como exenta.
         </div>
 
         {error && <div style={{ fontSize: 12.5, color: 'oklch(56% 0.19 25)' }}>{error}</div>}
