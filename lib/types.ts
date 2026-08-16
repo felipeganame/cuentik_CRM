@@ -18,6 +18,7 @@ export type Inmobiliaria = {
 };
 
 export type Operacion = 'venta' | 'alquiler';
+export type Moneda = 'ARS' | 'USD';
 
 export const SERVICIOS_OPCIONES = [
   'Agua corriente',
@@ -33,6 +34,14 @@ export const SERVICIOS_OPCIONES = [
   'Parrilla',
 ] as const;
 
+export const ORIENTACION_OPCIONES = ['Norte', 'Noreste', 'Este', 'Sudeste', 'Sur', 'Sudoeste', 'Oeste', 'Noroeste'] as const;
+
+export const ESTADO_OPCIONES = ['A estrenar', 'Excelente', 'Muy bueno', 'Bueno', 'A refaccionar'] as const;
+
+// Tipos donde tiene sentido pedir superficie total y de terreno además de
+// cubierta/semicubierta (una casa o un terreno tienen lote; un depto no).
+export const TIPOS_CON_TERRENO = ['Casa', 'Terreno'] as const;
+
 export type Publicacion = {
   id: string;
   inmobiliaria_id: string;
@@ -41,13 +50,19 @@ export type Publicacion = {
   titulo: string;
   descripcion: string | null;
   precio: number | null;
-  localidad: string | null;
-  direccion: string | null;
+  moneda: Moneda;
+  pais: string;
+  provincia: string;
+  ciudad: string;
+  calle: string;
+  numero: string;
+  barrio: string | null;
   dormitorios: number | null;
   banos: number | null;
   ambientes: number | null;
   superficie_total: number | null;
   superficie_cubierta: number | null;
+  superficie_semicubierta: number | null;
   superficie_terreno: number | null;
   antiguedad: string | null;
   orientacion: string | null;

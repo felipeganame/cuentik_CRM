@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -10,8 +10,9 @@ import {
   recordPublicacionFotoUpload,
   type PublicacionInput,
 } from '@/lib/actions/publicaciones';
-import { SERVICIOS_OPCIONES, type Operacion, type Publicacion } from '@/lib/types';
+import { ESTADO_OPCIONES, ORIENTACION_OPCIONES, SERVICIOS_OPCIONES, TIPOS_CON_TERRENO, type Moneda, type Operacion, type Publicacion } from '@/lib/types';
 import type { PublicacionFotoConUrl } from '@/lib/queries';
+import { PAISES } from '@/lib/paises';
 
 const TIPOS = ['Departamento', 'Casa', 'Terreno', 'Cochera', 'Local', 'Oficina'];
 const MAX_FOTO_BYTES = 1024 * 1024;
@@ -59,34 +60,57 @@ export function PublicacionForm({
   const [titulo, setTitulo] = useState(publicacion?.titulo ?? '');
   const [descripcion, setDescripcion] = useState(publicacion?.descripcion ?? '');
   const [precio, setPrecio] = useState(publicacion?.precio != null ? String(publicacion.precio) : '');
+  const [moneda, setMoneda] = useState<Moneda>(publicacion?.moneda ?? 'ARS');
   const [expensas, setExpensas] = useState(publicacion?.expensas != null ? String(publicacion.expensas) : '');
-  const [localidad, setLocalidad] = useState(publicacion?.localidad ?? '');
-  const [direccion, setDireccion] = useState(publicacion?.direccion ?? '');
+  const [pais, setPais] = useState(publicacion?.pais ?? 'Argentina');
+  const [provincia, setProvincia] = useState(publicacion?.provincia ?? 'Córdoba');
+  const [ciudad, setCiudad] = useState(publicacion?.ciudad ?? '');
+  const [calle, setCalle] = useState(publicacion?.calle ?? '');
+  const [numero, setNumero] = useState(publicacion?.numero ?? '');
+  const [barrio, setBarrio] = useState(publicacion?.barrio ?? '');
   const [dormitorios, setDormitorios] = useState(publicacion?.dormitorios != null ? String(publicacion.dormitorios) : '');
   const [banos, setBanos] = useState(publicacion?.banos != null ? String(publicacion.banos) : '');
   const [ambientes, setAmbientes] = useState(publicacion?.ambientes != null ? String(publicacion.ambientes) : '');
   const [superficieTotal, setSuperficieTotal] = useState(publicacion?.superficie_total != null ? String(publicacion.superficie_total) : '');
   const [superficieCubierta, setSuperficieCubierta] = useState(publicacion?.superficie_cubierta != null ? String(publicacion.superficie_cubierta) : '');
+  const [superficieSemicubierta, setSuperficieSemicubierta] = useState(publicacion?.superficie_semicubierta != null ? String(publicacion.superficie_semicubierta) : '');
   const [superficieTerreno, setSuperficieTerreno] = useState(publicacion?.superficie_terreno != null ? String(publicacion.superficie_terreno) : '');
   const [antiguedad, setAntiguedad] = useState(publicacion?.antiguedad ?? '');
   const [orientacion, setOrientacion] = useState(publicacion?.orientacion ?? '');
-  const [estado, setEstado] = useState(publicacion?.estado ?? '');
+  const [estado, setEstado] = useState(publicacion?.estado ?? ESTADO_OPCIONES[0]);
   const [videoUrl, setVideoUrl] = useState(publicacion?.video_url ?? '');
   const [servicios, setServicios] = useState<string[]>(publicacion?.servicios ?? []);
+  const [servicioCustom, setServicioCustom] = useState('');
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [pendingPreviews, setPendingPreviews] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const tieneTerreno = TIPOS_CON_TERRENO.includes(tipo as (typeof TIPOS_CON_TERRENO)[number]);
+
+  useEffect(() => {
+    return () => {
+      pendingPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function toggleServicio(s: string) {
     setServicios((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
   }
 
-  async function handleSubmit() {
-    if (!titulo.trim()) {
-      setErrorMsg('Ingresá un título para la publicación.');
+  function agregarServicioCustom() {
+    const valor = servicioCustom.trim();
+    if (!valor || servicios.includes(valor)) {
+      setServicioCustom('');
       return;
     }
+    setServicios((prev) => [...prev, valor]);
+    setServicioCustom('');
+  }
+
+  async function handleSubmit() {
     setSaving(true);
     setErrorMsg(null);
 
@@ -96,14 +120,20 @@ export function PublicacionForm({
       titulo,
       descripcion,
       precio: numOrNull(precio),
-      localidad,
-      direccion,
+      moneda,
+      pais,
+      provincia,
+      ciudad,
+      calle,
+      numero,
+      barrio,
       dormitorios: numOrNull(dormitorios),
       banos: numOrNull(banos),
       ambientes: numOrNull(ambientes),
-      superficieTotal: numOrNull(superficieTotal),
+      superficieTotal: tieneTerreno ? numOrNull(superficieTotal) : null,
       superficieCubierta: numOrNull(superficieCubierta),
-      superficieTerreno: numOrNull(superficieTerreno),
+      superficieSemicubierta: numOrNull(superficieSemicubierta),
+      superficieTerreno: tieneTerreno ? numOrNull(superficieTerreno) : null,
       antiguedad,
       orientacion,
       estado,
@@ -158,7 +188,12 @@ export function PublicacionForm({
     }
 
     if (mode === 'crear') {
-      setPendingFiles((prev) => [...prev, ...files].slice(0, MAX_FOTOS));
+      const nextFiles = [...pendingFiles, ...files].slice(0, MAX_FOTOS);
+      setPendingFiles(nextFiles);
+      setPendingPreviews((prev) => {
+        prev.forEach((url) => URL.revokeObjectURL(url));
+        return nextFiles.map((f) => URL.createObjectURL(f));
+      });
       return;
     }
 
@@ -171,6 +206,12 @@ export function PublicacionForm({
     }
     router.refresh();
     if (inputRef.current) inputRef.current.value = '';
+  }
+
+  function handleRemovePendingFile(index: number) {
+    URL.revokeObjectURL(pendingPreviews[index]);
+    setPendingFiles((prev) => prev.filter((_, i) => i !== index));
+    setPendingPreviews((prev) => prev.filter((_, i) => i !== index));
   }
 
   async function handleDeleteFoto(fotoId: string, url: string) {
@@ -205,16 +246,44 @@ export function PublicacionForm({
 
         <SectionTitle>Ubicación</SectionTitle>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <Field label="Dirección">
-            <input value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Ej: Poeta Lugones al 300" style={fieldStyle()} />
+          <Field label="País *">
+            <select value={pais} onChange={(e) => setPais(e.target.value)} style={fieldStyle()}>
+              {PAISES.map((p) => (
+                <option key={p.iso} value={p.nombre}>
+                  {p.nombre}
+                </option>
+              ))}
+            </select>
           </Field>
-          <Field label="Localidad">
-            <input value={localidad} onChange={(e) => setLocalidad(e.target.value)} placeholder="Ej: Nueva Córdoba" style={fieldStyle()} />
+          <Field label="Provincia *">
+            <input value={provincia} onChange={(e) => setProvincia(e.target.value)} placeholder="Ej: Córdoba" style={fieldStyle()} />
+          </Field>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <Field label="Ciudad *">
+            <input value={ciudad} onChange={(e) => setCiudad(e.target.value)} placeholder="Ej: Ciudad de Córdoba" style={fieldStyle()} />
+          </Field>
+          <Field label="Barrio">
+            <input value={barrio} onChange={(e) => setBarrio(e.target.value)} placeholder="Ej: Nueva Córdoba" style={fieldStyle()} />
+          </Field>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
+          <Field label="Calle *">
+            <input value={calle} onChange={(e) => setCalle(e.target.value)} placeholder="Ej: Poeta Lugones" style={fieldStyle()} />
+          </Field>
+          <Field label="Número *">
+            <input value={numero} onChange={(e) => setNumero(e.target.value)} placeholder="Ej: 300" style={fieldStyle()} />
           </Field>
         </div>
 
         <SectionTitle>Precio</SectionTitle>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          <Field label="Moneda">
+            <select value={moneda} onChange={(e) => setMoneda(e.target.value as Moneda)} style={fieldStyle()}>
+              <option value="ARS">Pesos (ARS)</option>
+              <option value="USD">Dólares (USD)</option>
+            </select>
+          </Field>
           <Field label="Precio">
             <input type="number" value={precio} onChange={(e) => setPrecio(e.target.value)} placeholder="Dejalo vacío para “Consultar precio”" style={fieldStyle()} />
           </Field>
@@ -234,28 +303,44 @@ export function PublicacionForm({
           <Field label="Baños">
             <input type="number" value={banos} onChange={(e) => setBanos(e.target.value)} style={fieldStyle()} />
           </Field>
-          <Field label="Sup. total (m²)">
-            <input type="number" value={superficieTotal} onChange={(e) => setSuperficieTotal(e.target.value)} style={fieldStyle()} />
-          </Field>
-          <Field label="Sup. cubierta (m²)">
+          {tieneTerreno && (
+            <Field label="Sup. total (m², opcional)">
+              <input type="number" value={superficieTotal} onChange={(e) => setSuperficieTotal(e.target.value)} style={fieldStyle()} />
+            </Field>
+          )}
+          <Field label="Sup. cubierta (m², opcional)">
             <input type="number" value={superficieCubierta} onChange={(e) => setSuperficieCubierta(e.target.value)} style={fieldStyle()} />
           </Field>
-          <Field label="Sup. terreno (m²)">
-            <input type="number" value={superficieTerreno} onChange={(e) => setSuperficieTerreno(e.target.value)} style={fieldStyle()} />
+          <Field label="Sup. semicubierta (m², opcional)">
+            <input type="number" value={superficieSemicubierta} onChange={(e) => setSuperficieSemicubierta(e.target.value)} style={fieldStyle()} />
           </Field>
+          {tieneTerreno && (
+            <Field label="Sup. terreno (m², opcional)">
+              <input type="number" value={superficieTerreno} onChange={(e) => setSuperficieTerreno(e.target.value)} style={fieldStyle()} />
+            </Field>
+          )}
           <Field label="Antigüedad">
             <input value={antiguedad} onChange={(e) => setAntiguedad(e.target.value)} placeholder="Ej: A estrenar, 20 años" style={fieldStyle()} />
           </Field>
           <Field label="Orientación">
-            <input value={orientacion} onChange={(e) => setOrientacion(e.target.value)} placeholder="Ej: Noreste" style={fieldStyle()} />
+            <select value={orientacion} onChange={(e) => setOrientacion(e.target.value)} style={fieldStyle()}>
+              <option value="">Sin especificar</option>
+              {ORIENTACION_OPCIONES.map((o) => (
+                <option key={o}>{o}</option>
+              ))}
+            </select>
           </Field>
-          <Field label="Estado">
-            <input value={estado} onChange={(e) => setEstado(e.target.value)} placeholder="Ej: Excelente" style={fieldStyle()} />
+          <Field label="Estado *">
+            <select value={estado} onChange={(e) => setEstado(e.target.value)} style={fieldStyle()}>
+              {ESTADO_OPCIONES.map((e) => (
+                <option key={e}>{e}</option>
+              ))}
+            </select>
           </Field>
         </div>
 
         <SectionTitle>Servicios</SectionTitle>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
           {SERVICIOS_OPCIONES.map((s) => {
             const checked = servicios.includes(s);
             return (
@@ -278,6 +363,51 @@ export function PublicacionForm({
               </button>
             );
           })}
+          {servicios
+            .filter((s) => !(SERVICIOS_OPCIONES as readonly string[]).includes(s))
+            .map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => toggleServicio(s)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '7px 12px',
+                  borderRadius: 20,
+                  border: '1px solid var(--accent)',
+                  background: 'oklch(96% 0.03 40)',
+                  color: 'var(--accent-deep, var(--accent))',
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {s} ×
+              </button>
+            ))}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            value={servicioCustom}
+            onChange={(e) => setServicioCustom(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                agregarServicioCustom();
+              }
+            }}
+            placeholder="Agregar otro servicio (Ej: Aire acondicionado)"
+            style={{ ...fieldStyle(), flex: 1 }}
+          />
+          <button
+            type="button"
+            onClick={agregarServicioCustom}
+            style={{ padding: '9px 16px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 7, background: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+          >
+            + Agregar
+          </button>
         </div>
 
         <SectionTitle>Descripción</SectionTitle>
@@ -306,9 +436,22 @@ export function PublicacionForm({
               ))}
             </div>
           )}
-          {mode === 'crear' && pendingFiles.length > 0 && (
-            <div style={{ fontSize: 12, color: 'oklch(50% 0.01 255)', marginBottom: 8 }}>
-              {pendingFiles.length} foto(s) seleccionada(s)
+          {mode === 'crear' && pendingPreviews.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 8, marginBottom: 10 }}>
+              {pendingPreviews.map((url, i) => (
+                <div key={url} style={{ position: 'relative' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt="" style={{ width: '100%', height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid oklch(90% 0.007 250)', display: 'block' }} />
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePendingFile(i)}
+                    style={{ position: 'absolute', top: 4, right: 4, width: 20, height: 20, borderRadius: '50%', border: 'none', background: 'rgba(0,0,0,.6)', color: '#fff', cursor: 'pointer', fontSize: 11, lineHeight: 1 }}
+                    aria-label="Quitar foto"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
             </div>
           )}
           <label style={{ display: 'inline-block', padding: '8px 14px', border: '1px dashed oklch(80% 0.01 250)', borderRadius: 8, background: 'none', fontSize: 12.5, fontWeight: 600, color: 'oklch(52% 0.01 255)', cursor: 'pointer' }}>

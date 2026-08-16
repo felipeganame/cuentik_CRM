@@ -3,24 +3,8 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentRole } from '@/lib/auth';
 import { getPaginaPreview, type PublicacionPreview } from '@/lib/queries';
-import { waDigits } from '@/lib/phone';
 import { PaginaPreviewFiltros } from './filtros';
-
-const OPERACION_LABEL: Record<string, string> = { venta: 'Venta', alquiler: 'Alquiler' };
-
-function formatPrecio(precio: number | null) {
-  if (precio === null) return 'Consultar precio';
-  return `$${precio.toLocaleString('es-AR')}`;
-}
-
-function statsLine(p: { ambientes: number | null; dormitorios: number | null; banos: number | null; superficie_total: number | null }) {
-  const parts: string[] = [];
-  if (p.ambientes) parts.push(`${p.ambientes} amb.`);
-  if (p.dormitorios) parts.push(`${p.dormitorios} dorm.`);
-  if (p.banos) parts.push(`${p.banos} baño${p.banos === 1 ? '' : 's'}`);
-  if (p.superficie_total) parts.push(`${p.superficie_total} m²`);
-  return parts.join(' · ');
-}
+import { PaginaPreviewListado } from './listado';
 
 function aplicarFiltros(
   publicaciones: PublicacionPreview[],
@@ -31,7 +15,7 @@ function aplicarFiltros(
     if (params.operacion !== 'Todos' && params.operacion.toLowerCase() !== p.operacion) return false;
     if (params.tipo !== 'Todos' && params.tipo !== p.tipo) return false;
     if (query) {
-      const haystack = [p.titulo, p.direccion, p.localidad].filter(Boolean).join(' ').toLowerCase();
+      const haystack = [p.titulo, p.calle, p.numero, p.barrio, p.ciudad].filter(Boolean).join(' ').toLowerCase();
       if (!haystack.includes(query)) return false;
     }
     return true;
@@ -103,58 +87,7 @@ export default async function MiPaginaPreviewPage({
             No encontramos publicaciones que coincidan con la búsqueda o el filtro.
           </div>
         ) : (
-          <div style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 10, overflow: 'hidden' }}>
-            {publicacionesFiltradas.map((p, i) => (
-              <div
-                key={p.id}
-                style={{
-                  display: 'flex',
-                  gap: 16,
-                  padding: 16,
-                  borderTop: i === 0 ? 'none' : '1px solid oklch(92% 0.006 250)',
-                }}
-              >
-                <div style={{ width: 140, height: 100, flex: 'none', borderRadius: 8, background: 'oklch(94% 0.005 250)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {p.fotos[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.fotos[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <span style={{ fontSize: 10.5, color: 'oklch(60% 0.01 255)' }}>Sin foto</span>
-                  )}
-                </div>
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent-deep, var(--accent))', marginBottom: 3 }}>{p.titulo}</div>
-                  {(p.direccion || p.localidad) && (
-                    <div style={{ fontSize: 12.5, color: 'oklch(50% 0.01 255)', marginBottom: 4 }}>
-                      {[p.direccion, p.localidad].filter(Boolean).join(' — ')}
-                    </div>
-                  )}
-                  <div style={{ fontSize: 12, fontWeight: 600, color: 'oklch(45% 0.01 255)' }}>
-                    {p.tipo} · {OPERACION_LABEL[p.operacion]}
-                    {statsLine(p) ? ` · ${statsLine(p)}` : ''}
-                  </div>
-                </div>
-                <div style={{ flex: 'none', textAlign: 'right', alignSelf: 'center', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-                  <div>
-                    <div style={{ fontSize: 11, color: 'oklch(55% 0.01 255)', marginBottom: 2 }}>
-                      Precio de {p.operacion === 'venta' ? 'venta' : 'alquiler'}
-                    </div>
-                    <div style={{ fontSize: 16, fontWeight: 700 }}>{formatPrecio(p.precio)}</div>
-                  </div>
-                  {data.telefono && (
-                    <a
-                      href={`https://wa.me/${waDigits(data.telefono)}?text=${encodeURIComponent(`Hola! Te escribo por "${p.titulo}"`)}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 20, background: 'oklch(58% 0.14 150)', color: '#fff', fontSize: 12, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap' }}
-                    >
-                      WhatsApp
-                    </a>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          <PaginaPreviewListado publicaciones={publicacionesFiltradas} telefono={data.telefono} />
         )}
       </main>
     </div>

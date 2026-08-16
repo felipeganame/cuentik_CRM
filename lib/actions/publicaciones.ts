@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import type { Operacion } from '@/lib/types';
+import type { Moneda, Operacion } from '@/lib/types';
 
 export type PublicacionInput = {
   tipo: string;
@@ -10,13 +10,19 @@ export type PublicacionInput = {
   titulo: string;
   descripcion: string;
   precio: number | null;
-  localidad: string;
-  direccion: string;
+  moneda: Moneda;
+  pais: string;
+  provincia: string;
+  ciudad: string;
+  calle: string;
+  numero: string;
+  barrio: string;
   dormitorios: number | null;
   banos: number | null;
   ambientes: number | null;
   superficieTotal: number | null;
   superficieCubierta: number | null;
+  superficieSemicubierta: number | null;
   superficieTerreno: number | null;
   antiguedad: string;
   orientacion: string;
@@ -33,13 +39,19 @@ function publicacionRow(input: PublicacionInput) {
     titulo: input.titulo.trim(),
     descripcion: input.descripcion.trim() || null,
     precio: input.precio,
-    localidad: input.localidad.trim() || null,
-    direccion: input.direccion.trim() || null,
+    moneda: input.moneda,
+    pais: input.pais.trim(),
+    provincia: input.provincia.trim(),
+    ciudad: input.ciudad.trim(),
+    calle: input.calle.trim(),
+    numero: input.numero.trim(),
+    barrio: input.barrio.trim() || null,
     dormitorios: input.dormitorios,
     banos: input.banos,
     ambientes: input.ambientes,
     superficie_total: input.superficieTotal,
     superficie_cubierta: input.superficieCubierta,
+    superficie_semicubierta: input.superficieSemicubierta,
     superficie_terreno: input.superficieTerreno,
     antiguedad: input.antiguedad.trim() || null,
     orientacion: input.orientacion.trim() || null,
@@ -48,6 +60,15 @@ function publicacionRow(input: PublicacionInput) {
     video_url: input.videoUrl.trim() || null,
     servicios: input.servicios,
   };
+}
+
+function validarPublicacion(input: PublicacionInput): string | null {
+  if (!input.titulo.trim()) return 'Ingresá un título para la publicación.';
+  if (!input.provincia.trim() || !input.ciudad.trim() || !input.calle.trim() || !input.numero.trim()) {
+    return 'Completá provincia, ciudad, calle y número.';
+  }
+  if (!input.estado.trim()) return 'Elegí el estado de la propiedad.';
+  return null;
 }
 
 async function getInmobiliariaId(supabase: Awaited<ReturnType<typeof createClient>>): Promise<string | null> {
@@ -64,7 +85,8 @@ export async function crearPublicacion(input: PublicacionInput): Promise<{ error
   const inmobiliariaId = await getInmobiliariaId(supabase);
   if (!inmobiliariaId) return { error: 'No se encontró la inmobiliaria del usuario.' };
 
-  if (!input.titulo.trim()) return { error: 'Ingresá un título para la publicación.' };
+  const validacionError = validarPublicacion(input);
+  if (validacionError) return { error: validacionError };
 
   const { data, error } = await supabase
     .from('publicaciones')
@@ -79,7 +101,8 @@ export async function crearPublicacion(input: PublicacionInput): Promise<{ error
 
 export async function actualizarPublicacion(id: string, input: PublicacionInput): Promise<{ error: string } | { ok: true }> {
   const supabase = await createClient();
-  if (!input.titulo.trim()) return { error: 'Ingresá un título para la publicación.' };
+  const validacionError = validarPublicacion(input);
+  if (validacionError) return { error: validacionError };
 
   const { error } = await supabase.from('publicaciones').update(publicacionRow(input)).eq('id', id);
   if (error) return { error: 'No se pudo guardar la publicación.' };

@@ -20,6 +20,9 @@ test('página web: content form, publicación CRUD, pause, and preview', async (
   await page.getByRole('link', { name: '+ Nueva publicación' }).click();
   await expect(page).toHaveURL(/\/dashboard\/pagina\/nueva$/);
   await page.locator('input').first().fill('Depto 2 ambientes en Nueva Córdoba');
+  await page.getByPlaceholder('Ej: Ciudad de Córdoba').fill('Córdoba');
+  await page.getByPlaceholder('Ej: Poeta Lugones').fill('Obispo Trejo');
+  await page.getByPlaceholder('Ej: 300').fill('450');
   await page.getByPlaceholder('Dejalo vacío para “Consultar precio”').fill('150000');
   await page.getByRole('button', { name: 'Crear publicación' }).click();
   await expect(page).toHaveURL(/\/dashboard\/pagina$/, { timeout: 10_000 });
@@ -44,7 +47,7 @@ test('página web: content form, publicación CRUD, pause, and preview', async (
   const previewPage2 = await page.context().newPage();
   await previewPage2.goto('/mi-pagina-preview');
   await expect(previewPage2.getByText('Depto 2 ambientes en Nueva Córdoba')).toBeVisible();
-  await expect(previewPage2.getByText('$150.000')).toBeVisible();
+  await expect(previewPage2.getByText('$ 150.000')).toBeVisible();
 
   // Search and filters
   await previewPage2.getByPlaceholder('Buscar por título, dirección o localidad…').fill('no existe');

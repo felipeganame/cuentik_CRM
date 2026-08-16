@@ -8,9 +8,11 @@ import type { PublicacionConFoto } from '@/lib/queries';
 
 const OPERACION_LABEL: Record<string, string> = { venta: 'Venta', alquiler: 'Alquiler' };
 
-function formatPrecio(precio: number | null) {
+const MONEDA_SIMBOLO: Record<string, string> = { ARS: '$', USD: 'U$S' };
+
+function formatPrecio(precio: number | null, moneda: string) {
   if (precio === null) return 'Consultar precio';
-  return `$${precio.toLocaleString('es-AR')}`;
+  return `${MONEDA_SIMBOLO[moneda] ?? '$'} ${precio.toLocaleString('es-AR')}`;
 }
 
 export function PublicacionesList({ publicaciones }: { publicaciones: PublicacionConFoto[] }) {
@@ -87,8 +89,8 @@ export function PublicacionesList({ publicaciones }: { publicaciones: Publicacio
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.titulo}</div>
                 <div style={{ fontSize: 12, color: 'oklch(50% 0.01 255)', marginTop: 2 }}>
-                  {p.tipo} · {OPERACION_LABEL[p.operacion]} · {formatPrecio(p.precio)}
-                  {p.localidad ? ` · ${p.localidad}` : ''}
+                  {p.tipo} · {OPERACION_LABEL[p.operacion]} · {formatPrecio(p.precio, p.moneda)}
+                  {p.ciudad ? ` · ${p.ciudad}` : ''}
                 </div>
               </div>
               <span
