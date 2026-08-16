@@ -1,17 +1,18 @@
 .page {
-  --ledger: oklch(20% 0.045 255);
-  --ledger-deep: oklch(14% 0.04 255);
-  --ledger-line: oklch(30% 0.05 255);
-  --brass: oklch(76% 0.11 85);
-  --brass-bright: oklch(82% 0.12 88);
-  --paper: oklch(93% 0.02 85);
-  --ink: oklch(28% 0.07 260);
-  --ink-red: oklch(48% 0.17 25);
-  --cream-text: oklch(90% 0.015 95);
-  --muted-text: oklch(65% 0.025 255);
+  --bg: oklch(97% 0.014 80);
+  --bg-deep: oklch(94% 0.018 78);
+  --line: oklch(88% 0.014 75);
+  --card: oklch(99.5% 0.004 90);
+  --ink-text: oklch(26% 0.025 255);
+  --muted-text: oklch(50% 0.02 255);
+  --accent: oklch(64% 0.16 40);
+  --accent-bright: oklch(70% 0.17 42);
+  --accent-deep: oklch(48% 0.14 36);
+  --ink: oklch(32% 0.09 260);
+  --ink-red: oklch(50% 0.18 25);
   font-family: 'Source Sans 3', system-ui, sans-serif;
-  background: var(--ledger);
-  color: var(--cream-text);
+  background: var(--bg);
+  color: var(--ink-text);
 }
 
 .display {
@@ -33,9 +34,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px clamp(20px, 5vw, 64px);
-  background: color-mix(in oklch, var(--ledger) 88%, transparent);
+  background: color-mix(in oklch, var(--bg) 85%, transparent);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--ledger-line);
+  border-bottom: 1px solid var(--line);
 }
 
 .wordmark {
@@ -43,20 +44,20 @@
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  color: var(--cream-text);
+  color: var(--ink-text);
 }
 
 .wordmarkSeal {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1.5px solid var(--brass);
+  border: 1.5px solid var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   font-weight: 700;
-  color: var(--brass-bright);
+  color: var(--accent-deep);
   flex: none;
 }
 
@@ -68,11 +69,11 @@
 }
 
 .navLink:hover {
-  color: var(--cream-text);
+  color: var(--ink-text);
 }
 
 .navLinkActive {
-  color: var(--brass-bright);
+  color: var(--accent-deep);
   font-weight: 600;
 }
 
@@ -95,22 +96,22 @@
   align-items: center;
   gap: 8px;
   padding: 13px 24px;
-  border-radius: 3px;
-  background: var(--brass);
-  color: var(--ledger-deep);
+  border-radius: 8px;
+  background: var(--accent);
+  color: oklch(99% 0.005 90);
   font-weight: 600;
   font-size: 15px;
   text-decoration: none;
   border: none;
   cursor: pointer;
-  box-shadow: 0 1px 0 color-mix(in oklch, var(--brass) 40%, black), 0 8px 20px -8px oklch(0% 0 0 / 0.5);
+  box-shadow: 0 8px 20px -8px color-mix(in oklch, var(--accent) 60%, transparent);
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 .btnPrimary:hover {
-  background: var(--brass-bright);
+  background: var(--accent-bright);
   transform: translateY(-1px);
-  box-shadow: 0 1px 0 color-mix(in oklch, var(--brass) 40%, black), 0 12px 26px -8px oklch(0% 0 0 / 0.55);
+  box-shadow: 0 12px 26px -8px color-mix(in oklch, var(--accent) 65%, transparent);
 }
 
 .btnGhost {
@@ -118,20 +119,20 @@
   align-items: center;
   gap: 8px;
   padding: 12px 22px;
-  border-radius: 3px;
+  border-radius: 8px;
   background: transparent;
-  color: var(--cream-text);
+  color: var(--ink-text);
   font-weight: 600;
   font-size: 14.5px;
   text-decoration: none;
-  border: 1px solid var(--ledger-line);
+  border: 1px solid var(--line);
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .btnGhost:hover {
-  border-color: var(--brass);
-  background: color-mix(in oklch, var(--brass) 8%, transparent);
+  border-color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 8%, transparent);
 }
 
 /* ---------- hero ---------- */
@@ -164,7 +165,7 @@
 
 .heroHeadline em {
   font-style: italic;
-  color: var(--brass-bright);
+  color: var(--accent-deep);
 }
 
 .heroSub {
@@ -212,12 +213,13 @@
 /* ---------- folio card ---------- */
 
 .folioCard {
-  background: var(--paper);
-  color: var(--ledger-deep);
-  border-radius: 4px;
+  background: var(--card);
+  color: var(--ink-text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
   padding: 28px 26px;
   position: relative;
-  box-shadow: 0 30px 60px -20px oklch(0% 0 0 / 0.5), 0 2px 0 color-mix(in oklch, var(--brass) 60%, transparent);
+  box-shadow: 0 24px 48px -28px oklch(40% 0.03 255 / 0.35);
   transform: rotate(-1.2deg);
 }
 
@@ -225,7 +227,7 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  border-bottom: 1px solid color-mix(in oklch, var(--ledger-deep) 20%, transparent);
+  border-bottom: 1px solid var(--line);
   padding-bottom: 12px;
   margin-bottom: 16px;
 }
@@ -233,14 +235,14 @@
 .folioNum {
   font-size: 11px;
   letter-spacing: 0.08em;
-  color: color-mix(in oklch, var(--ledger-deep) 55%, transparent);
+  color: var(--muted-text);
 }
 
 .folioLine {
   display: flex;
   justify-content: space-between;
   padding: 9px 0;
-  border-bottom: 1px dashed color-mix(in oklch, var(--ledger-deep) 18%, transparent);
+  border-bottom: 1px dashed var(--line);
   font-size: 14px;
 }
 
@@ -249,7 +251,7 @@
 }
 
 .folioLabel {
-  color: color-mix(in oklch, var(--ledger-deep) 60%, transparent);
+  color: var(--muted-text);
 }
 
 .folioValue {
@@ -266,14 +268,14 @@
   padding: 10px 18px;
   border: 2.5px solid var(--ink);
   color: var(--ink);
-  border-radius: 3px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   transform: rotate(-8deg) scale(1.6);
   opacity: 0;
-  background: color-mix(in oklch, var(--paper) 40%, transparent);
+  background: color-mix(in oklch, var(--card) 55%, transparent);
   animation: stampDown 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.1) 0.7s forwards;
 }
 
@@ -308,9 +310,9 @@
 }
 
 .sectionAlt {
-  background: var(--ledger-deep);
-  border-top: 1px solid var(--ledger-line);
-  border-bottom: 1px solid var(--ledger-line);
+  background: var(--bg-deep);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .sectionHead {
@@ -339,8 +341,8 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
-  background: var(--ledger-line);
-  border: 1px solid var(--ledger-line);
+  background: var(--line);
+  border: 1px solid var(--line);
 }
 
 @media (max-width: 900px) {
@@ -350,13 +352,13 @@
 }
 
 .folioStep {
-  background: var(--ledger);
+  background: var(--bg-deep);
   padding: 30px 24px;
 }
 
 .folioStepNum {
   font-size: 12px;
-  color: var(--brass-bright);
+  color: var(--accent-deep);
   letter-spacing: 0.08em;
   margin-bottom: 14px;
   display: block;
@@ -426,7 +428,7 @@
 
 .mechanismStepNum {
   font-size: 12px;
-  color: var(--brass-bright);
+  color: var(--accent-deep);
   letter-spacing: 0.08em;
   margin-bottom: 12px;
   display: block;
@@ -448,11 +450,12 @@
 /* app-mock: a stylized "person using the app" panel in the ledger's own grammar */
 
 .appMock {
-  background: var(--paper);
-  color: var(--ledger-deep);
-  border-radius: 6px;
+  background: var(--card);
+  color: var(--ink-text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
   padding: 22px;
-  box-shadow: 0 30px 70px -24px oklch(0% 0 0 / 0.55);
+  box-shadow: 0 24px 56px -28px oklch(40% 0.03 255 / 0.4);
   min-height: 340px;
 }
 
@@ -462,7 +465,7 @@
   align-items: center;
   padding-bottom: 14px;
   margin-bottom: 16px;
-  border-bottom: 1px solid color-mix(in oklch, var(--ledger-deep) 18%, transparent);
+  border-bottom: 1px solid var(--line);
 }
 
 .appMockTitle {
@@ -470,12 +473,12 @@
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: color-mix(in oklch, var(--ledger-deep) 55%, transparent);
+  color: var(--muted-text);
 }
 
 .appMockField {
   padding: 10px 0;
-  border-bottom: 1px dashed color-mix(in oklch, var(--ledger-deep) 15%, transparent);
+  border-bottom: 1px dashed var(--line);
   display: flex;
   justify-content: space-between;
   font-size: 13.5px;
@@ -519,11 +522,12 @@
 }
 
 .stampShowcase {
-  background: var(--paper);
-  color: var(--ledger-deep);
-  border-radius: 4px;
+  background: var(--card);
+  color: var(--ink-text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
   padding: clamp(24px, 3vw, 36px);
-  box-shadow: 0 20px 50px -20px oklch(0% 0 0 / 0.45);
+  box-shadow: 0 20px 44px -26px oklch(40% 0.03 255 / 0.35);
 }
 
 .stampRow {
@@ -531,7 +535,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 0;
-  border-bottom: 1px dashed color-mix(in oklch, var(--ledger-deep) 18%, transparent);
+  border-bottom: 1px dashed var(--line);
 }
 
 .stampRow:last-child {
@@ -545,7 +549,7 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   padding: 6px 12px;
-  border-radius: 2px;
+  border-radius: 4px;
   border: 2px solid currentColor;
 }
 
@@ -558,7 +562,7 @@
   display: flex;
   gap: 18px;
   padding: 22px 0;
-  border-bottom: 1px solid var(--ledger-line);
+  border-bottom: 1px solid var(--line);
 }
 
 .ledgerItem:first-child {
@@ -572,7 +576,7 @@
 .ledgerMark {
   font-family: 'Vollkorn', serif;
   font-size: 22px;
-  color: var(--brass-bright);
+  color: var(--accent-deep);
   flex: none;
   width: 28px;
 }
@@ -599,22 +603,24 @@
 }
 
 .providerBadge {
-  border: 1px solid var(--ledger-line);
-  border-radius: 4px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
   padding: 16px 18px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--cream-text);
+  color: var(--ink-text);
   transition: border-color 0.2s ease;
 }
 
 .providerBadge:hover {
-  border-color: var(--brass);
+  border-color: var(--accent);
 }
 
 .roadmapCard {
-  border: 1px dashed var(--ledger-line);
-  border-radius: 6px;
+  background: var(--card);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
   padding: clamp(24px, 3vw, 32px);
   margin-top: 20px;
 }
@@ -625,9 +631,9 @@
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--brass-bright);
-  border: 1px solid var(--brass);
-  border-radius: 2px;
+  color: var(--accent-deep);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
   padding: 4px 9px;
   margin-bottom: 14px;
 }
@@ -635,13 +641,14 @@
 /* ---------- pricing ---------- */
 
 .pricingCard {
-  background: var(--paper);
-  color: var(--ledger-deep);
-  border-radius: 4px;
+  background: var(--card);
+  color: var(--ink-text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
   padding: clamp(32px, 4vw, 48px);
   max-width: 640px;
   margin: 0 auto;
-  box-shadow: 0 30px 60px -24px oklch(0% 0 0 / 0.5);
+  box-shadow: 0 24px 52px -28px oklch(40% 0.03 255 / 0.35);
   position: relative;
 }
 
@@ -653,7 +660,7 @@
   text-transform: uppercase;
   color: var(--ink);
   border: 1.5px solid var(--ink);
-  border-radius: 2px;
+  border-radius: 4px;
   padding: 5px 10px;
   margin-bottom: 20px;
 }
@@ -670,11 +677,12 @@
   font-size: clamp(2.4rem, 5vw, 3.4rem);
   font-weight: 600;
   letter-spacing: -0.02em;
+  color: var(--accent-deep);
 }
 
 .priceUnit {
   font-size: 15px;
-  color: color-mix(in oklch, var(--ledger-deep) 60%, transparent);
+  color: var(--muted-text);
 }
 
 /* ---------- contact ---------- */
@@ -697,15 +705,16 @@
   flex-direction: column;
   gap: 10px;
   padding: 26px;
-  border: 1px solid var(--ledger-line);
-  border-radius: 4px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
   text-decoration: none;
-  color: var(--cream-text);
+  color: var(--ink-text);
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .contactCard:hover {
-  border-color: var(--brass);
+  border-color: var(--accent);
   transform: translateY(-2px);
 }
 
@@ -714,7 +723,7 @@
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--brass-bright);
+  color: var(--accent-deep);
 }
 
 .contactValue {
@@ -726,7 +735,7 @@
 
 .footer {
   padding: 36px clamp(20px, 5vw, 64px) 44px;
-  border-top: 1px solid var(--ledger-line);
+  border-top: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -104,7 +104,7 @@ function AppMock({ mock }: { mock: StepMock }) {
           ))
         : mock.rows.map((row, i) => (
             <div key={row.label} className={styles.appMockField} style={{ animationDelay: `${i * 0.1}s` }}>
-              <span style={{ color: 'color-mix(in oklch, var(--ledger-deep) 60%, transparent)' }}>{row.label}</span>
+              <span style={{ color: 'var(--muted-text)' }}>{row.label}</span>
               <span style={{ fontWeight: 600 }}>{row.value}</span>
             </div>
           ))}

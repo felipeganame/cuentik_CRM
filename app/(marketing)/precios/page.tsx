@@ -24,11 +24,11 @@ export default function PreciosPage() {
             <span className={styles.priceNum}>$1.000</span>
             <span className={styles.priceUnit}>ARS por alquiler activo / mes</span>
           </div>
-          <p style={{ fontSize: 14.5, lineHeight: 1.6, color: 'color-mix(in oklch, var(--ledger-deep) 65%, transparent)', margin: '18px 0 0', maxWidth: '52ch' }}>
+          <p style={{ fontSize: 14.5, lineHeight: 1.6, color: 'var(--muted-text)', margin: '18px 0 0', maxWidth: '52ch' }}>
             Empezás con un alquiler sin costo y sin tarjeta. Cuando cargás el segundo, ahí arranca el cobro: $1.000
             por cada alquiler activo que tengas cargado, todos los meses.
           </p>
-          <p style={{ fontSize: 13, lineHeight: 1.55, color: 'color-mix(in oklch, var(--ledger-deep) 55%, transparent)', margin: '14px 0 0', maxWidth: '52ch' }}>
+          <p style={{ fontSize: 13, lineHeight: 1.55, color: 'var(--muted-text)', margin: '14px 0 0', maxWidth: '52ch' }}>
             Este precio es el del módulo de gestión de alquileres, el que existe hoy. A medida que sumemos otros
             módulos (conexión con proveedores de servicios, página web propia, etc.) cada uno va a tener su propio
             costo — no va a cambiar de golpe lo que ya estás pagando.

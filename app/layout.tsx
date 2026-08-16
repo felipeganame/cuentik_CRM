@@ -31,20 +31,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           THESIS: A rental ledger, not another blue SaaS dashboard — Cuentik CRM
           reads as a registry of record, where every alquiler is a folio and
           every payment is a stamp, refusing the generic icon-card feature grid.
-          OWN-WORLD: Argentine escribanía/libro de registro — deep ledger-green
-          ground, brass/gold accents, blue-black ink for confirmed entries, red
-          ink reserved for overdue. Vollkorn display (an old-book ledger serif,
-          deliberately not one of the common AI-default display faces), IBM
-          Plex Mono for folio numbers and labels, Source Sans 3 body.
+          OWN-WORLD: Argentine escribanía/libro de registro — warm cream paper
+          ground (revised from an earlier dark navy/green pass: dark+gold read
+          as expensive/premium, fighting the product's actual affordable
+          pitch), terracotta/coral accent, blue-black ink for confirmed
+          entries, red ink reserved for overdue. Vollkorn display (an old-book
+          ledger serif, deliberately not one of the common AI-default display
+          faces), IBM Plex Mono for folio numbers and labels, Source Sans 3
+          body.
           STORY: A Córdoba agency owner sees their own workflow — property,
           partes, pagos, servicios — turned into a ledger they'd trust with
           contracts and money, then acts: try free, or talk to a person.
-          FIRST VIEWPORT: full-bleed ledger-green hero, Vollkorn headline left,
-          a live folio card right (address, monto, an ink stamp animating down
-          to AL DÍA on load), primary CTA below headline.
+          FIRST VIEWPORT: cream hero, Vollkorn headline left, a live folio
+          card right (address, monto, an ink stamp animating down to AL DÍA
+          on load), primary CTA below headline.
           FORM: escribanía/ledger world, candidate 6 of 7 grounded candidates,
           seed key d41b6298, no staging challenger used — straight structural
-          build in the committed identity.
+          build in the committed identity, palette revised twice on direct
+          user feedback (green → navy → light cream).
           FINISH: unreviewed and undocumented is unfinished; this build ends
           with the finish review, the verdict, and DESIGN.md.
         */}

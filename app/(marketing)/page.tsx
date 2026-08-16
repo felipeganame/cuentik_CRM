@@ -120,7 +120,7 @@ export default async function LandingPage() {
         </div>
         <div className={styles.featuresGrid}>
           <div className={styles.stampShowcase}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'color-mix(in oklch, var(--ledger-deep) 60%, transparent)' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--muted-text)' }}>
               Estado de pago
             </div>
             <div className={styles.stampRow}>
