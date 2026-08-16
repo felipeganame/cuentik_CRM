@@ -3,10 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createAlquiler, type WizardPersonaInput, type WizardPropiedadInput, type WizardServicioInput } from '@/lib/actions/alquileres';
+import { createClient } from '@/lib/supabase/client';
+import { createAlquiler, recordFotoUpload, type WizardPersonaInput, type WizardPropiedadInput, type WizardServicioInput } from '@/lib/actions/alquileres';
 
 const STEP_NOMBRES = ['Propiedad', 'Partes', 'Pago', 'Servicios', 'Confirmar'];
 const SERVICIO_NOMBRES_DEFAULT = ['Agua', 'Luz', 'Gas', 'Municipalidad', 'Rentas', 'Expensas'];
+const MAX_FOTO_BYTES = 1024 * 1024;
+const MAX_FOTOS_POR_PROPIEDAD = 15;
 
 const emptyPersona = (): WizardPersonaInput => ({ nombre: '', dni: '', telefono: '', email: '', domicilio: '' });
 const emptyPropiedad = (): WizardPropiedadInput => ({ direccion: '', localidad: '', tipo: 'Departamento' });
@@ -55,7 +58,7 @@ function validateServicios(servicios: WizardServicioInput[]): string | null {
   return null;
 }
 
-export function NuevoAlquilerForm({ localidadesSugeridas }: { localidadesSugeridas: string[] }) {
+export function NuevoAlquilerForm({ localidadesSugeridas, inmobiliariaId }: { localidadesSugeridas: string[]; inmobiliariaId: string }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -63,6 +66,7 @@ export function NuevoAlquilerForm({ localidadesSugeridas }: { localidadesSugerid
   const [stepError, setStepError] = useState<string | null>(null);
 
   const [propiedades, setPropiedades] = useState<WizardPropiedadInput[]>([emptyPropiedad()]);
+  const [fotosPorPropiedad, setFotosPorPropiedad] = useState<File[][]>([[]]);
   const [locador, setLocador] = useState<WizardPersonaInput>(emptyPersona());
   const [locatario, setLocatario] = useState<WizardPersonaInput>(emptyPersona());
   const [garantes, setGarantes] = useState<WizardPersonaInput[]>([]);
@@ -120,7 +124,7 @@ export function NuevoAlquilerForm({ localidadesSugeridas }: { localidadesSugerid
     setSubmitting(true);
     setErrorMsg(null);
     try {
-      await createAlquiler({
+      const { id: alquilerId, propiedadIds } = await createAlquiler({
         propiedades,
         locador,
         locatario,
@@ -137,6 +141,17 @@ export function NuevoAlquilerForm({ localidadesSugeridas }: { localidadesSugerid
         fechaFin,
         servicios,
       });
+
+      const supabase = createClient();
+      for (let i = 0; i < propiedadIds.length; i++) {
+        const propiedadId = propiedadIds[i];
+        for (const file of fotosPorPropiedad[i] ?? []) {
+          const path = `${inmobiliariaId}/${propiedadId}/${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabase.storage.from('propiedad-fotos').upload(path, file);
+          if (!uploadError) await recordFotoUpload(propiedadId, alquilerId, path);
+        }
+      }
+
       router.push('/dashboard');
     } catch {
       setErrorMsg('No se pudo crear el alquiler. Revisá los datos e intentá de nuevo.');
@@ -172,7 +187,15 @@ export function NuevoAlquilerForm({ localidadesSugeridas }: { localidadesSugerid
       </div>
 
       <div style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 14, padding: 30, minHeight: 360 }}>
-        {step === 0 && <StepPropiedades propiedades={propiedades} setPropiedades={setPropiedades} localidadesSugeridas={localidadesSugeridas} />}
+        {step === 0 && (
+          <StepPropiedades
+            propiedades={propiedades}
+            setPropiedades={setPropiedades}
+            localidadesSugeridas={localidadesSugeridas}
+            fotosPorPropiedad={fotosPorPropiedad}
+            setFotosPorPropiedad={setFotosPorPropiedad}
+          />
+        )}
         {step === 1 && <StepPartes locador={locador} setLocador={setLocador} locatario={locatario} setLocatario={setLocatario} garantes={garantes} setGarantes={setGarantes} />}
         {step === 2 && (
           <StepPago
@@ -262,13 +285,51 @@ function RemoveButton({ onClick, label }: { onClick: () => void; label: string }
   );
 }
 
-function StepPropiedades({ propiedades, setPropiedades, localidadesSugeridas }: { propiedades: WizardPropiedadInput[]; setPropiedades: (p: WizardPropiedadInput[]) => void; localidadesSugeridas: string[] }) {
+function StepPropiedades({
+  propiedades, setPropiedades, localidadesSugeridas, fotosPorPropiedad, setFotosPorPropiedad,
+}: {
+  propiedades: WizardPropiedadInput[]; setPropiedades: (p: WizardPropiedadInput[]) => void;
+  localidadesSugeridas: string[];
+  fotosPorPropiedad: File[][]; setFotosPorPropiedad: (f: File[][]) => void;
+}) {
+  const [fotoError, setFotoError] = useState<string | null>(null);
+
   function update(i: number, field: keyof WizardPropiedadInput, value: string) {
     setPropiedades(propiedades.map((p, idx) => (idx === i ? { ...p, [field]: value } : p)));
   }
   function remove(i: number) {
     setPropiedades(propiedades.filter((_, idx) => idx !== i));
+    setFotosPorPropiedad(fotosPorPropiedad.filter((_, idx) => idx !== i));
   }
+  function agregar() {
+    setPropiedades([...propiedades, emptyPropiedad()]);
+    setFotosPorPropiedad([...fotosPorPropiedad, []]);
+  }
+  function addFotos(i: number, fileList: FileList | null) {
+    if (!fileList || fileList.length === 0) return;
+    setFotoError(null);
+    const actuales = fotosPorPropiedad[i] ?? [];
+    const nuevos = Array.from(fileList);
+    if (actuales.length + nuevos.length > MAX_FOTOS_POR_PROPIEDAD) {
+      setFotoError(`Máximo ${MAX_FOTOS_POR_PROPIEDAD} fotos por propiedad.`);
+      return;
+    }
+    for (const file of nuevos) {
+      if (file.type !== 'image/jpeg') {
+        setFotoError('Solo se aceptan imágenes JPEG.');
+        return;
+      }
+      if (file.size > MAX_FOTO_BYTES) {
+        setFotoError(`"${file.name}" supera 1 MB.`);
+        return;
+      }
+    }
+    setFotosPorPropiedad(fotosPorPropiedad.map((fs, idx) => (idx === i ? [...fs, ...nuevos] : fs)));
+  }
+  function removeFoto(i: number, fileIdx: number) {
+    setFotosPorPropiedad(fotosPorPropiedad.map((fs, idx) => (idx === i ? fs.filter((_, fi) => fi !== fileIdx) : fs)));
+  }
+
   return (
     <div>
       <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 18 }}>Propiedad(es) del alquiler</div>
@@ -281,7 +342,7 @@ function StepPropiedades({ propiedades, setPropiedades, localidadesSugeridas }: 
             <div style={{ fontSize: 13, fontWeight: 700, color: 'oklch(52% 0.01 255)' }}>Propiedad {i + 1}</div>
             {propiedades.length > 1 && <RemoveButton onClick={() => remove(i)} label={`Quitar propiedad ${i + 1}`} />}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
             <Field label="Dirección" required>
               <input style={fieldStyle()} value={p.direccion} onChange={(e) => update(i, 'direccion', e.target.value)} placeholder="Ej: Bv. Illia 245, 3B" />
             </Field>
@@ -302,6 +363,20 @@ function StepPropiedades({ propiedades, setPropiedades, localidadesSugeridas }: 
               </select>
             </Field>
           </div>
+          <Field label="Fotos (opcional)">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: (fotosPorPropiedad[i]?.length ?? 0) > 0 ? 8 : 0 }}>
+              {(fotosPorPropiedad[i] ?? []).map((file, fi) => (
+                <div key={fi} style={{ display: 'flex', alignItems: 'center', gap: 6, border: '1px solid oklch(90% 0.007 250)', borderRadius: 6, padding: '4px 8px', fontSize: 11.5 }}>
+                  <span style={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</span>
+                  <button type="button" onClick={() => removeFoto(i, fi)} aria-label={`Quitar ${file.name}`} style={{ border: 'none', background: 'none', color: 'oklch(56% 0.19 25)', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}>×</button>
+                </div>
+              ))}
+            </div>
+            <label style={{ display: 'inline-block', padding: '7px 12px', border: '1px dashed oklch(80% 0.01 250)', borderRadius: 7, background: 'none', fontSize: 12, fontWeight: 600, color: 'oklch(52% 0.01 255)', cursor: 'pointer' }}>
+              + Agregar fotos
+              <input type="file" accept="image/jpeg" multiple onChange={(e) => { addFotos(i, e.target.files); e.target.value = ''; }} style={{ display: 'none' }} />
+            </label>
+          </Field>
         </div>
       ))}
       <datalist id="localidades-sugeridas">
@@ -309,9 +384,10 @@ function StepPropiedades({ propiedades, setPropiedades, localidadesSugeridas }: 
           <option key={l} value={l} />
         ))}
       </datalist>
+      {fotoError && <div style={{ fontSize: 12.5, color: 'oklch(56% 0.19 25)', marginBottom: 12 }}>{fotoError}</div>}
       <button
         type="button"
-        onClick={() => setPropiedades([...propiedades, emptyPropiedad()])}
+        onClick={agregar}
         style={{ padding: '9px 14px', border: '1px dashed oklch(80% 0.01 250)', borderRadius: 8, background: 'none', fontSize: 12.5, fontWeight: 600, color: 'oklch(52% 0.01 255)', cursor: 'pointer' }}
       >
         + Agregar otra propiedad al mismo contrato

@@ -1,7 +1,9 @@
 'use client';
 
-import { useActionState } from 'react';
-import { updatePassword, updatePerfil, type PasswordState, type PerfilState } from '@/lib/actions/perfil';
+import { useActionState, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { recordLogoUpload, updatePassword, updatePerfil, type PasswordState, type PerfilState } from '@/lib/actions/perfil';
 
 function fieldStyle() {
   return { width: '100%', padding: '9px 11px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 7, fontSize: 13.5 } as const;
@@ -9,6 +11,71 @@ function fieldStyle() {
 
 const perfilInitial: PerfilState = { error: null, success: false };
 const passwordInitial: PasswordState = { error: null, success: false };
+const MAX_LOGO_BYTES = 1024 * 1024;
+
+export function LogoForm({ inmobiliariaId, logoUrl }: { inmobiliariaId: string; logoUrl: string | null }) {
+  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleFile(file: File | null) {
+    if (!file) return;
+    setError(null);
+    if (!['image/jpeg', 'image/png', 'image/svg+xml'].includes(file.type)) {
+      setError('Solo se aceptan imágenes JPEG, PNG o SVG.');
+      return;
+    }
+    if (file.size > MAX_LOGO_BYTES) {
+      setError('El logo no puede superar 1 MB.');
+      return;
+    }
+    setUploading(true);
+    const supabase = createClient();
+    try {
+      const path = `${inmobiliariaId}/${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage.from('logos').upload(path, file);
+      if (uploadError) throw uploadError;
+      await recordLogoUpload(path);
+      router.refresh();
+    } catch {
+      setError('No se pudo subir el logo.');
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = '';
+    }
+  }
+
+  return (
+    <div style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 12, padding: 20 }}>
+      <div style={{ fontSize: 11.5, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', marginBottom: 14 }}>
+        Logo de la inmobiliaria
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ width: 64, height: 64, borderRadius: 10, border: '1px solid oklch(90% 0.007 250)', background: 'oklch(97% 0.004 250)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flex: 'none' }}>
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          ) : (
+            <span style={{ fontSize: 11, color: 'oklch(60% 0.01 255)' }}>Sin logo</span>
+          )}
+        </div>
+        <label style={{ padding: '9px 14px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 8, background: '#fff', fontSize: 12.5, fontWeight: 600, cursor: uploading ? 'default' : 'pointer' }}>
+          {uploading ? 'Subiendo…' : logoUrl ? 'Reemplazar logo' : 'Subir logo'}
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/svg+xml"
+            disabled={uploading}
+            onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
+      {error && <div style={{ marginTop: 10, fontSize: 12.5, color: 'oklch(56% 0.19 25)' }}>{error}</div>}
+    </div>
+  );
+}
 
 export function PerfilForm({
   nombreInmobiliaria,

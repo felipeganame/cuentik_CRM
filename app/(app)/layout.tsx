@@ -13,12 +13,22 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('nombre, inmobiliaria_id, inmobiliarias(nombre)')
+    .select('nombre, inmobiliaria_id, inmobiliarias(nombre, logo_url)')
     .eq('id', user.id)
     .single();
 
-  const inmobiliariaRel = profile?.inmobiliarias as unknown as { nombre: string } | { nombre: string }[] | null;
-  const inmobiliariaNombre = (Array.isArray(inmobiliariaRel) ? inmobiliariaRel[0]?.nombre : inmobiliariaRel?.nombre) ?? '';
+  const inmobiliariaRel = profile?.inmobiliarias as unknown as
+    | { nombre: string; logo_url: string | null }
+    | { nombre: string; logo_url: string | null }[]
+    | null;
+  const inmobiliaria = Array.isArray(inmobiliariaRel) ? inmobiliariaRel[0] : inmobiliariaRel;
+  const inmobiliariaNombre = inmobiliaria?.nombre ?? '';
+
+  let inmobiliariaLogoUrl: string | null = null;
+  if (inmobiliaria?.logo_url) {
+    const { data: signed } = await supabase.storage.from('logos').createSignedUrl(inmobiliaria.logo_url, 3600);
+    inmobiliariaLogoUrl = signed?.signedUrl ?? null;
+  }
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
@@ -27,7 +37,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div style={{ width: 26, height: 26, borderRadius: 7, background: 'oklch(55% 0.16 250)' }} />
           <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Cuentik CRM</div>
         </div>
-        <div style={{ fontSize: 12, color: 'oklch(55% 0.02 258)', padding: '0 6px 22px' }}>{inmobiliariaNombre}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 6px 22px' }}>
+          {inmobiliariaLogoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={inmobiliariaLogoUrl} alt="" style={{ width: 20, height: 20, borderRadius: 5, objectFit: 'contain', background: '#fff', flex: 'none' }} />
+          )}
+          <div style={{ fontSize: 12, color: 'oklch(55% 0.02 258)' }}>{inmobiliariaNombre}</div>
+        </div>
         <NavLinks />
         <div style={{ flex: 1 }} />
         <form action={logout}>

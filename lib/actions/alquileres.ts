@@ -267,5 +267,5 @@ export async function createAlquiler(input: {
   if (pagoError) throw pagoError;
 
   revalidatePath('/dashboard');
-  return { id: alquiler.id as string };
+  return { id: alquiler.id as string, propiedadIds: propiedadesCreadas.map((p) => p.id) };
 }

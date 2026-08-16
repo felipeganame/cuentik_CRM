@@ -33,6 +33,28 @@ export async function updatePerfil(_prevState: PerfilState, formData: FormData):
   return { error: null, success: true };
 }
 
+export async function recordLogoUpload(storagePath: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('No autenticado');
+
+  const { data: profile } = await supabase.from('profiles').select('inmobiliaria_id, inmobiliarias(logo_url)').eq('id', user.id).single();
+  if (!profile?.inmobiliaria_id) throw new Error('No se encontró la inmobiliaria');
+
+  const rel = profile.inmobiliarias as unknown as { logo_url: string | null } | { logo_url: string | null }[] | null;
+  const oldPath = Array.isArray(rel) ? rel[0]?.logo_url : rel?.logo_url;
+
+  const { error } = await supabase.from('inmobiliarias').update({ logo_url: storagePath }).eq('id', profile.inmobiliaria_id);
+  if (error) throw error;
+
+  if (oldPath) await supabase.storage.from('logos').remove([oldPath]);
+
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/configuracion');
+}
+
 export type PasswordState = { error: string | null; success: boolean };
 
 export async function updatePassword(_prevState: PasswordState, formData: FormData): Promise<PasswordState> {
