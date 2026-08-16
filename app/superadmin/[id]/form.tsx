@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { resetInmobiliariaPassword, updateInmobiliaria } from '@/lib/actions/superadmin';
+import { marcarCobroPagado, resetInmobiliariaPassword, updateInmobiliaria } from '@/lib/actions/superadmin';
 import { parseTelefono } from '@/lib/phone';
+import type { EstadoCobro } from '@/lib/billing';
 import type { Inmobiliaria } from '@/lib/types';
 
 function fieldStyle() {
@@ -14,7 +15,13 @@ function soloDigitos(e: React.ChangeEvent<HTMLInputElement>) {
   e.target.value = e.target.value.replace(/\D/g, '');
 }
 
-export function InmobiliariaForm({ inmobiliaria }: { inmobiliaria: Inmobiliaria }) {
+function cobroBadgeStyle(estado: EstadoCobro) {
+  if (estado === 'Pagado') return { background: 'oklch(94% 0.06 150)', color: 'oklch(45% 0.13 150)' };
+  if (estado === 'Pendiente') return { background: 'oklch(96% 0.05 80)', color: 'oklch(55% 0.15 70)' };
+  return { background: 'oklch(95% 0.03 25)', color: 'oklch(56% 0.19 25)' };
+}
+
+export function InmobiliariaForm({ inmobiliaria, montoMensual, estadoCobro }: { inmobiliaria: Inmobiliaria; montoMensual: number; estadoCobro: EstadoCobro }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -23,6 +30,18 @@ export function InmobiliariaForm({ inmobiliaria }: { inmobiliaria: Inmobiliaria 
   const [resetting, setResetting] = useState(false);
   const [newPassword, setNewPassword] = useState<string | null>(null);
   const [resetError, setResetError] = useState<string | null>(null);
+
+  const [marcandoPagado, setMarcandoPagado] = useState(false);
+  const [pagoError, setPagoError] = useState<string | null>(null);
+
+  async function handleMarcarPagado() {
+    setMarcandoPagado(true);
+    setPagoError(null);
+    const result = await marcarCobroPagado(inmobiliaria.id);
+    if ('error' in result) setPagoError(result.error);
+    else router.refresh();
+    setMarcandoPagado(false);
+  }
 
   async function handleSubmit(formData: FormData) {
     setSaving(true);
@@ -79,35 +98,20 @@ export function InmobiliariaForm({ inmobiliaria }: { inmobiliaria: Inmobiliaria 
             <input name="telefono_numero" type="text" inputMode="numeric" maxLength={10} placeholder="Número" defaultValue={parseTelefono(inmobiliaria.telefono).numero} onChange={soloDigitos} style={fieldStyle()} />
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Límite de alquileres</div>
-            <input name="limite_alquileres" type="number" defaultValue={inmobiliaria.limite_alquileres} style={fieldStyle()} />
-          </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Mensualidad ($)</div>
-            <input name="monto_mensual" type="number" defaultValue={inmobiliaria.monto_mensual} style={fieldStyle()} />
-          </div>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Límite de alquileres</div>
+          <input name="limite_alquileres" type="number" defaultValue={inmobiliaria.limite_alquileres} style={fieldStyle()} />
         </div>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Vencimiento del plan</div>
-          <input name="fecha_vencimiento" type="date" defaultValue={inmobiliaria.fecha_vencimiento ?? ''} style={fieldStyle()} />
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Próximo cobro</div>
+          <input name="fecha_proximo_cobro" type="date" defaultValue={inmobiliaria.fecha_proximo_cobro ?? ''} style={fieldStyle()} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Estado</div>
-            <select name="estado" defaultValue={inmobiliaria.estado} style={fieldStyle()}>
-              <option value="Activo">Activo</option>
-              <option value="Suspendido">Suspendido</option>
-            </select>
-          </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Cobro</div>
-            <select name="cobro_estado" defaultValue={inmobiliaria.cobro_estado} style={fieldStyle()}>
-              <option value="Pagado">Pagado</option>
-              <option value="Pendiente">Pendiente</option>
-            </select>
-          </div>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Estado</div>
+          <select name="estado" defaultValue={inmobiliaria.estado} style={fieldStyle()}>
+            <option value="Activo">Activo</option>
+            <option value="Suspendido">Suspendido</option>
+          </select>
         </div>
 
         {error && <div style={{ fontSize: 12.5, color: 'oklch(56% 0.19 25)' }}>{error}</div>}
@@ -121,6 +125,27 @@ export function InmobiliariaForm({ inmobiliaria }: { inmobiliaria: Inmobiliaria 
           {saving ? 'Guardando…' : 'Guardar cambios'}
         </button>
       </form>
+
+      <div style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 12, padding: 20 }}>
+        <div style={{ fontSize: 11.5, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', marginBottom: 14 }}>
+          Cobro
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+          <div style={{ fontSize: 18, fontWeight: 700 }}>${montoMensual.toLocaleString('es-AR')}/mes</div>
+          <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...cobroBadgeStyle(estadoCobro) }}>{estadoCobro}</span>
+        </div>
+        {estadoCobro !== 'Pagado' && (
+          <button
+            type="button"
+            onClick={handleMarcarPagado}
+            disabled={marcandoPagado}
+            style={{ padding: '9px 14px', border: '1px solid oklch(80% 0.06 150)', borderRadius: 8, background: '#fff', color: 'oklch(45% 0.13 150)', fontSize: 13, fontWeight: 600, cursor: marcandoPagado ? 'default' : 'pointer' }}
+          >
+            {marcandoPagado ? 'Guardando…' : 'Marcar como pagado'}
+          </button>
+        )}
+        {pagoError && <div style={{ marginTop: 10, fontSize: 12.5, color: 'oklch(56% 0.19 25)' }}>{pagoError}</div>}
+      </div>
 
       <div style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 12, padding: 20 }}>
         <div style={{ fontSize: 11.5, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', marginBottom: 14 }}>

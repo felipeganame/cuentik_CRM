@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireSuperadmin } from '@/lib/auth';
 import { formatTelefono } from '@/lib/phone';
+import { avanzarUnMes, proximoCicloDesdeHoy } from '@/lib/billing';
 
 export async function createInmobiliaria(formData: FormData): Promise<{ error: string } | { id: string }> {
   const supabase = await createClient();
@@ -15,8 +16,7 @@ export async function createInmobiliaria(formData: FormData): Promise<{ error: s
   const password = String(formData.get('password') || '');
   const telefono = formatTelefono(String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
-  const fechaVencimiento = String(formData.get('fecha_vencimiento') || '') || null;
-  const montoMensual = Number(formData.get('monto_mensual')) || 0;
+  const fechaProximoCobro = String(formData.get('fecha_proximo_cobro') || '') || proximoCicloDesdeHoy();
 
   if (!nombre || !emailContacto || password.length < 8) {
     return { error: 'Datos incompletos: nombre, email y contraseña (mín. 8 caracteres) son obligatorios.' };
@@ -40,8 +40,7 @@ export async function createInmobiliaria(formData: FormData): Promise<{ error: s
       email_contacto: emailContacto,
       telefono,
       limite_alquileres: limiteAlquileres,
-      fecha_vencimiento: fechaVencimiento,
-      monto_mensual: montoMensual,
+      fecha_proximo_cobro: fechaProximoCobro,
     })
     .select()
     .single();
@@ -73,10 +72,8 @@ export async function updateInmobiliaria(id: string, formData: FormData): Promis
   const nombre = String(formData.get('nombre') || '');
   const telefono = formatTelefono(String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
-  const fechaVencimiento = String(formData.get('fecha_vencimiento') || '') || null;
+  const fechaProximoCobro = String(formData.get('fecha_proximo_cobro') || '') || null;
   const estado = String(formData.get('estado') || 'Activo');
-  const cobroEstado = String(formData.get('cobro_estado') || 'Pendiente');
-  const montoMensual = Number(formData.get('monto_mensual')) || 0;
 
   const { error } = await supabase
     .from('inmobiliarias')
@@ -84,16 +81,49 @@ export async function updateInmobiliaria(id: string, formData: FormData): Promis
       nombre,
       telefono,
       limite_alquileres: limiteAlquileres,
-      fecha_vencimiento: fechaVencimiento,
+      fecha_proximo_cobro: fechaProximoCobro,
       estado,
-      cobro_estado: cobroEstado,
-      monto_mensual: montoMensual,
     })
     .eq('id', id);
   if (error) return { error: error.message };
 
   revalidatePath('/superadmin');
   revalidatePath(`/superadmin/${id}`);
+  return { ok: true };
+}
+
+export async function marcarCobroPagado(id: string): Promise<{ error: string } | { ok: true }> {
+  const supabase = await createClient();
+  await requireSuperadmin(supabase);
+
+  const { data: inmobiliaria, error: fetchError } = await supabase
+    .from('inmobiliarias')
+    .select('fecha_proximo_cobro')
+    .eq('id', id)
+    .single();
+  if (fetchError || !inmobiliaria) return { error: 'No se encontró la inmobiliaria.' };
+
+  const nuevaFecha = avanzarUnMes(inmobiliaria.fecha_proximo_cobro ?? proximoCicloDesdeHoy());
+
+  const { error } = await supabase.from('inmobiliarias').update({ fecha_proximo_cobro: nuevaFecha }).eq('id', id);
+  if (error) return { error: error.message };
+
+  revalidatePath('/superadmin');
+  revalidatePath(`/superadmin/${id}`);
+  return { ok: true };
+}
+
+export async function updatePrecioPorAlquiler(formData: FormData): Promise<{ error: string } | { ok: true }> {
+  const supabase = await createClient();
+  await requireSuperadmin(supabase);
+
+  const precio = Number(formData.get('precio_por_alquiler'));
+  if (!Number.isFinite(precio) || precio < 0) return { error: 'Precio inválido.' };
+
+  const { error } = await supabase.from('config').update({ precio_por_alquiler: precio, updated_at: new Date().toISOString() }).eq('id', 1);
+  if (error) return { error: error.message };
+
+  revalidatePath('/superadmin');
   return { ok: true };
 }
 

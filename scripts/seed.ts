@@ -27,7 +27,7 @@ async function main() {
       telefono: '351 555 0000',
       limite_alquileres: 50,
       estado: 'Activo',
-      fecha_vencimiento: '2027-01-01',
+      fecha_proximo_cobro: '2027-01-01',
     })
     .select()
     .single();

@@ -1,40 +1,45 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { listInmobiliariasConMetricas } from '@/lib/queries';
-import { toggleEstadoInmobiliaria } from '@/lib/actions/superadmin';
+import { getPrecioPorAlquiler, listInmobiliariasConMetricas } from '@/lib/queries';
+import { marcarCobroPagado, toggleEstadoInmobiliaria } from '@/lib/actions/superadmin';
+import type { EstadoCobro } from '@/lib/billing';
+import { PrecioForm } from './precio-form';
 
-function badgeStyle(active: boolean) {
-  return active
-    ? { background: 'oklch(94% 0.06 150)', color: 'oklch(45% 0.13 150)' }
-    : { background: 'oklch(95% 0.03 25)', color: 'oklch(56% 0.19 25)' };
+function badgeStyle(tone: 'ok' | 'warn' | 'bad') {
+  if (tone === 'ok') return { background: 'oklch(94% 0.06 150)', color: 'oklch(45% 0.13 150)' };
+  if (tone === 'warn') return { background: 'oklch(96% 0.05 80)', color: 'oklch(55% 0.15 70)' };
+  return { background: 'oklch(95% 0.03 25)', color: 'oklch(56% 0.19 25)' };
+}
+
+function cobroTone(estado: EstadoCobro): 'ok' | 'warn' | 'bad' {
+  if (estado === 'Pagado') return 'ok';
+  if (estado === 'Pendiente') return 'warn';
+  return 'bad';
 }
 
 function formatMoney(n: number) {
   return `$${n.toLocaleString('es-AR')}`;
 }
 
-function vencimientoStyle(dias: number | null) {
-  if (dias === null) return { color: 'oklch(55% 0.01 255)' };
-  if (dias < 0) return { color: 'oklch(56% 0.19 25)', fontWeight: 700 as const };
-  if (dias <= 7) return { color: 'oklch(60% 0.15 60)', fontWeight: 700 as const };
-  return { color: 'oklch(48% 0.01 255)' };
-}
-
-function vencimientoLabel(dias: number | null) {
+function proximoCobroLabel(dias: number | null, estado: EstadoCobro) {
   if (dias === null) return '—';
-  if (dias < 0) return `Vencido hace ${Math.abs(dias)}d`;
+  if (estado === 'En mora') return `Vencido hace ${Math.abs(dias)}d`;
   if (dias === 0) return 'Vence hoy';
-  return `${dias}d restantes`;
+  if (dias < 0) return `En gracia (${Math.abs(dias)}d)`;
+  return `${dias}d`;
 }
 
 export default async function SuperadminPage() {
   const supabase = await createClient();
-  const inmobiliarias = await listInmobiliariasConMetricas(supabase);
+  const [inmobiliarias, precioPorAlquiler] = await Promise.all([
+    listInmobiliariasConMetricas(supabase),
+    getPrecioPorAlquiler(supabase),
+  ]);
 
   const activas = inmobiliarias.filter((i) => i.estado === 'Activo');
-  const enDeuda = inmobiliarias.filter((i) => i.cobro_estado === 'Pendiente');
-  const porVencer = inmobiliarias.filter((i) => i.diasParaVencimiento !== null && i.diasParaVencimiento <= 7);
-  const ingresoMensual = activas.reduce((sum, i) => sum + Number(i.monto_mensual), 0);
+  const enMora = inmobiliarias.filter((i) => i.estadoCobro === 'En mora');
+  const pendientes = inmobiliarias.filter((i) => i.estadoCobro === 'Pendiente');
+  const ingresoMensual = activas.reduce((sum, i) => sum + i.montoMensual, 0);
 
   return (
     <div>
@@ -51,22 +56,26 @@ export default async function SuperadminPage() {
         </Link>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 14 }}>
         <KpiCard label="Clientes" value={inmobiliarias.length} />
         <KpiCard label="Activos" value={activas.length} />
-        <KpiCard label="En deuda" value={enDeuda.length} tone={enDeuda.length > 0 ? 'warn' : undefined} />
-        <KpiCard label="Por vencer (≤7d)" value={porVencer.length} tone={porVencer.length > 0 ? 'warn' : undefined} />
+        <KpiCard label="Pendientes" value={pendientes.length} tone={pendientes.length > 0 ? 'warn' : undefined} />
+        <KpiCard label="En mora" value={enMora.length} tone={enMora.length > 0 ? 'warn' : undefined} />
         <KpiCard label="Ingreso mensual" value={formatMoney(ingresoMensual)} />
       </div>
 
+      <div style={{ marginBottom: 24 }}>
+        <PrecioForm precioActual={precioPorAlquiler} />
+      </div>
+
       <div style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 12, overflow: 'hidden' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 0.9fr 0.9fr 0.9fr 1fr 0.8fr 1.2fr', padding: '12px 18px', fontSize: 11, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', borderBottom: '1px solid oklch(92% 0.006 250)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 0.8fr 0.9fr 0.9fr 0.9fr 0.8fr 1.6fr', padding: '12px 18px', fontSize: 11, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', borderBottom: '1px solid oklch(92% 0.006 250)' }}>
           <div>Nombre</div>
           <div>Email</div>
           <div>Alquileres</div>
           <div>Mensualidad</div>
           <div>Cobro</div>
-          <div>Vencimiento</div>
+          <div>Próx. cobro</div>
           <div>Estado</div>
           <div>Acciones</div>
         </div>
@@ -76,7 +85,7 @@ export default async function SuperadminPage() {
         {inmobiliarias.map((i) => (
           <div
             key={i.id}
-            style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 0.9fr 0.9fr 0.9fr 1fr 0.8fr 1.2fr', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid oklch(94% 0.005 250)', fontSize: 13.5 }}
+            style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 0.8fr 0.9fr 0.9fr 0.9fr 0.8fr 1.6fr', alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid oklch(94% 0.005 250)', fontSize: 13.5 }}
           >
             <div style={{ fontWeight: 600 }}>{i.nombre}</div>
             <div style={{ color: 'oklch(48% 0.01 255)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{i.email_contacto}</div>
@@ -86,18 +95,35 @@ export default async function SuperadminPage() {
                 <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: 'oklch(56% 0.19 25)' }}>al límite</span>
               )}
             </div>
-            <div>{formatMoney(Number(i.monto_mensual))}</div>
+            <div>{formatMoney(i.montoMensual)}</div>
             <div>
-              <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...badgeStyle(i.cobro_estado === 'Pagado') }}>{i.cobro_estado}</span>
+              <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...badgeStyle(cobroTone(i.estadoCobro)) }}>{i.estadoCobro}</span>
             </div>
-            <div style={vencimientoStyle(i.diasParaVencimiento)}>{vencimientoLabel(i.diasParaVencimiento)}</div>
+            <div style={{ color: i.estadoCobro === 'En mora' ? 'oklch(56% 0.19 25)' : i.estadoCobro === 'Pendiente' ? 'oklch(55% 0.15 70)' : 'oklch(48% 0.01 255)', fontWeight: i.estadoCobro === 'Pagado' ? 400 : 700 }}>
+              {proximoCobroLabel(i.diasParaProximoCobro, i.estadoCobro)}
+            </div>
             <div>
-              <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...badgeStyle(i.estado === 'Activo') }}>{i.estado}</span>
+              <span style={{ fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 20, ...badgeStyle(i.estado === 'Activo' ? 'ok' : 'bad') }}>{i.estado}</span>
             </div>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
               <Link href={`/superadmin/${i.id}`} style={{ fontSize: 12.5, fontWeight: 600, color: 'oklch(55% 0.16 250)', textDecoration: 'none' }}>
                 Ver
               </Link>
+              {i.estadoCobro !== 'Pagado' && (
+                <form
+                  action={async () => {
+                    'use server';
+                    await marcarCobroPagado(i.id);
+                  }}
+                >
+                  <button
+                    type="submit"
+                    style={{ fontSize: 12, fontWeight: 600, padding: '5px 10px', borderRadius: 6, cursor: 'pointer', border: '1px solid oklch(80% 0.06 150)', background: '#fff', color: 'oklch(45% 0.13 150)' }}
+                  >
+                    Marcar pagado
+                  </button>
+                </form>
+              )}
               <form action={toggleEstadoInmobiliaria.bind(null, i.id, i.estado === 'Activo' ? 'Suspendido' : 'Activo')}>
                 <button
                   type="submit"

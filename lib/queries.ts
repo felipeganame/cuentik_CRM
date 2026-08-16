@@ -1,5 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { mesActualLabel, type Alquiler, type AlquilerParte, type Contacto, type Inmobiliaria, type PagoHistorial, type Propiedad, type Servicio } from './types';
+import { estadoCobro, type EstadoCobro } from './billing';
+
+export async function getPrecioPorAlquiler(supabase: SupabaseClient): Promise<number> {
+  const { data } = await supabase.from('config').select('precio_por_alquiler').eq('id', 1).single();
+  return Number(data?.precio_por_alquiler ?? 1000);
+}
 
 export async function listInmobiliarias(supabase: SupabaseClient): Promise<Inmobiliaria[]> {
   const { data, error } = await supabase.from('inmobiliarias').select('*').order('nombre', { ascending: true });
@@ -26,12 +32,16 @@ export async function getUsoAlquileres(supabase: SupabaseClient, inmobiliariaId:
 export type InmobiliariaConMetricas = Inmobiliaria & {
   alquileresActivos: number;
   propiedadesActuales: number;
-  diasParaVencimiento: number | null;
+  diasParaProximoCobro: number | null;
+  montoMensual: number;
+  estadoCobro: EstadoCobro;
 };
 
 export async function listInmobiliariasConMetricas(supabase: SupabaseClient): Promise<InmobiliariaConMetricas[]> {
   const inmobiliarias = await listInmobiliarias(supabase);
   if (inmobiliarias.length === 0) return [];
+
+  const precioPorAlquiler = await getPrecioPorAlquiler(supabase);
 
   const { data: alquileres } = await supabase.from('alquileres').select('id, inmobiliaria_id');
   const alquilerToInmobiliaria = new Map((alquileres ?? []).map((a) => [a.id, a.inmobiliaria_id as string]));
@@ -57,14 +67,19 @@ export async function listInmobiliariasConMetricas(supabase: SupabaseClient): Pr
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
-  return inmobiliarias.map((i) => ({
-    ...i,
-    alquileresActivos: alquileresPorInmobiliaria.get(i.id) ?? 0,
-    propiedadesActuales: propiedadesPorInmobiliaria.get(i.id) ?? 0,
-    diasParaVencimiento: i.fecha_vencimiento
-      ? Math.round((new Date(i.fecha_vencimiento + 'T00:00:00').getTime() - hoy.getTime()) / 86400000)
-      : null,
-  }));
+  return inmobiliarias.map((i) => {
+    const activos = alquileresPorInmobiliaria.get(i.id) ?? 0;
+    return {
+      ...i,
+      alquileresActivos: activos,
+      propiedadesActuales: propiedadesPorInmobiliaria.get(i.id) ?? 0,
+      montoMensual: precioPorAlquiler * activos,
+      estadoCobro: estadoCobro(i.fecha_proximo_cobro, hoy),
+      diasParaProximoCobro: i.fecha_proximo_cobro
+        ? Math.round((new Date(i.fecha_proximo_cobro + 'T00:00:00').getTime() - hoy.getTime()) / 86400000)
+        : null,
+    };
+  });
 }
 
 export type AlquilerListItem = Alquiler & {

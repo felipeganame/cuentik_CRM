@@ -9,10 +9,8 @@ export type Inmobiliaria = {
   telefono: string | null;
   limite_alquileres: number;
   estado: 'Activo' | 'Suspendido';
-  fecha_vencimiento: string | null;
+  fecha_proximo_cobro: string | null;
   logo_url: string | null;
-  cobro_estado: 'Pagado' | 'Pendiente';
-  monto_mensual: number;
 };
 
 export type Alquiler = {

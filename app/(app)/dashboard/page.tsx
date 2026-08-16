@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { listAlquileres } from '@/lib/queries';
 import { estadoPagoLabel, statusStyle } from '@/lib/types';
+import { estadoCobro } from '@/lib/billing';
 
 const FILTROS = ['Todos', 'Al día', 'Pendiente', 'Deuda'] as const;
 
@@ -20,12 +21,17 @@ export default async function DashboardPage({
   } = await supabase.auth.getUser();
   const { data: profile } = await supabase
     .from('profiles')
-    .select('inmobiliarias(limite_alquileres)')
+    .select('inmobiliarias(limite_alquileres, fecha_proximo_cobro)')
     .eq('id', user!.id)
     .single();
-  const inmobiliariaRel = profile?.inmobiliarias as unknown as { limite_alquileres: number } | { limite_alquileres: number }[] | null;
-  const limiteAlquileres = (Array.isArray(inmobiliariaRel) ? inmobiliariaRel[0]?.limite_alquileres : inmobiliariaRel?.limite_alquileres) ?? 0;
+  const inmobiliariaRel = profile?.inmobiliarias as unknown as
+    | { limite_alquileres: number; fecha_proximo_cobro: string | null }
+    | { limite_alquileres: number; fecha_proximo_cobro: string | null }[]
+    | null;
+  const inmobiliaria = Array.isArray(inmobiliariaRel) ? inmobiliariaRel[0] : inmobiliariaRel;
+  const limiteAlquileres = inmobiliaria?.limite_alquileres ?? 0;
   const alLimite = all.length >= limiteAlquileres;
+  const enMora = estadoCobro(inmobiliaria?.fecha_proximo_cobro ?? null) === 'En mora';
 
   const query = q.trim().toLowerCase();
   const filtered = all
@@ -56,6 +62,11 @@ export default async function DashboardPage({
 
   return (
     <div>
+      {enMora && (
+        <div style={{ background: 'oklch(96% 0.03 25)', border: '1px solid oklch(88% 0.06 25)', color: 'oklch(50% 0.17 25)', borderRadius: 10, padding: '12px 16px', fontSize: 13.5, marginBottom: 20 }}>
+          <strong>Tenés un pago pendiente.</strong> Regularizalo para evitar la suspensión del servicio. Contactá a Cuentik CRM si ya pagaste.
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 26 }}>
         <div>
           <div style={{ fontSize: 22, fontWeight: 700 }}>Tus alquileres</div>

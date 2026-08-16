@@ -62,19 +62,14 @@ export default function NuevaInmobiliariaPage() {
             <input name="telefono_numero" type="text" inputMode="numeric" maxLength={10} placeholder="Número" onChange={soloDigitos} style={fieldStyle()} />
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Límite de alquileres</div>
-            <input name="limite_alquileres" type="number" defaultValue={20} style={fieldStyle()} />
-          </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Mensualidad ($)</div>
-            <input name="monto_mensual" type="number" defaultValue={0} style={fieldStyle()} />
-          </div>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Límite de alquileres</div>
+          <input name="limite_alquileres" type="number" defaultValue={20} style={fieldStyle()} />
         </div>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Vencimiento del plan</div>
-          <input name="fecha_vencimiento" type="date" style={fieldStyle()} />
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Próximo cobro</div>
+          <input name="fecha_proximo_cobro" type="date" style={fieldStyle()} />
+          <div style={{ fontSize: 11.5, color: 'oklch(55% 0.01 255)', marginTop: 5 }}>Si lo dejás vacío, se pone a un mes desde hoy.</div>
         </div>
 
         {error && <div style={{ fontSize: 12.5, color: 'oklch(56% 0.19 25)' }}>{error}</div>}
