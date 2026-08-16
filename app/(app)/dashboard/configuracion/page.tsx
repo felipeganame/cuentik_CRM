@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { PerfilForm, PasswordForm, LogoForm } from './forms';
+import { PerfilForm, PasswordForm, LogoForm, EliminarCuentaForm } from './forms';
 
 export default async function ConfiguracionPage() {
   const supabase = await createClient();
@@ -38,6 +38,7 @@ export default async function ConfiguracionPage() {
           emailContacto={user?.email ?? ''}
         />
         <PasswordForm />
+        <EliminarCuentaForm />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { recordLogoUpload, updatePassword, updatePerfil, type PasswordState, type PerfilState } from '@/lib/actions/perfil';
+import { eliminarCuenta, type EliminarCuentaState } from '@/lib/actions/cuenta';
 import { parseTelefono } from '@/lib/phone';
 import { PaisSelectOptions, paisSelectStyle } from '@/app/pais-select';
 
@@ -149,9 +150,17 @@ export function PerfilForm({
 
 export function PasswordForm() {
   const [state, formAction, pending] = useActionState(updatePassword, passwordInitial);
+  const formRef = useRef<HTMLFormElement>(null);
 
   return (
-    <form action={formAction} style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 12, padding: 20 }}>
+    <form
+      ref={formRef}
+      action={(formData) => {
+        formAction(formData);
+        formRef.current?.reset();
+      }}
+      style={{ background: '#fff', border: '1px solid oklch(90% 0.007 250)', borderRadius: 12, padding: 20 }}
+    >
       <div style={{ fontSize: 11.5, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', marginBottom: 14 }}>
         Seguridad
       </div>
@@ -160,7 +169,22 @@ export function PasswordForm() {
         <input name="nueva_password" type="password" placeholder="Elegí una nueva contraseña" style={fieldStyle()} />
       </div>
       {state.error && <div style={{ marginTop: 10, fontSize: 12.5, color: 'oklch(56% 0.19 25)' }}>{state.error}</div>}
-      {state.success && <div style={{ marginTop: 10, fontSize: 12.5, color: 'oklch(45% 0.13 150)' }}>Contraseña actualizada.</div>}
+      {state.success && (
+        <div
+          style={{
+            marginTop: 12,
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'oklch(40% 0.12 150)',
+            background: 'oklch(94% 0.06 150)',
+            border: '1px solid oklch(80% 0.06 150)',
+            borderRadius: 8,
+            padding: '9px 12px',
+          }}
+        >
+          ✓ Contraseña actualizada correctamente.
+        </div>
+      )}
       <button
         type="submit"
         disabled={pending}
@@ -169,5 +193,90 @@ export function PasswordForm() {
         {pending ? 'Guardando…' : 'Guardar cambios'}
       </button>
     </form>
+  );
+}
+
+export function EliminarCuentaForm() {
+  const [open, setOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [state, formAction, pending] = useActionState<EliminarCuentaState, FormData>(eliminarCuenta, { error: null });
+
+  return (
+    <div style={{ background: '#fff', border: '1px solid oklch(85% 0.08 25)', borderRadius: 12, padding: 20 }}>
+      <div style={{ fontSize: 11.5, fontWeight: 700, color: 'oklch(56% 0.19 25)', textTransform: 'uppercase', letterSpacing: '.03em', marginBottom: 10 }}>
+        Zona peligrosa
+      </div>
+      <p style={{ fontSize: 13, color: 'oklch(45% 0.01 255)', lineHeight: 1.5, marginBottom: 14 }}>
+        Eliminar tu cuenta borra tu inmobiliaria, todos sus alquileres, propiedades, contactos, fotos y contratos.
+        Esta acción es permanente y no se puede deshacer.
+      </p>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        style={{ padding: '9px 14px', border: '1px solid oklch(80% 0.1 25)', borderRadius: 8, background: '#fff', color: 'oklch(56% 0.19 25)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+      >
+        Eliminar mi cuenta
+      </button>
+
+      {open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{ position: 'fixed', inset: 0, background: 'oklch(20% 0.02 258 / 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}
+          onClick={() => !pending && setOpen(false)}
+        >
+          <div
+            style={{ background: '#fff', borderRadius: 14, padding: 26, width: 440, maxWidth: '90vw', boxShadow: '0 20px 50px oklch(20% 0.02 258 / 0.25)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 10 }}>¿Eliminar tu cuenta?</div>
+            <div style={{ fontSize: 13.5, color: 'oklch(45% 0.01 255)', lineHeight: 1.5, marginBottom: 16 }}>
+              Esta acción es <strong>permanente</strong>. Se borran tu inmobiliaria, todos los alquileres, propiedades,
+              contactos, fotos y contratos asociados. No hay forma de deshacerlo.
+            </div>
+            <form action={formAction}>
+              <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+                Escribí <strong>ELIMINAR</strong> para confirmar
+              </div>
+              <input
+                name="confirmacion"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                autoFocus
+                style={fieldStyle()}
+              />
+              {state.error && <div style={{ marginTop: 10, fontSize: 13, color: 'oklch(56% 0.19 25)' }}>{state.error}</div>}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  disabled={pending}
+                  style={{ padding: '9px 16px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 8, background: '#fff', fontSize: 13.5, fontWeight: 600, cursor: pending ? 'default' : 'pointer' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={pending || confirmText !== 'ELIMINAR'}
+                  style={{
+                    padding: '9px 16px',
+                    border: 'none',
+                    borderRadius: 8,
+                    background: 'oklch(56% 0.19 25)',
+                    color: '#fff',
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                    cursor: pending || confirmText !== 'ELIMINAR' ? 'default' : 'pointer',
+                    opacity: confirmText !== 'ELIMINAR' ? 0.5 : 1,
+                  }}
+                >
+                  {pending ? 'Eliminando…' : 'Eliminar mi cuenta'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

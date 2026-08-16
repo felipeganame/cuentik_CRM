@@ -14,6 +14,7 @@ function LoginForm() {
   const motivo = searchParams.get('motivo');
   const suspendido = motivo === 'suspendido';
   const confirmacionInvalida = motivo === 'confirmacion_invalida';
+  const cuentaEliminada = motivo === 'cuenta_eliminada';
 
   const mfaStep = state.mfaRequired || mfaState.mfaRequired;
 
@@ -33,6 +34,11 @@ function LoginForm() {
         {confirmacionInvalida && (
           <div style={{ fontSize: 12.5, color: 'oklch(56% 0.19 25)', background: 'oklch(96% 0.03 25)', border: '1px solid oklch(88% 0.06 25)', borderRadius: 8, padding: '10px 12px', marginBottom: 18 }}>
             El link de confirmación no es válido o ya expiró. Volvé a registrarte para recibir uno nuevo.
+          </div>
+        )}
+        {cuentaEliminada && (
+          <div style={{ fontSize: 12.5, color: 'oklch(40% 0.12 150)', background: 'oklch(94% 0.06 150)', border: '1px solid oklch(80% 0.06 150)', borderRadius: 8, padding: '10px 12px', marginBottom: 18 }}>
+            Tu cuenta fue eliminada correctamente.
           </div>
         )}
 
