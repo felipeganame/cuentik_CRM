@@ -30,10 +30,10 @@ test('página web: content form, publicación CRUD, pause, and preview', async (
   await page.getByRole('button', { name: 'Pausar' }).click();
   await expect(page.getByText('Pausada')).toBeVisible();
 
-  // Preview shows content but not the paused listing
+  // Preview shows the logo/name header but not the paused listing
   const previewPage = await page.context().newPage();
   await previewPage.goto('/mi-pagina-preview');
-  await expect(previewPage.getByText('Somos una inmobiliaria del centro de Córdoba.')).toBeVisible();
+  await expect(previewPage.getByText('Inmobiliaria del Centro')).toBeVisible();
   await expect(previewPage.getByText('Todavía no hay publicaciones activas.')).toBeVisible();
   await previewPage.close();
 
