@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentRole } from '@/lib/auth';
 import { logout } from '@/app/(app)/actions';
+import { SuperadminNavLinks } from './nav-links';
 
 export default async function SuperadminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -18,12 +19,7 @@ export default async function SuperadminLayout({ children }: { children: React.R
           <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Cuentik CRM</div>
         </div>
         <div style={{ fontSize: 12, color: 'oklch(55% 0.02 258)', padding: '0 6px 22px' }}>Superadmin</div>
-        <a
-          href="/superadmin"
-          style={{ padding: '9px 12px', borderRadius: 8, fontSize: 13.5, fontWeight: 600, color: 'oklch(85% 0.01 258)', textDecoration: 'none', background: 'oklch(26% 0.02 258)' }}
-        >
-          Inmobiliarias
-        </a>
+        <SuperadminNavLinks />
         <div style={{ flex: 1 }} />
         <form action={logout}>
           <button

@@ -37,6 +37,18 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (user && (isDashboard || isSuperadmin)) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal && aal.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
+      // Password verified but the 2nd factor isn't — e.g. they closed the tab
+      // mid-login and came back with a fresh one. The login page itself only
+      // gates the happy path; this is the actual enforcement point.
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
+  }
+
   if (user && (isLoginPage || isDashboard || isSuperadmin)) {
     const { data: profile } = await supabase.from('profiles').select('role, inmobiliarias(estado)').eq('id', user.id).single();
     const home = profile?.role === 'superadmin' ? '/superadmin' : '/dashboard';
