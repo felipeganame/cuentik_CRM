@@ -25,7 +25,7 @@ async function main() {
       nombre: 'Inmobiliaria del Centro',
       email_contacto: TEST_EMAIL,
       telefono: '351 555 0000',
-      limite_propiedades: 50,
+      limite_alquileres: 50,
       estado: 'Activo',
       fecha_vencimiento: '2027-01-01',
     })

@@ -65,8 +65,8 @@ export function InmobiliariaForm({ inmobiliaria }: { inmobiliaria: Inmobiliaria 
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Límite de propiedades</div>
-            <input name="limite_propiedades" type="number" defaultValue={inmobiliaria.limite_propiedades} style={fieldStyle()} />
+            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Límite de alquileres</div>
+            <input name="limite_alquileres" type="number" defaultValue={inmobiliaria.limite_alquileres} style={fieldStyle()} />
           </div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Mensualidad ($)</div>

@@ -38,8 +38,20 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && (isLoginPage || isDashboard || isSuperadmin)) {
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    const { data: profile } = await supabase.from('profiles').select('role, inmobiliarias(estado)').eq('id', user.id).single();
     const home = profile?.role === 'superadmin' ? '/superadmin' : '/dashboard';
+
+    if (isDashboard && profile?.role === 'inmobiliaria') {
+      const rel = profile.inmobiliarias as unknown as { estado: string } | { estado: string }[] | null;
+      const estado = Array.isArray(rel) ? rel[0]?.estado : rel?.estado;
+      if (estado === 'Suspendido') {
+        await supabase.auth.signOut();
+        const url = request.nextUrl.clone();
+        url.pathname = '/login';
+        url.searchParams.set('motivo', 'suspendido');
+        return NextResponse.redirect(url);
+      }
+    }
 
     if (isLoginPage || (isDashboard && profile?.role === 'superadmin') || (isSuperadmin && profile?.role !== 'superadmin')) {
       const url = request.nextUrl.clone();

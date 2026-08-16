@@ -7,7 +7,7 @@ export type Inmobiliaria = {
   nombre: string;
   email_contacto: string;
   telefono: string | null;
-  limite_propiedades: number;
+  limite_alquileres: number;
   estado: 'Activo' | 'Suspendido';
   fecha_vencimiento: string | null;
   logo_url: string | null;

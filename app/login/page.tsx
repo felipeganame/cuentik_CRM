@@ -1,12 +1,15 @@
 'use client';
 
-import { useActionState } from 'react';
+import { Suspense, useActionState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { login, type LoginState } from './actions';
 
 const initialState: LoginState = { error: null };
 
-export default function LoginPage() {
+function LoginForm() {
   const [state, formAction, pending] = useActionState(login, initialState);
+  const searchParams = useSearchParams();
+  const suspendido = searchParams.get('motivo') === 'suspendido';
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
@@ -16,6 +19,11 @@ export default function LoginPage() {
           <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-.01em' }}>Cuentik CRM</div>
         </div>
         <div style={{ fontSize: 13, color: 'oklch(50% 0.01 255)', marginBottom: 28 }}>CRM de alquileres · Córdoba</div>
+        {suspendido && (
+          <div style={{ fontSize: 12.5, color: 'oklch(56% 0.19 25)', background: 'oklch(96% 0.03 25)', border: '1px solid oklch(88% 0.06 25)', borderRadius: 8, padding: '10px 12px', marginBottom: 18 }}>
+            Tu cuenta está suspendida. Contactá a Cuentik CRM para regularizar el pago.
+          </div>
+        )}
         <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
             <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 6, color: 'oklch(35% 0.01 255)' }}>Email</div>
@@ -48,5 +56,13 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

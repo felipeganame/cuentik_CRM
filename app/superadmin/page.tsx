@@ -63,7 +63,7 @@ export default async function SuperadminPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 0.9fr 0.9fr 0.9fr 1fr 0.8fr 1.2fr', padding: '12px 18px', fontSize: 11, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', borderBottom: '1px solid oklch(92% 0.006 250)' }}>
           <div>Nombre</div>
           <div>Email</div>
-          <div>Propiedades</div>
+          <div>Alquileres</div>
           <div>Mensualidad</div>
           <div>Cobro</div>
           <div>Vencimiento</div>
@@ -81,8 +81,8 @@ export default async function SuperadminPage() {
             <div style={{ fontWeight: 600 }}>{i.nombre}</div>
             <div style={{ color: 'oklch(48% 0.01 255)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{i.email_contacto}</div>
             <div>
-              {i.propiedadesActuales} / {i.limite_propiedades}
-              {i.propiedadesActuales >= i.limite_propiedades && (
+              {i.alquileresActivos} / {i.limite_alquileres}
+              {i.alquileresActivos >= i.limite_alquileres && (
                 <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: 'oklch(56% 0.19 25)' }}>al límite</span>
               )}
             </div>

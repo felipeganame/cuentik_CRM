@@ -13,6 +13,16 @@ export async function getInmobiliaria(supabase: SupabaseClient, id: string): Pro
   return data;
 }
 
+export async function getUsoAlquileres(supabase: SupabaseClient, inmobiliariaId: string): Promise<{ usados: number; limite: number }> {
+  const { data: inmobiliaria } = await supabase.from('inmobiliarias').select('limite_alquileres').eq('id', inmobiliariaId).single();
+  const { count } = await supabase
+    .from('alquileres')
+    .select('id', { count: 'exact', head: true })
+    .eq('inmobiliaria_id', inmobiliariaId);
+
+  return { usados: count ?? 0, limite: inmobiliaria?.limite_alquileres ?? 0 };
+}
+
 export type InmobiliariaConMetricas = Inmobiliaria & {
   alquileresActivos: number;
   propiedadesActuales: number;

@@ -185,7 +185,7 @@ export async function createAlquiler(input: {
   fechaInicio: string;
   fechaFin: string;
   servicios: WizardServicioInput[];
-}) {
+}): Promise<{ error: string } | { id: string; propiedadIds: string[] }> {
   const supabase = await createClient();
 
   const {
@@ -199,6 +199,21 @@ export async function createAlquiler(input: {
     .eq('id', user.id)
     .single();
   if (profileError || !profile?.inmobiliaria_id) throw new Error('No se encontró la inmobiliaria del usuario');
+
+  const { data: inmobiliaria } = await supabase
+    .from('inmobiliarias')
+    .select('limite_alquileres')
+    .eq('id', profile.inmobiliaria_id)
+    .single();
+
+  const { count: alquileresActuales } = await supabase
+    .from('alquileres')
+    .select('id', { count: 'exact', head: true })
+    .eq('inmobiliaria_id', profile.inmobiliaria_id);
+
+  if (inmobiliaria && (alquileresActuales ?? 0) >= inmobiliaria.limite_alquileres) {
+    return { error: `Alcanzaste el límite de ${inmobiliaria.limite_alquileres} alquileres de tu plan. Contactá a Cuentik CRM para ampliarlo.` };
+  }
 
   const { data: alquiler, error: alquilerError } = await supabase
     .from('alquileres')

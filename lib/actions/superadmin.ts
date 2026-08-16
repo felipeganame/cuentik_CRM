@@ -13,7 +13,7 @@ export async function createInmobiliaria(formData: FormData) {
   const emailContacto = String(formData.get('email_contacto') || '').trim();
   const password = String(formData.get('password') || '');
   const telefono = String(formData.get('telefono') || '');
-  const limitePropiedades = Number(formData.get('limite_propiedades')) || 20;
+  const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
   const fechaVencimiento = String(formData.get('fecha_vencimiento') || '') || null;
   const montoMensual = Number(formData.get('monto_mensual')) || 0;
 
@@ -36,7 +36,7 @@ export async function createInmobiliaria(formData: FormData) {
       nombre,
       email_contacto: emailContacto,
       telefono,
-      limite_propiedades: limitePropiedades,
+      limite_alquileres: limiteAlquileres,
       fecha_vencimiento: fechaVencimiento,
       monto_mensual: montoMensual,
     })
@@ -62,7 +62,7 @@ export async function updateInmobiliaria(id: string, formData: FormData) {
 
   const nombre = String(formData.get('nombre') || '');
   const telefono = String(formData.get('telefono') || '');
-  const limitePropiedades = Number(formData.get('limite_propiedades')) || 20;
+  const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
   const fechaVencimiento = String(formData.get('fecha_vencimiento') || '') || null;
   const estado = String(formData.get('estado') || 'Activo');
   const cobroEstado = String(formData.get('cobro_estado') || 'Pendiente');
@@ -73,7 +73,7 @@ export async function updateInmobiliaria(id: string, formData: FormData) {
     .update({
       nombre,
       telefono,
-      limite_propiedades: limitePropiedades,
+      limite_alquileres: limiteAlquileres,
       fecha_vencimiento: fechaVencimiento,
       estado,
       cobro_estado: cobroEstado,

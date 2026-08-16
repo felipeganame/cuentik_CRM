@@ -124,7 +124,7 @@ export function NuevoAlquilerForm({ localidadesSugeridas, inmobiliariaId }: { lo
     setSubmitting(true);
     setErrorMsg(null);
     try {
-      const { id: alquilerId, propiedadIds } = await createAlquiler({
+      const result = await createAlquiler({
         propiedades,
         locador,
         locatario,
@@ -142,6 +142,13 @@ export function NuevoAlquilerForm({ localidadesSugeridas, inmobiliariaId }: { lo
         servicios,
       });
 
+      if ('error' in result) {
+        setErrorMsg(result.error);
+        setSubmitting(false);
+        return;
+      }
+
+      const { id: alquilerId, propiedadIds } = result;
       const supabase = createClient();
       for (let i = 0; i < propiedadIds.length; i++) {
         const propiedadId = propiedadIds[i];

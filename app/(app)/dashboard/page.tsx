@@ -15,6 +15,18 @@ export default async function DashboardPage({
   const supabase = await createClient();
   const all = await listAlquileres(supabase);
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('inmobiliarias(limite_alquileres)')
+    .eq('id', user!.id)
+    .single();
+  const inmobiliariaRel = profile?.inmobiliarias as unknown as { limite_alquileres: number } | { limite_alquileres: number }[] | null;
+  const limiteAlquileres = (Array.isArray(inmobiliariaRel) ? inmobiliariaRel[0]?.limite_alquileres : inmobiliariaRel?.limite_alquileres) ?? 0;
+  const alLimite = all.length >= limiteAlquileres;
+
   const query = q.trim().toLowerCase();
   const filtered = all
     .map((a) => ({ ...a, estadoLabel: estadoPagoLabel(a.estadoPagoMesActual) }))
@@ -47,14 +59,32 @@ export default async function DashboardPage({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 26 }}>
         <div>
           <div style={{ fontSize: 22, fontWeight: 700 }}>Tus alquileres</div>
-          <div style={{ fontSize: 13.5, color: 'oklch(50% 0.01 255)', marginTop: 4 }}>Todos los contratos que administrás</div>
+          <div style={{ fontSize: 13.5, color: 'oklch(50% 0.01 255)', marginTop: 4 }}>
+            Todos los contratos que administrás ·{' '}
+            <span style={{ fontWeight: 600, color: alLimite ? 'oklch(56% 0.19 25)' : 'oklch(45% 0.01 255)' }}>
+              {all.length} / {limiteAlquileres} del plan
+            </span>
+          </div>
         </div>
-        <Link
-          href="/dashboard/alquileres/nuevo"
-          style={{ padding: '10px 16px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', textDecoration: 'none' }}
-        >
-          + Nuevo alquiler
-        </Link>
+        {alLimite ? (
+          <div style={{ textAlign: 'right' }}>
+            <button
+              type="button"
+              disabled
+              style={{ padding: '10px 16px', border: 'none', borderRadius: 8, background: 'oklch(90% 0.007 250)', color: 'oklch(60% 0.01 255)', fontSize: 13.5, fontWeight: 600, cursor: 'not-allowed' }}
+            >
+              + Nuevo alquiler
+            </button>
+            <div style={{ fontSize: 11.5, color: 'oklch(56% 0.19 25)', marginTop: 4 }}>Llegaste al límite de tu plan</div>
+          </div>
+        ) : (
+          <Link
+            href="/dashboard/alquileres/nuevo"
+            style={{ padding: '10px 16px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', textDecoration: 'none' }}
+          >
+            + Nuevo alquiler
+          </Link>
+        )}
       </div>
 
       <form style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 18, flexWrap: 'wrap' }}>
