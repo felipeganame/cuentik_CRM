@@ -122,20 +122,10 @@ export function PerfilForm({
               <PaisSelectOptions />
             </select>
             <input
-              name="telefono_area"
-              type="text"
-              inputMode="numeric"
-              maxLength={4}
-              placeholder="Cód. área"
-              defaultValue={parseTelefono(telefono).area}
-              onChange={soloDigitos}
-              style={{ ...fieldStyle(), width: 80 }}
-            />
-            <input
               name="telefono_numero"
               type="text"
               inputMode="numeric"
-              maxLength={10}
+              maxLength={14}
               placeholder="Número"
               defaultValue={parseTelefono(telefono).numero}
               onChange={soloDigitos}

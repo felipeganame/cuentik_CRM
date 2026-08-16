@@ -5,7 +5,7 @@ import { registrarInmobiliaria, type RegistroState } from '@/lib/actions/registr
 import { PaisSelectOptions, paisSelectStyle } from '@/app/pais-select';
 import styles from '../marketing.module.css';
 
-const initialState: RegistroState = { error: null };
+const initialState: RegistroState = { error: null, success: false };
 
 function fieldStyle() {
   return {
@@ -25,6 +25,20 @@ function soloDigitos(e: React.ChangeEvent<HTMLInputElement>) {
 
 export function RegistroForm() {
   const [state, formAction, pending] = useActionState(registrarInmobiliaria, initialState);
+
+  if (state.success) {
+    return (
+      <div
+        className={styles.folioCard}
+        style={{ maxWidth: 480, margin: '0 auto', transform: 'none', display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'center' }}
+      >
+        <div style={{ fontSize: 19, fontWeight: 700, fontFamily: 'Vollkorn, serif' }}>Revisá tu email</div>
+        <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--muted-text)' }}>
+          Te mandamos un link de confirmación. Abrilo para activar tu cuenta y empezar a usar Cuentik CRM.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form
@@ -50,8 +64,7 @@ export function RegistroForm() {
           <select name="telefono_dial" style={{ ...paisSelectStyle(), background: 'var(--card)', borderColor: 'var(--line)', color: 'var(--ink-text)' }}>
             <PaisSelectOptions />
           </select>
-          <input name="telefono_area" type="text" inputMode="numeric" maxLength={4} placeholder="Cód. área" onChange={soloDigitos} style={{ ...fieldStyle(), width: 80 }} />
-          <input name="telefono_numero" type="text" inputMode="numeric" maxLength={10} placeholder="Número" onChange={soloDigitos} style={fieldStyle()} />
+          <input name="telefono_numero" type="text" inputMode="numeric" maxLength={14} placeholder="Número" onChange={soloDigitos} style={fieldStyle()} />
         </div>
       </div>
 

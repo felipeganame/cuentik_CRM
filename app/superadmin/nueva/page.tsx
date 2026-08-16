@@ -62,8 +62,7 @@ export default function NuevaInmobiliariaPage() {
             <select name="telefono_dial" style={paisSelectStyle()}>
               <PaisSelectOptions />
             </select>
-            <input name="telefono_area" type="text" inputMode="numeric" maxLength={4} placeholder="Cód. área" onChange={soloDigitos} style={{ ...fieldStyle(), width: 80 }} />
-            <input name="telefono_numero" type="text" inputMode="numeric" maxLength={10} placeholder="Número" onChange={soloDigitos} style={fieldStyle()} />
+            <input name="telefono_numero" type="text" inputMode="numeric" maxLength={14} placeholder="Número" onChange={soloDigitos} style={fieldStyle()} />
           </div>
         </div>
         <div>

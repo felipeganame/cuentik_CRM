@@ -135,7 +135,11 @@ async function seedAlquiler(
     ['locador', input.locador],
     ['locatario', input.locatario],
   ] as const) {
-    const { data: contacto, error: contactoError } = await supabase.from('contactos').insert(persona).select().single();
+    const { data: contacto, error: contactoError } = await supabase
+      .from('contactos')
+      .insert({ ...persona, inmobiliaria_id: inmobiliariaId })
+      .select()
+      .single();
     if (contactoError) throw contactoError;
     const { error: parteError } = await supabase
       .from('alquiler_partes')

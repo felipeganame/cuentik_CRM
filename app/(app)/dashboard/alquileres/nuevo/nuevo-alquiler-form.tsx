@@ -471,7 +471,7 @@ function StepPropiedades({
 }
 
 function PersonaForm({ persona, onChange }: { persona: WizardPersonaInput; onChange: (p: WizardPersonaInput) => void }) {
-  const { dial, area, numero } = parseTelefono(persona.telefono);
+  const { dial, numero } = parseTelefono(persona.telefono);
   const emailInvalido = persona.email.trim() !== '' && !EMAIL_PATTERN.test(persona.email);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -481,25 +481,17 @@ function PersonaForm({ persona, onChange }: { persona: WizardPersonaInput; onCha
         <select
           style={paisSelectStyle()}
           value={dial}
-          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(e.target.value, area, numero) })}
+          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(e.target.value, numero) })}
         >
           <PaisSelectOptions />
         </select>
         <input
-          style={{ ...fieldStyle(), width: 80 }}
-          placeholder="Cód. área"
-          inputMode="numeric"
-          maxLength={4}
-          value={area}
-          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(dial, e.target.value, numero) })}
-        />
-        <input
           style={fieldStyle()}
           placeholder="Teléfono"
           inputMode="numeric"
-          maxLength={10}
+          maxLength={14}
           value={numero}
-          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(dial, area, e.target.value) })}
+          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(dial, e.target.value) })}
         />
       </div>
       <div>
@@ -609,7 +601,7 @@ function StepPago(props: {
               style={fieldStyle()}
               value={props.cuenta}
               onChange={(e) => props.setCuenta(e.target.value)}
-              placeholder={isOtro ? 'Ej: cheque, Mercado Pago, etc.' : ''}
+              placeholder={isOtro ? 'Ej: cheque, Mercado Pago, etc.' : 'Ej: 0000003100000000000000'}
             />
           </Field>
         )}

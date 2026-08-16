@@ -18,6 +18,9 @@ export async function login(_prevState: LoginState, formData: FormData): Promise
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error || !data.user) {
+    if (error?.code === 'email_not_confirmed') {
+      return { error: 'Todavía no confirmaste tu email. Revisá tu bandeja de entrada y abrí el link que te mandamos.' };
+    }
     return { error: 'Email o contraseña incorrectos.' };
   }
 

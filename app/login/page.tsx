@@ -11,7 +11,9 @@ function LoginForm() {
   const [state, formAction, pending] = useActionState(login, initialState);
   const [mfaState, mfaFormAction, mfaPending] = useActionState(verifyMfaCode, initialState);
   const searchParams = useSearchParams();
-  const suspendido = searchParams.get('motivo') === 'suspendido';
+  const motivo = searchParams.get('motivo');
+  const suspendido = motivo === 'suspendido';
+  const confirmacionInvalida = motivo === 'confirmacion_invalida';
 
   const mfaStep = state.mfaRequired || mfaState.mfaRequired;
 
@@ -26,6 +28,11 @@ function LoginForm() {
         {suspendido && (
           <div style={{ fontSize: 12.5, color: 'oklch(56% 0.19 25)', background: 'oklch(96% 0.03 25)', border: '1px solid oklch(88% 0.06 25)', borderRadius: 8, padding: '10px 12px', marginBottom: 18 }}>
             Tu cuenta está suspendida. Contactá a Cuentik CRM para regularizar el pago.
+          </div>
+        )}
+        {confirmacionInvalida && (
+          <div style={{ fontSize: 12.5, color: 'oklch(56% 0.19 25)', background: 'oklch(96% 0.03 25)', border: '1px solid oklch(88% 0.06 25)', borderRadius: 8, padding: '10px 12px', marginBottom: 18 }}>
+            El link de confirmación no es válido o ya expiró. Volvé a registrarte para recibir uno nuevo.
           </div>
         )}
 

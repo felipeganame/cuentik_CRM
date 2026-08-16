@@ -17,10 +17,14 @@ test('nuevo alquiler wizard creates a rental end to end', async ({ page }) => {
   const nombres = page.getByPlaceholder('Nombre completo');
   await nombres.nth(0).fill('Locador E2E');
   await nombres.nth(1).fill('Locatario E2E');
+  const dnis = page.getByPlaceholder('DNI / CUIT');
+  await dnis.nth(0).fill('30111222');
+  await dnis.nth(1).fill('30333444');
   await page.getByRole('button', { name: 'Siguiente →' }).click();
 
   // Step 3: Pago
   await page.getByPlaceholder('185000').fill('200000');
+  await page.getByPlaceholder('Ej: 0000003100000000000000').fill('0000003100000000001234');
   await page.getByRole('button', { name: 'Siguiente →' }).click();
 
   // Step 4: Servicios (defaults fine)
@@ -31,5 +35,5 @@ test('nuevo alquiler wizard creates a rental end to end', async ({ page }) => {
   await page.getByRole('button', { name: 'Crear alquiler' }).click();
 
   await expect(page).toHaveURL(/\/dashboard$/, { timeout: 10_000 });
-  await expect(page.getByText('Av. Test 999, 5A')).toBeVisible();
+  await expect(page.getByText('Av. Test 999, 5A').first()).toBeVisible();
 });
