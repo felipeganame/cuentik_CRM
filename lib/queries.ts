@@ -9,6 +9,12 @@ export type AlquilerListItem = Alquiler & {
   serviciosPendientes: number;
 };
 
+export async function listLocalidadesUsadas(supabase: SupabaseClient): Promise<string[]> {
+  const { data } = await supabase.from('propiedades').select('localidad');
+  const unique = new Set((data ?? []).map((p) => p.localidad).filter(Boolean));
+  return Array.from(unique).sort();
+}
+
 export async function listAlquileres(supabase: SupabaseClient): Promise<AlquilerListItem[]> {
   const { data: alquileres, error } = await supabase
     .from('alquileres')
