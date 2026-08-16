@@ -73,7 +73,12 @@ function LoginForm() {
               />
             </div>
             <div>
-              <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 6, color: 'oklch(35% 0.01 255)' }}>Contraseña</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: 'oklch(35% 0.01 255)' }}>Contraseña</div>
+                <Link href="/login/olvide" style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'none' }}>
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
               <input
                 name="password"
                 type="password"
