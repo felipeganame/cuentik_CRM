@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { mesActualLabel, type Alquiler, type AlquilerParte, type Contacto, type Inmobiliaria, type PagoHistorial, type Propiedad, type Servicio } from './types';
+import { mesActualLabel, type Alquiler, type AlquilerParte, type Contacto, type Inmobiliaria, type PagoHistorial, type Propiedad, type Publicacion, type Servicio } from './types';
 import { estadoCobro, type EstadoCobro } from './billing';
 
 export async function getPrecioPorAlquiler(supabase: SupabaseClient): Promise<number> {
@@ -242,5 +242,123 @@ export async function getAlquilerDetail(supabase: SupabaseClient, alquilerId: st
     servicios: (servicios ?? []).map((sv) => ({ ...sv, propiedad: propiedadById.get(sv.propiedad_id) ?? null })),
     historial: historial ?? [],
     estadoPagoMesActual: historialActual?.estado ?? 'pendiente',
+  };
+}
+
+export type PublicacionConFoto = Publicacion & { fotoUrl: string | null };
+
+export async function listPublicaciones(supabase: SupabaseClient, inmobiliariaId: string): Promise<PublicacionConFoto[]> {
+  const { data: publicaciones, error } = await supabase
+    .from('publicaciones')
+    .select('*')
+    .eq('inmobiliaria_id', inmobiliariaId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  if (!publicaciones || publicaciones.length === 0) return [];
+
+  const ids = publicaciones.map((p) => p.id);
+  const { data: fotos } = await supabase.from('publicacion_fotos').select('publicacion_id, storage_path').in('publicacion_id', ids);
+
+  const primeraFotoPorPublicacion = new Map<string, string>();
+  for (const f of fotos ?? []) {
+    if (!primeraFotoPorPublicacion.has(f.publicacion_id)) primeraFotoPorPublicacion.set(f.publicacion_id, f.storage_path);
+  }
+
+  const paths = Array.from(primeraFotoPorPublicacion.values());
+  const { data: signedList } = paths.length
+    ? await supabase.storage.from('publicacion-fotos').createSignedUrls(paths, 3600)
+    : { data: [] as { path: string | null; signedUrl: string }[] };
+  const urlByPath = new Map((signedList ?? []).map((s) => [s.path, s.signedUrl]));
+
+  return publicaciones.map((p) => {
+    const path = primeraFotoPorPublicacion.get(p.id);
+    return { ...p, fotoUrl: path ? urlByPath.get(path) ?? null : null };
+  });
+}
+
+export type PublicacionFotoConUrl = { id: string; url: string };
+
+export async function getPublicacionConFotos(
+  supabase: SupabaseClient,
+  publicacionId: string
+): Promise<{ publicacion: Publicacion; fotos: PublicacionFotoConUrl[] } | null> {
+  const { data: publicacion, error } = await supabase.from('publicaciones').select('*').eq('id', publicacionId).single();
+  if (error || !publicacion) return null;
+
+  const { data: fotoRows } = await supabase.from('publicacion_fotos').select('id, storage_path').eq('publicacion_id', publicacionId);
+  const fotos: PublicacionFotoConUrl[] = [];
+  if (fotoRows && fotoRows.length > 0) {
+    const { data: signedList } = await supabase.storage
+      .from('publicacion-fotos')
+      .createSignedUrls(fotoRows.map((f) => f.storage_path), 3600);
+    const urlByPath = new Map((signedList ?? []).map((s) => [s.path, s.signedUrl]));
+    for (const foto of fotoRows) {
+      const url = urlByPath.get(foto.storage_path);
+      if (url) fotos.push({ id: foto.id, url });
+    }
+  }
+
+  return { publicacion, fotos };
+}
+
+export type PublicacionPreview = Publicacion & { fotos: string[] };
+
+export async function getPaginaPreview(
+  supabase: SupabaseClient,
+  inmobiliariaId: string
+): Promise<{
+  nombre: string;
+  logoUrl: string | null;
+  bio: string | null;
+  ubicacion: string | null;
+  telefono: string | null;
+  publicaciones: PublicacionPreview[];
+}> {
+  const { data: inmobiliaria } = await supabase
+    .from('inmobiliarias')
+    .select('nombre, logo_url, pagina_bio, pagina_ubicacion, telefono')
+    .eq('id', inmobiliariaId)
+    .single();
+
+  let logoUrl: string | null = null;
+  if (inmobiliaria?.logo_url) {
+    const { data: signed } = await supabase.storage.from('logos').createSignedUrl(inmobiliaria.logo_url, 3600);
+    logoUrl = signed?.signedUrl ?? null;
+  }
+
+  const { data: publicaciones } = await supabase
+    .from('publicaciones')
+    .select('*')
+    .eq('inmobiliaria_id', inmobiliariaId)
+    .eq('activa', true)
+    .order('created_at', { ascending: false });
+
+  const ids = (publicaciones ?? []).map((p) => p.id);
+  const { data: fotos } = ids.length
+    ? await supabase.from('publicacion_fotos').select('publicacion_id, storage_path').in('publicacion_id', ids)
+    : { data: [] as { publicacion_id: string; storage_path: string }[] };
+
+  const paths = (fotos ?? []).map((f) => f.storage_path);
+  const { data: signedList } = paths.length
+    ? await supabase.storage.from('publicacion-fotos').createSignedUrls(paths, 3600)
+    : { data: [] as { path: string | null; signedUrl: string }[] };
+  const urlByPath = new Map((signedList ?? []).map((s) => [s.path, s.signedUrl]));
+
+  const fotosPorPublicacion = new Map<string, string[]>();
+  for (const f of fotos ?? []) {
+    const url = urlByPath.get(f.storage_path);
+    if (!url) continue;
+    const list = fotosPorPublicacion.get(f.publicacion_id) ?? [];
+    list.push(url);
+    fotosPorPublicacion.set(f.publicacion_id, list);
+  }
+
+  return {
+    nombre: inmobiliaria?.nombre ?? '',
+    logoUrl,
+    bio: inmobiliaria?.pagina_bio ?? null,
+    ubicacion: inmobiliaria?.pagina_ubicacion ?? null,
+    telefono: inmobiliaria?.telefono ?? null,
+    publicaciones: (publicaciones ?? []).map((p) => ({ ...p, fotos: fotosPorPublicacion.get(p.id) ?? [] })),
   };
 }

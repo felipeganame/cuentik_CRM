@@ -13,6 +13,23 @@ export type Inmobiliaria = {
   logo_url: string | null;
   exento_cobro: boolean;
   metodo_pago_preferido: string | null;
+  pagina_bio: string | null;
+  pagina_ubicacion: string | null;
+};
+
+export type Operacion = 'venta' | 'alquiler';
+
+export type Publicacion = {
+  id: string;
+  inmobiliaria_id: string;
+  tipo: string;
+  operacion: Operacion;
+  titulo: string;
+  descripcion: string | null;
+  precio: number | null;
+  localidad: string | null;
+  activa: boolean;
+  created_at: string;
 };
 
 export type Alquiler = {
