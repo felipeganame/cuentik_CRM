@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createInmobiliaria } from '@/lib/actions/superadmin';
+import { PaisSelectOptions, paisSelectStyle } from '@/app/pais-select';
 
 function fieldStyle() {
   return { width: '100%', padding: '9px 11px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 7, fontSize: 13.5 } as const;
@@ -58,7 +59,10 @@ export default function NuevaInmobiliariaPage() {
         <div>
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Teléfono</div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <input name="telefono_area" type="text" inputMode="numeric" maxLength={4} placeholder="Cód. área" onChange={soloDigitos} style={{ ...fieldStyle(), width: 90 }} />
+            <select name="telefono_dial" style={paisSelectStyle()}>
+              <PaisSelectOptions />
+            </select>
+            <input name="telefono_area" type="text" inputMode="numeric" maxLength={4} placeholder="Cód. área" onChange={soloDigitos} style={{ ...fieldStyle(), width: 80 }} />
             <input name="telefono_numero" type="text" inputMode="numeric" maxLength={10} placeholder="Número" onChange={soloDigitos} style={fieldStyle()} />
           </div>
         </div>

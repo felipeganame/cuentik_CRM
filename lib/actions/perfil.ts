@@ -18,7 +18,7 @@ export async function updatePerfil(_prevState: PerfilState, formData: FormData):
 
   const nombreContacto = String(formData.get('nombre_contacto') || '');
   const nombreInmobiliaria = String(formData.get('nombre_inmobiliaria') || '');
-  const telefono = formatTelefono(String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
+  const telefono = formatTelefono(String(formData.get('telefono_dial') || ''), String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
 
   const { error: profileError } = await supabase.from('profiles').update({ nombre: nombreContacto }).eq('id', user.id);
   if (profileError) return { error: 'No se pudo guardar el perfil.', success: false };

@@ -1,20 +1,31 @@
-export function formatTelefono(area: string, numero: string): string {
+import { PAIS_RECOMENDADO } from './paises';
+
+export function formatTelefono(dial: string, area: string, numero: string): string {
+  const d = dial.replace(/\D/g, '') || PAIS_RECOMENDADO.dial;
   const a = area.replace(/\D/g, '');
   const n = numero.replace(/\D/g, '');
   if (!a && !n) return '';
-  return `+54 ${a} ${n}`.trim();
+  return `+${d} ${a} ${n}`.trim();
 }
 
-export function parseTelefono(value: string | null | undefined): { area: string; numero: string } {
-  if (!value) return { area: '', numero: '' };
-  const sinPrefijo = value.replace(/^\+?54\s*/, '').trim();
-  const [area = '', ...resto] = sinPrefijo.split(/\s+/);
-  return { area: area.replace(/\D/g, ''), numero: resto.join('').replace(/\D/g, '') };
+export function parseTelefono(value: string | null | undefined): { dial: string; area: string; numero: string } {
+  if (!value) return { dial: PAIS_RECOMENDADO.dial, area: '', numero: '' };
+
+  const conPrefijo = value.match(/^\+(\d{1,3})\s*(.*)$/);
+  if (conPrefijo) {
+    const [, dial, resto] = conPrefijo;
+    const [area = '', ...rest] = resto.trim().split(/\s+/);
+    return { dial, area: area.replace(/\D/g, ''), numero: rest.join('').replace(/\D/g, '') };
+  }
+
+  // Formato legado sin código de país (datos previos a esta función).
+  const [area = '', ...rest] = value.trim().split(/\s+/);
+  return { dial: PAIS_RECOMENDADO.dial, area: area.replace(/\D/g, ''), numero: rest.join('').replace(/\D/g, '') };
 }
 
 export function waDigits(value: string | null | undefined): string {
-  const digits = (value ?? '').replace(/\D/g, '');
-  return digits.startsWith('54') ? digits : `54${digits}`;
+  const { dial, area, numero } = parseTelefono(value);
+  return `${dial}${area}${numero}`;
 }
 
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

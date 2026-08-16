@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { recordLogoUpload, updatePassword, updatePerfil, type PasswordState, type PerfilState } from '@/lib/actions/perfil';
 import { parseTelefono } from '@/lib/phone';
+import { PaisSelectOptions, paisSelectStyle } from '@/app/pais-select';
 
 function fieldStyle() {
   return { width: '100%', padding: '9px 11px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 7, fontSize: 13.5 } as const;
@@ -117,6 +118,9 @@ export function PerfilForm({
         <div>
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Teléfono</div>
           <div style={{ display: 'flex', gap: 8 }}>
+            <select name="telefono_dial" defaultValue={parseTelefono(telefono).dial} style={paisSelectStyle()}>
+              <PaisSelectOptions />
+            </select>
             <input
               name="telefono_area"
               type="text"
@@ -125,7 +129,7 @@ export function PerfilForm({
               placeholder="Cód. área"
               defaultValue={parseTelefono(telefono).area}
               onChange={soloDigitos}
-              style={{ ...fieldStyle(), width: 90 }}
+              style={{ ...fieldStyle(), width: 80 }}
             />
             <input
               name="telefono_numero"

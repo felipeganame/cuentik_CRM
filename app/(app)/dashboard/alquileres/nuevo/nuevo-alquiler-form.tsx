@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { createAlquiler, recordFotoUpload, type WizardPersonaInput, type WizardPropiedadInput, type WizardServicioInput } from '@/lib/actions/alquileres';
 import { EMAIL_PATTERN, formatTelefono, parseTelefono } from '@/lib/phone';
+import { PaisSelectOptions, paisSelectStyle } from '@/app/pais-select';
 
 const STEP_NOMBRES = ['Propiedad', 'Partes', 'Pago', 'Servicios', 'Confirmar'];
 const SERVICIO_NOMBRES_DEFAULT = ['Agua', 'Luz', 'Gas', 'Municipalidad', 'Rentas', 'Expensas'];
@@ -422,20 +423,27 @@ function StepPropiedades({
 }
 
 function PersonaForm({ persona, onChange }: { persona: WizardPersonaInput; onChange: (p: WizardPersonaInput) => void }) {
-  const { area, numero } = parseTelefono(persona.telefono);
+  const { dial, area, numero } = parseTelefono(persona.telefono);
   const emailInvalido = persona.email.trim() !== '' && !EMAIL_PATTERN.test(persona.email);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <input style={fieldStyle()} placeholder="Nombre completo *" value={persona.nombre} onChange={(e) => onChange({ ...persona, nombre: e.target.value })} />
       <input style={fieldStyle()} placeholder="DNI / CUIT *" value={persona.dni} onChange={(e) => onChange({ ...persona, dni: e.target.value })} />
       <div style={{ display: 'flex', gap: 8 }}>
+        <select
+          style={paisSelectStyle()}
+          value={dial}
+          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(e.target.value, area, numero) })}
+        >
+          <PaisSelectOptions />
+        </select>
         <input
-          style={{ ...fieldStyle(), width: 90 }}
+          style={{ ...fieldStyle(), width: 80 }}
           placeholder="Cód. área"
           inputMode="numeric"
           maxLength={4}
           value={area}
-          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(e.target.value, numero) })}
+          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(dial, e.target.value, numero) })}
         />
         <input
           style={fieldStyle()}
@@ -443,7 +451,7 @@ function PersonaForm({ persona, onChange }: { persona: WizardPersonaInput; onCha
           inputMode="numeric"
           maxLength={10}
           value={numero}
-          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(area, e.target.value) })}
+          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(dial, area, e.target.value) })}
         />
       </div>
       <div>

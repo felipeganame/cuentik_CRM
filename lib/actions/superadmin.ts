@@ -14,7 +14,7 @@ export async function createInmobiliaria(formData: FormData): Promise<{ error: s
   const nombre = String(formData.get('nombre') || '').trim();
   const emailContacto = String(formData.get('email_contacto') || '').trim();
   const password = String(formData.get('password') || '');
-  const telefono = formatTelefono(String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
+  const telefono = formatTelefono(String(formData.get('telefono_dial') || ''), String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
   const fechaProximoCobro = String(formData.get('fecha_proximo_cobro') || '') || proximoCicloDesdeHoy();
 
@@ -70,7 +70,7 @@ export async function updateInmobiliaria(id: string, formData: FormData): Promis
   await requireSuperadmin(supabase);
 
   const nombre = String(formData.get('nombre') || '');
-  const telefono = formatTelefono(String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
+  const telefono = formatTelefono(String(formData.get('telefono_dial') || ''), String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
   const fechaProximoCobro = String(formData.get('fecha_proximo_cobro') || '') || null;
   const estado = String(formData.get('estado') || 'Activo');

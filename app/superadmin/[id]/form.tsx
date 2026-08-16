@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { marcarCobroPagado, resetInmobiliariaPassword, updateInmobiliaria } from '@/lib/actions/superadmin';
 import { parseTelefono } from '@/lib/phone';
+import { PaisSelectOptions, paisSelectStyle } from '@/app/pais-select';
 import type { EstadoCobro } from '@/lib/billing';
 import type { Inmobiliaria } from '@/lib/types';
 
@@ -94,7 +95,10 @@ export function InmobiliariaForm({ inmobiliaria, montoMensual, estadoCobro }: { 
         <div>
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Teléfono</div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <input name="telefono_area" type="text" inputMode="numeric" maxLength={4} placeholder="Cód. área" defaultValue={parseTelefono(inmobiliaria.telefono).area} onChange={soloDigitos} style={{ ...fieldStyle(), width: 90 }} />
+            <select name="telefono_dial" defaultValue={parseTelefono(inmobiliaria.telefono).dial} style={paisSelectStyle()}>
+              <PaisSelectOptions />
+            </select>
+            <input name="telefono_area" type="text" inputMode="numeric" maxLength={4} placeholder="Cód. área" defaultValue={parseTelefono(inmobiliaria.telefono).area} onChange={soloDigitos} style={{ ...fieldStyle(), width: 80 }} />
             <input name="telefono_numero" type="text" inputMode="numeric" maxLength={10} placeholder="Número" defaultValue={parseTelefono(inmobiliaria.telefono).numero} onChange={soloDigitos} style={fieldStyle()} />
           </div>
         </div>
