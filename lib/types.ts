@@ -12,6 +12,7 @@ export type Inmobiliaria = {
   fecha_vencimiento: string | null;
   logo_url: string | null;
   cobro_estado: 'Pagado' | 'Pendiente';
+  monto_mensual: number;
 };
 
 export type Alquiler = {

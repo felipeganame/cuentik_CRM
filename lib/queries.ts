@@ -13,6 +13,50 @@ export async function getInmobiliaria(supabase: SupabaseClient, id: string): Pro
   return data;
 }
 
+export type InmobiliariaConMetricas = Inmobiliaria & {
+  alquileresActivos: number;
+  propiedadesActuales: number;
+  diasParaVencimiento: number | null;
+};
+
+export async function listInmobiliariasConMetricas(supabase: SupabaseClient): Promise<InmobiliariaConMetricas[]> {
+  const inmobiliarias = await listInmobiliarias(supabase);
+  if (inmobiliarias.length === 0) return [];
+
+  const { data: alquileres } = await supabase.from('alquileres').select('id, inmobiliaria_id');
+  const alquilerToInmobiliaria = new Map((alquileres ?? []).map((a) => [a.id, a.inmobiliaria_id as string]));
+  const alquilerIds = (alquileres ?? []).map((a) => a.id);
+
+  const { data: propiedades } = alquilerIds.length
+    ? await supabase.from('propiedades').select('id, alquiler_id').in('alquiler_id', alquilerIds)
+    : { data: [] as { id: string; alquiler_id: string }[] };
+
+  const alquileresPorInmobiliaria = new Map<string, number>();
+  for (const a of alquileres ?? []) {
+    const id = a.inmobiliaria_id as string;
+    alquileresPorInmobiliaria.set(id, (alquileresPorInmobiliaria.get(id) ?? 0) + 1);
+  }
+
+  const propiedadesPorInmobiliaria = new Map<string, number>();
+  for (const p of propiedades ?? []) {
+    const inmobiliariaId = alquilerToInmobiliaria.get(p.alquiler_id);
+    if (!inmobiliariaId) continue;
+    propiedadesPorInmobiliaria.set(inmobiliariaId, (propiedadesPorInmobiliaria.get(inmobiliariaId) ?? 0) + 1);
+  }
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  return inmobiliarias.map((i) => ({
+    ...i,
+    alquileresActivos: alquileresPorInmobiliaria.get(i.id) ?? 0,
+    propiedadesActuales: propiedadesPorInmobiliaria.get(i.id) ?? 0,
+    diasParaVencimiento: i.fecha_vencimiento
+      ? Math.round((new Date(i.fecha_vencimiento + 'T00:00:00').getTime() - hoy.getTime()) / 86400000)
+      : null,
+  }));
+}
+
 export type AlquilerListItem = Alquiler & {
   propiedadPrincipal: Propiedad | null;
   locador: Contacto | null;

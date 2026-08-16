@@ -69,9 +69,13 @@ export function InmobiliariaForm({ inmobiliaria }: { inmobiliaria: Inmobiliaria 
             <input name="limite_propiedades" type="number" defaultValue={inmobiliaria.limite_propiedades} style={fieldStyle()} />
           </div>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Vencimiento del plan</div>
-            <input name="fecha_vencimiento" type="date" defaultValue={inmobiliaria.fecha_vencimiento ?? ''} style={fieldStyle()} />
+            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Mensualidad ($)</div>
+            <input name="monto_mensual" type="number" defaultValue={inmobiliaria.monto_mensual} style={fieldStyle()} />
           </div>
+        </div>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Vencimiento del plan</div>
+          <input name="fecha_vencimiento" type="date" defaultValue={inmobiliaria.fecha_vencimiento ?? ''} style={fieldStyle()} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <div>

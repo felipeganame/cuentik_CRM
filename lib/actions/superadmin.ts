@@ -15,6 +15,7 @@ export async function createInmobiliaria(formData: FormData) {
   const telefono = String(formData.get('telefono') || '');
   const limitePropiedades = Number(formData.get('limite_propiedades')) || 20;
   const fechaVencimiento = String(formData.get('fecha_vencimiento') || '') || null;
+  const montoMensual = Number(formData.get('monto_mensual')) || 0;
 
   if (!nombre || !emailContacto || password.length < 8) {
     throw new Error('Datos incompletos: nombre, email y contraseña (mín. 8 caracteres) son obligatorios.');
@@ -37,6 +38,7 @@ export async function createInmobiliaria(formData: FormData) {
       telefono,
       limite_propiedades: limitePropiedades,
       fecha_vencimiento: fechaVencimiento,
+      monto_mensual: montoMensual,
     })
     .select()
     .single();
@@ -64,6 +66,7 @@ export async function updateInmobiliaria(id: string, formData: FormData) {
   const fechaVencimiento = String(formData.get('fecha_vencimiento') || '') || null;
   const estado = String(formData.get('estado') || 'Activo');
   const cobroEstado = String(formData.get('cobro_estado') || 'Pendiente');
+  const montoMensual = Number(formData.get('monto_mensual')) || 0;
 
   const { error } = await supabase
     .from('inmobiliarias')
@@ -74,12 +77,23 @@ export async function updateInmobiliaria(id: string, formData: FormData) {
       fecha_vencimiento: fechaVencimiento,
       estado,
       cobro_estado: cobroEstado,
+      monto_mensual: montoMensual,
     })
     .eq('id', id);
   if (error) throw error;
 
   revalidatePath('/superadmin');
   revalidatePath(`/superadmin/${id}`);
+}
+
+export async function toggleEstadoInmobiliaria(id: string, nuevoEstado: 'Activo' | 'Suspendido') {
+  const supabase = await createClient();
+  await requireSuperadmin(supabase);
+
+  const { error } = await supabase.from('inmobiliarias').update({ estado: nuevoEstado }).eq('id', id);
+  if (error) throw error;
+
+  revalidatePath('/superadmin');
 }
 
 function randomPassword() {
