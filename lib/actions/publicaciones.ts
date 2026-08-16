@@ -11,7 +11,44 @@ export type PublicacionInput = {
   descripcion: string;
   precio: number | null;
   localidad: string;
+  direccion: string;
+  dormitorios: number | null;
+  banos: number | null;
+  ambientes: number | null;
+  superficieTotal: number | null;
+  superficieCubierta: number | null;
+  superficieTerreno: number | null;
+  antiguedad: string;
+  orientacion: string;
+  estado: string;
+  expensas: number | null;
+  videoUrl: string;
+  servicios: string[];
 };
+
+function publicacionRow(input: PublicacionInput) {
+  return {
+    tipo: input.tipo,
+    operacion: input.operacion,
+    titulo: input.titulo.trim(),
+    descripcion: input.descripcion.trim() || null,
+    precio: input.precio,
+    localidad: input.localidad.trim() || null,
+    direccion: input.direccion.trim() || null,
+    dormitorios: input.dormitorios,
+    banos: input.banos,
+    ambientes: input.ambientes,
+    superficie_total: input.superficieTotal,
+    superficie_cubierta: input.superficieCubierta,
+    superficie_terreno: input.superficieTerreno,
+    antiguedad: input.antiguedad.trim() || null,
+    orientacion: input.orientacion.trim() || null,
+    estado: input.estado.trim() || null,
+    expensas: input.expensas,
+    video_url: input.videoUrl.trim() || null,
+    servicios: input.servicios,
+  };
+}
 
 async function getInmobiliariaId(supabase: Awaited<ReturnType<typeof createClient>>): Promise<string | null> {
   const {
@@ -31,15 +68,7 @@ export async function crearPublicacion(input: PublicacionInput): Promise<{ error
 
   const { data, error } = await supabase
     .from('publicaciones')
-    .insert({
-      inmobiliaria_id: inmobiliariaId,
-      tipo: input.tipo,
-      operacion: input.operacion,
-      titulo: input.titulo.trim(),
-      descripcion: input.descripcion.trim() || null,
-      precio: input.precio,
-      localidad: input.localidad.trim() || null,
-    })
+    .insert({ inmobiliaria_id: inmobiliariaId, ...publicacionRow(input) })
     .select('id')
     .single();
   if (error || !data) return { error: 'No se pudo crear la publicación.' };
@@ -52,17 +81,7 @@ export async function actualizarPublicacion(id: string, input: PublicacionInput)
   const supabase = await createClient();
   if (!input.titulo.trim()) return { error: 'Ingresá un título para la publicación.' };
 
-  const { error } = await supabase
-    .from('publicaciones')
-    .update({
-      tipo: input.tipo,
-      operacion: input.operacion,
-      titulo: input.titulo.trim(),
-      descripcion: input.descripcion.trim() || null,
-      precio: input.precio,
-      localidad: input.localidad.trim() || null,
-    })
-    .eq('id', id);
+  const { error } = await supabase.from('publicaciones').update(publicacionRow(input)).eq('id', id);
   if (error) return { error: 'No se pudo guardar la publicación.' };
 
   revalidatePath('/dashboard/pagina');

@@ -10,7 +10,7 @@ import {
   recordPublicacionFotoUpload,
   type PublicacionInput,
 } from '@/lib/actions/publicaciones';
-import type { Operacion, Publicacion } from '@/lib/types';
+import { SERVICIOS_OPCIONES, type Operacion, type Publicacion } from '@/lib/types';
 import type { PublicacionFotoConUrl } from '@/lib/queries';
 
 const TIPOS = ['Departamento', 'Casa', 'Terreno', 'Cochera', 'Local', 'Oficina'];
@@ -21,10 +21,22 @@ function fieldStyle() {
   return { width: '100%', padding: '9px 11px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 7, fontSize: 13.5, fontFamily: 'inherit' } as const;
 }
 
+function numOrNull(v: string): number | null {
+  return v.trim() ? Number(v) : null;
+}
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
       <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>{label}</div>
+      {children}
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ fontSize: 11.5, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', marginTop: 22, marginBottom: 12 }}>
       {children}
     </div>
   );
@@ -47,11 +59,28 @@ export function PublicacionForm({
   const [titulo, setTitulo] = useState(publicacion?.titulo ?? '');
   const [descripcion, setDescripcion] = useState(publicacion?.descripcion ?? '');
   const [precio, setPrecio] = useState(publicacion?.precio != null ? String(publicacion.precio) : '');
+  const [expensas, setExpensas] = useState(publicacion?.expensas != null ? String(publicacion.expensas) : '');
   const [localidad, setLocalidad] = useState(publicacion?.localidad ?? '');
+  const [direccion, setDireccion] = useState(publicacion?.direccion ?? '');
+  const [dormitorios, setDormitorios] = useState(publicacion?.dormitorios != null ? String(publicacion.dormitorios) : '');
+  const [banos, setBanos] = useState(publicacion?.banos != null ? String(publicacion.banos) : '');
+  const [ambientes, setAmbientes] = useState(publicacion?.ambientes != null ? String(publicacion.ambientes) : '');
+  const [superficieTotal, setSuperficieTotal] = useState(publicacion?.superficie_total != null ? String(publicacion.superficie_total) : '');
+  const [superficieCubierta, setSuperficieCubierta] = useState(publicacion?.superficie_cubierta != null ? String(publicacion.superficie_cubierta) : '');
+  const [superficieTerreno, setSuperficieTerreno] = useState(publicacion?.superficie_terreno != null ? String(publicacion.superficie_terreno) : '');
+  const [antiguedad, setAntiguedad] = useState(publicacion?.antiguedad ?? '');
+  const [orientacion, setOrientacion] = useState(publicacion?.orientacion ?? '');
+  const [estado, setEstado] = useState(publicacion?.estado ?? '');
+  const [videoUrl, setVideoUrl] = useState(publicacion?.video_url ?? '');
+  const [servicios, setServicios] = useState<string[]>(publicacion?.servicios ?? []);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  function toggleServicio(s: string) {
+    setServicios((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
+  }
 
   async function handleSubmit() {
     if (!titulo.trim()) {
@@ -66,8 +95,21 @@ export function PublicacionForm({
       operacion,
       titulo,
       descripcion,
-      precio: precio.trim() ? Number(precio) : null,
+      precio: numOrNull(precio),
       localidad,
+      direccion,
+      dormitorios: numOrNull(dormitorios),
+      banos: numOrNull(banos),
+      ambientes: numOrNull(ambientes),
+      superficieTotal: numOrNull(superficieTotal),
+      superficieCubierta: numOrNull(superficieCubierta),
+      superficieTerreno: numOrNull(superficieTerreno),
+      antiguedad,
+      orientacion,
+      estado,
+      expensas: numOrNull(expensas),
+      videoUrl,
+      servicios,
     };
 
     try {
@@ -160,25 +202,92 @@ export function PublicacionForm({
             </select>
           </Field>
         </div>
+
+        <SectionTitle>Ubicación</SectionTitle>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <Field label="Precio">
-            <input
-              type="number"
-              value={precio}
-              onChange={(e) => setPrecio(e.target.value)}
-              placeholder="Dejalo vacío para “Consultar precio”"
-              style={fieldStyle()}
-            />
+          <Field label="Dirección">
+            <input value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Ej: Poeta Lugones al 300" style={fieldStyle()} />
           </Field>
           <Field label="Localidad">
             <input value={localidad} onChange={(e) => setLocalidad(e.target.value)} placeholder="Ej: Nueva Córdoba" style={fieldStyle()} />
           </Field>
         </div>
-        <Field label="Descripción">
-          <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} rows={4} style={{ ...fieldStyle(), resize: 'vertical' }} />
-        </Field>
 
-        <Field label={`Fotos ${mode === 'crear' ? `(se suben al crear la publicación)` : ''}`}>
+        <SectionTitle>Precio</SectionTitle>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <Field label="Precio">
+            <input type="number" value={precio} onChange={(e) => setPrecio(e.target.value)} placeholder="Dejalo vacío para “Consultar precio”" style={fieldStyle()} />
+          </Field>
+          <Field label="Expensas">
+            <input type="number" value={expensas} onChange={(e) => setExpensas(e.target.value)} style={fieldStyle()} />
+          </Field>
+        </div>
+
+        <SectionTitle>Detalles</SectionTitle>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          <Field label="Ambientes">
+            <input type="number" value={ambientes} onChange={(e) => setAmbientes(e.target.value)} style={fieldStyle()} />
+          </Field>
+          <Field label="Dormitorios">
+            <input type="number" value={dormitorios} onChange={(e) => setDormitorios(e.target.value)} style={fieldStyle()} />
+          </Field>
+          <Field label="Baños">
+            <input type="number" value={banos} onChange={(e) => setBanos(e.target.value)} style={fieldStyle()} />
+          </Field>
+          <Field label="Sup. total (m²)">
+            <input type="number" value={superficieTotal} onChange={(e) => setSuperficieTotal(e.target.value)} style={fieldStyle()} />
+          </Field>
+          <Field label="Sup. cubierta (m²)">
+            <input type="number" value={superficieCubierta} onChange={(e) => setSuperficieCubierta(e.target.value)} style={fieldStyle()} />
+          </Field>
+          <Field label="Sup. terreno (m²)">
+            <input type="number" value={superficieTerreno} onChange={(e) => setSuperficieTerreno(e.target.value)} style={fieldStyle()} />
+          </Field>
+          <Field label="Antigüedad">
+            <input value={antiguedad} onChange={(e) => setAntiguedad(e.target.value)} placeholder="Ej: A estrenar, 20 años" style={fieldStyle()} />
+          </Field>
+          <Field label="Orientación">
+            <input value={orientacion} onChange={(e) => setOrientacion(e.target.value)} placeholder="Ej: Noreste" style={fieldStyle()} />
+          </Field>
+          <Field label="Estado">
+            <input value={estado} onChange={(e) => setEstado(e.target.value)} placeholder="Ej: Excelente" style={fieldStyle()} />
+          </Field>
+        </div>
+
+        <SectionTitle>Servicios</SectionTitle>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {SERVICIOS_OPCIONES.map((s) => {
+            const checked = servicios.includes(s);
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => toggleServicio(s)}
+                style={{
+                  padding: '7px 12px',
+                  borderRadius: 20,
+                  border: `1px solid ${checked ? 'var(--accent)' : 'oklch(87% 0.007 250)'}`,
+                  background: checked ? 'oklch(96% 0.03 40)' : '#fff',
+                  color: checked ? 'var(--accent-deep, var(--accent))' : 'oklch(45% 0.01 255)',
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {s}
+              </button>
+            );
+          })}
+        </div>
+
+        <SectionTitle>Descripción</SectionTitle>
+        <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} rows={4} style={{ ...fieldStyle(), resize: 'vertical' }} />
+
+        <SectionTitle>Video (opcional)</SectionTitle>
+        <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="Link de YouTube o Vimeo" style={fieldStyle()} />
+
+        <SectionTitle>Fotos {mode === 'crear' ? '(se suben al crear la publicación)' : ''}</SectionTitle>
+        <div>
           {mode === 'editar' && fotos.length > 0 && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 8, marginBottom: 10 }}>
               {fotos.map((foto) => (
@@ -206,7 +315,7 @@ export function PublicacionForm({
             + Agregar fotos (JPEG, hasta 1MB)
             <input ref={inputRef} type="file" accept="image/jpeg" multiple onChange={(e) => handleAddFiles(e.target.files)} style={{ display: 'none' }} />
           </label>
-        </Field>
+        </div>
       </div>
 
       {errorMsg && <div style={{ marginTop: 16, fontSize: 13, color: 'oklch(56% 0.19 25)' }}>{errorMsg}</div>}

@@ -19,6 +19,20 @@ export type Inmobiliaria = {
 
 export type Operacion = 'venta' | 'alquiler';
 
+export const SERVICIOS_OPCIONES = [
+  'Agua corriente',
+  'Agua potable',
+  'Desagüe cloacal',
+  'Gas natural',
+  'Luz',
+  'Cochera',
+  'Pileta',
+  'Seguridad 24hs',
+  'Balcón',
+  'Terraza',
+  'Parrilla',
+] as const;
+
 export type Publicacion = {
   id: string;
   inmobiliaria_id: string;
@@ -28,6 +42,19 @@ export type Publicacion = {
   descripcion: string | null;
   precio: number | null;
   localidad: string | null;
+  direccion: string | null;
+  dormitorios: number | null;
+  banos: number | null;
+  ambientes: number | null;
+  superficie_total: number | null;
+  superficie_cubierta: number | null;
+  superficie_terreno: number | null;
+  antiguedad: string | null;
+  orientacion: string | null;
+  estado: string | null;
+  expensas: number | null;
+  video_url: string | null;
+  servicios: string[];
   activa: boolean;
   created_at: string;
 };

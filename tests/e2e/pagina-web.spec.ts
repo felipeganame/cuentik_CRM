@@ -20,7 +20,7 @@ test('página web: content form, publicación CRUD, pause, and preview', async (
   await page.getByRole('link', { name: '+ Nueva publicación' }).click();
   await expect(page).toHaveURL(/\/dashboard\/pagina\/nueva$/);
   await page.locator('input').first().fill('Depto 2 ambientes en Nueva Córdoba');
-  await page.locator('input[type="number"]').fill('150000');
+  await page.getByPlaceholder('Dejalo vacío para “Consultar precio”').fill('150000');
   await page.getByRole('button', { name: 'Crear publicación' }).click();
   await expect(page).toHaveURL(/\/dashboard\/pagina$/, { timeout: 10_000 });
   await expect(page.getByText('Depto 2 ambientes en Nueva Córdoba')).toBeVisible();
@@ -45,6 +45,18 @@ test('página web: content form, publicación CRUD, pause, and preview', async (
   await previewPage2.goto('/mi-pagina-preview');
   await expect(previewPage2.getByText('Depto 2 ambientes en Nueva Córdoba')).toBeVisible();
   await expect(previewPage2.getByText('$150.000')).toBeVisible();
+
+  // Search and filters
+  await previewPage2.getByPlaceholder('Buscar por título, dirección o localidad…').fill('no existe');
+  await previewPage2.keyboard.press('Enter');
+  await expect(previewPage2.getByText('No encontramos publicaciones que coincidan con la búsqueda o el filtro.')).toBeVisible();
+
+  await previewPage2.goto('/mi-pagina-preview?operacion=Venta');
+  await expect(previewPage2.getByText('Todavía no hay publicaciones activas.')).not.toBeVisible();
+  await expect(previewPage2.getByText('No encontramos publicaciones')).toBeVisible();
+
+  await previewPage2.goto('/mi-pagina-preview?operacion=Alquiler');
+  await expect(previewPage2.getByText('Depto 2 ambientes en Nueva Córdoba')).toBeVisible();
   await previewPage2.close();
 
   // Delete it
