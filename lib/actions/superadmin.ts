@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireSuperadmin } from '@/lib/auth';
-import { formatTelefono } from '@/lib/phone';
+import { formatTelefono, telefonoErrorMessage } from '@/lib/phone';
 import { avanzarUnMes, proximoCicloDesdeHoy } from '@/lib/billing';
 
 export async function createInmobiliaria(formData: FormData): Promise<{ error: string } | { id: string }> {
@@ -14,7 +14,8 @@ export async function createInmobiliaria(formData: FormData): Promise<{ error: s
   const nombre = String(formData.get('nombre') || '').trim();
   const emailContacto = String(formData.get('email_contacto') || '').trim();
   const password = String(formData.get('password') || '');
-  const telefono = formatTelefono(String(formData.get('telefono_dial') || ''), String(formData.get('telefono_numero') || ''));
+  const telefonoNumero = String(formData.get('telefono_numero') || '');
+  const telefono = formatTelefono(String(formData.get('telefono_dial') || ''), telefonoNumero);
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
   const fechaProximoCobro = String(formData.get('fecha_proximo_cobro') || '') || null;
   const exentoCobro = formData.get('exento_cobro') === 'on';
@@ -22,6 +23,8 @@ export async function createInmobiliaria(formData: FormData): Promise<{ error: s
   if (!nombre || !emailContacto || password.length < 8) {
     return { error: 'Datos incompletos: nombre, email y contraseña (mín. 8 caracteres) son obligatorios.' };
   }
+  const telefonoError = telefonoErrorMessage(telefonoNumero);
+  if (telefonoError) return { error: telefonoError };
 
   const admin = createAdminClient();
 
@@ -72,7 +75,10 @@ export async function updateInmobiliaria(id: string, formData: FormData): Promis
   await requireSuperadmin(supabase);
 
   const nombre = String(formData.get('nombre') || '');
-  const telefono = formatTelefono(String(formData.get('telefono_dial') || ''), String(formData.get('telefono_numero') || ''));
+  const telefonoNumero = String(formData.get('telefono_numero') || '');
+  const telefonoError = telefonoErrorMessage(telefonoNumero);
+  if (telefonoError) return { error: telefonoError };
+  const telefono = formatTelefono(String(formData.get('telefono_dial') || ''), telefonoNumero);
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
   const fechaProximoCobro = String(formData.get('fecha_proximo_cobro') || '') || null;
   const estado = String(formData.get('estado') || 'Activo');

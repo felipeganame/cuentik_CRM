@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { createAlquiler, recordFotoUpload, type WizardPersonaInput, type WizardPropiedadInput, type WizardServicioInput } from '@/lib/actions/alquileres';
-import { EMAIL_PATTERN, formatTelefono, parseTelefono } from '@/lib/phone';
+import { EMAIL_PATTERN, formatTelefono, isValidNumero, parseTelefono } from '@/lib/phone';
 import { PaisSelectOptions, paisSelectStyle } from '@/app/pais-select';
 
 const STEP_NOMBRES = ['Propiedad', 'Partes', 'Pago', 'Servicios', 'Confirmar'];
@@ -44,6 +44,7 @@ function validatePartes(locador: WizardPersonaInput, locatario: WizardPersonaInp
   if (garantes.some((g) => !g.nombre.trim() || !g.dni.trim())) return 'Completá nombre y DNI/CUIT de todos los garantes, o quitá los que no vayas a usar.';
   const todas = [locador, locatario, ...garantes];
   if (todas.some((p) => p.email.trim() && !EMAIL_PATTERN.test(p.email))) return 'Hay un email con formato inválido.';
+  if (todas.some((p) => p.telefono.trim() && !isValidNumero(parseTelefono(p.telefono).numero))) return 'Hay un teléfono con formato inválido.';
   return null;
 }
 

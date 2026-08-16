@@ -3,7 +3,7 @@
 import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { EMAIL_PATTERN, formatTelefono } from '@/lib/phone';
+import { EMAIL_PATTERN, formatTelefono, telefonoErrorMessage } from '@/lib/phone';
 
 const DEFAULT_LIMITE_ALQUILERES = 20;
 
@@ -13,14 +13,14 @@ export async function registrarInmobiliaria(_prevState: RegistroState, formData:
   const nombre = String(formData.get('nombre') || '').trim();
   const email = String(formData.get('email') || '').trim();
   const password = String(formData.get('password') || '');
-  const telefono = formatTelefono(
-    String(formData.get('telefono_dial') || ''),
-    String(formData.get('telefono_numero') || '')
-  );
+  const telefonoNumero = String(formData.get('telefono_numero') || '');
+  const telefono = formatTelefono(String(formData.get('telefono_dial') || ''), telefonoNumero);
 
   if (!nombre) return { error: 'Ingresá el nombre de tu inmobiliaria.', success: false };
   if (!EMAIL_PATTERN.test(email)) return { error: 'Ingresá un email válido.', success: false };
   if (password.length < 8) return { error: 'La contraseña debe tener al menos 8 caracteres.', success: false };
+  const telefonoError = telefonoErrorMessage(telefonoNumero);
+  if (telefonoError) return { error: telefonoError, success: false };
 
   const admin = createAdminClient();
 
