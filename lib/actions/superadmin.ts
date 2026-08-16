@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireSuperadmin } from '@/lib/auth';
+import { formatTelefono } from '@/lib/phone';
 
 export async function createInmobiliaria(formData: FormData): Promise<{ error: string } | { id: string }> {
   const supabase = await createClient();
@@ -12,7 +13,7 @@ export async function createInmobiliaria(formData: FormData): Promise<{ error: s
   const nombre = String(formData.get('nombre') || '').trim();
   const emailContacto = String(formData.get('email_contacto') || '').trim();
   const password = String(formData.get('password') || '');
-  const telefono = String(formData.get('telefono') || '');
+  const telefono = formatTelefono(String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
   const fechaVencimiento = String(formData.get('fecha_vencimiento') || '') || null;
   const montoMensual = Number(formData.get('monto_mensual')) || 0;
@@ -70,7 +71,7 @@ export async function updateInmobiliaria(id: string, formData: FormData): Promis
   await requireSuperadmin(supabase);
 
   const nombre = String(formData.get('nombre') || '');
-  const telefono = String(formData.get('telefono') || '');
+  const telefono = formatTelefono(String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
   const limiteAlquileres = Number(formData.get('limite_alquileres')) || 20;
   const fechaVencimiento = String(formData.get('fecha_vencimiento') || '') || null;
   const estado = String(formData.get('estado') || 'Activo');

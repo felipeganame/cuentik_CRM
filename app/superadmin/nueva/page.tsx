@@ -9,6 +9,10 @@ function fieldStyle() {
   return { width: '100%', padding: '9px 11px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 7, fontSize: 13.5 } as const;
 }
 
+function soloDigitos(e: React.ChangeEvent<HTMLInputElement>) {
+  e.target.value = e.target.value.replace(/\D/g, '');
+}
+
 export default function NuevaInmobiliariaPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -53,7 +57,10 @@ export default function NuevaInmobiliariaPage() {
         </div>
         <div>
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Teléfono</div>
-          <input name="telefono" style={fieldStyle()} />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input name="telefono_area" type="text" inputMode="numeric" maxLength={4} placeholder="Cód. área" onChange={soloDigitos} style={{ ...fieldStyle(), width: 90 }} />
+            <input name="telefono_numero" type="text" inputMode="numeric" maxLength={10} placeholder="Número" onChange={soloDigitos} style={fieldStyle()} />
+          </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <div>

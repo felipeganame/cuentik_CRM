@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { createAlquiler, recordFotoUpload, type WizardPersonaInput, type WizardPropiedadInput, type WizardServicioInput } from '@/lib/actions/alquileres';
+import { EMAIL_PATTERN, formatTelefono, parseTelefono } from '@/lib/phone';
 
 const STEP_NOMBRES = ['Propiedad', 'Partes', 'Pago', 'Servicios', 'Confirmar'];
 const SERVICIO_NOMBRES_DEFAULT = ['Agua', 'Luz', 'Gas', 'Municipalidad', 'Rentas', 'Expensas'];
@@ -40,6 +41,8 @@ function validatePartes(locador: WizardPersonaInput, locatario: WizardPersonaInp
   if (!locador.nombre.trim() || !locador.dni.trim()) return 'Completá nombre y DNI/CUIT del locador.';
   if (!locatario.nombre.trim() || !locatario.dni.trim()) return 'Completá nombre y DNI/CUIT del locatario.';
   if (garantes.some((g) => !g.nombre.trim() || !g.dni.trim())) return 'Completá nombre y DNI/CUIT de todos los garantes, o quitá los que no vayas a usar.';
+  const todas = [locador, locatario, ...garantes];
+  if (todas.some((p) => p.email.trim() && !EMAIL_PATTERN.test(p.email))) return 'Hay un email con formato inválido.';
   return null;
 }
 
@@ -419,12 +422,40 @@ function StepPropiedades({
 }
 
 function PersonaForm({ persona, onChange }: { persona: WizardPersonaInput; onChange: (p: WizardPersonaInput) => void }) {
+  const { area, numero } = parseTelefono(persona.telefono);
+  const emailInvalido = persona.email.trim() !== '' && !EMAIL_PATTERN.test(persona.email);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <input style={fieldStyle()} placeholder="Nombre completo *" value={persona.nombre} onChange={(e) => onChange({ ...persona, nombre: e.target.value })} />
       <input style={fieldStyle()} placeholder="DNI / CUIT *" value={persona.dni} onChange={(e) => onChange({ ...persona, dni: e.target.value })} />
-      <input style={fieldStyle()} placeholder="Teléfono" value={persona.telefono} onChange={(e) => onChange({ ...persona, telefono: e.target.value })} />
-      <input style={fieldStyle()} placeholder="Email" value={persona.email} onChange={(e) => onChange({ ...persona, email: e.target.value })} />
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input
+          style={{ ...fieldStyle(), width: 90 }}
+          placeholder="Cód. área"
+          inputMode="numeric"
+          maxLength={4}
+          value={area}
+          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(e.target.value, numero) })}
+        />
+        <input
+          style={fieldStyle()}
+          placeholder="Teléfono"
+          inputMode="numeric"
+          maxLength={10}
+          value={numero}
+          onChange={(e) => onChange({ ...persona, telefono: formatTelefono(area, e.target.value) })}
+        />
+      </div>
+      <div>
+        <input
+          style={{ ...fieldStyle(), borderColor: emailInvalido ? 'oklch(70% 0.15 25)' : undefined }}
+          type="email"
+          placeholder="Email"
+          value={persona.email}
+          onChange={(e) => onChange({ ...persona, email: e.target.value })}
+        />
+        {emailInvalido && <div style={{ fontSize: 11, color: 'oklch(56% 0.19 25)', marginTop: 4 }}>Email inválido.</div>}
+      </div>
       <input style={fieldStyle()} placeholder="Domicilio" value={persona.domicilio} onChange={(e) => onChange({ ...persona, domicilio: e.target.value })} />
     </div>
   );

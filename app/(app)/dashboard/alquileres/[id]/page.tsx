@@ -6,6 +6,7 @@ import { estadoPagoLabel, statusStyle } from '@/lib/types';
 import { cambiarPagaServicio, toggleMesActual, toggleServicioActivo, toggleServicioPagado, updateCondiciones } from '@/lib/actions/alquileres';
 import { ContratoUploader, FotosUploader } from './fotos-uploader';
 import { DeleteAlquilerButton } from './delete-button';
+import { waDigits } from '@/lib/phone';
 
 const TABS = [
   { key: 'resumen', label: 'Resumen' },
@@ -158,7 +159,7 @@ function PersonaCard({ titulo, persona }: { titulo: string; persona: { nombre: s
             <span>{persona.telefono}</span>
             {persona.telefono && (
               <a
-                href={`https://wa.me/54${String(persona.telefono).replace(/\D/g, '')}`}
+                href={`https://wa.me/${waDigits(persona.telefono)}`}
                 target="_blank"
                 rel="noreferrer"
                 style={{ fontSize: 12, fontWeight: 600, color: 'oklch(38% 0.1 150)', background: 'oklch(94% 0.05 150)', padding: '4px 10px', borderRadius: 7, textDecoration: 'none' }}

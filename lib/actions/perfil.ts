@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { formatTelefono } from '@/lib/phone';
 
 export type PerfilState = { error: string | null; success: boolean };
 
@@ -17,7 +18,7 @@ export async function updatePerfil(_prevState: PerfilState, formData: FormData):
 
   const nombreContacto = String(formData.get('nombre_contacto') || '');
   const nombreInmobiliaria = String(formData.get('nombre_inmobiliaria') || '');
-  const telefono = String(formData.get('telefono') || '');
+  const telefono = formatTelefono(String(formData.get('telefono_area') || ''), String(formData.get('telefono_numero') || ''));
 
   const { error: profileError } = await supabase.from('profiles').update({ nombre: nombreContacto }).eq('id', user.id);
   if (profileError) return { error: 'No se pudo guardar el perfil.', success: false };
