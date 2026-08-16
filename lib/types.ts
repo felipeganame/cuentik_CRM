@@ -62,6 +62,7 @@ export type Servicio = {
   nombre: string;
   paga: 'locador' | 'locatario';
   referencia: string | null;
+  referencia2: string | null;
   activo: boolean;
   pagado_mes_actual: boolean;
 };

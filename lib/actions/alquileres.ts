@@ -4,6 +4,31 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { mesActualLabel } from '@/lib/types';
 
+export async function deleteAlquiler(alquilerId: string) {
+  const supabase = await createClient();
+
+  const { data: alquiler } = await supabase
+    .from('alquileres')
+    .select('contrato_pdf_path, propiedades(propiedad_fotos(storage_path))')
+    .eq('id', alquilerId)
+    .single();
+
+  const { error } = await supabase.from('alquileres').delete().eq('id', alquilerId);
+  if (error) throw error;
+
+  const fotoPaths = (alquiler?.propiedades ?? []).flatMap((p: { propiedad_fotos: { storage_path: string }[] }) =>
+    p.propiedad_fotos.map((f) => f.storage_path)
+  );
+  if (fotoPaths.length > 0) {
+    await supabase.storage.from('propiedad-fotos').remove(fotoPaths);
+  }
+  if (alquiler?.contrato_pdf_path) {
+    await supabase.storage.from('contratos').remove([alquiler.contrato_pdf_path]);
+  }
+
+  revalidatePath('/dashboard');
+}
+
 export async function recordFotoUpload(propiedadId: string, alquilerId: string, storagePath: string) {
   const supabase = await createClient();
   const { error } = await supabase.from('propiedad_fotos').insert({ propiedad_id: propiedadId, storage_path: storagePath });
@@ -140,6 +165,7 @@ export type WizardServicioInput = {
   nombre: string;
   paga: 'locador' | 'locatario';
   referencia: string;
+  referencia2: string;
   activo: boolean;
 };
 
@@ -221,12 +247,13 @@ export async function createAlquiler(input: {
 
   const propiedadPrincipal = propiedadesCreadas[0];
   if (propiedadPrincipal) {
-    for (const sv of input.servicios) {
+    for (const sv of input.servicios.filter((sv) => sv.nombre.trim())) {
       const { error: servicioError } = await supabase.from('servicios').insert({
         propiedad_id: propiedadPrincipal.id,
         nombre: sv.nombre,
         paga: sv.paga,
         referencia: sv.referencia || null,
+        referencia2: sv.referencia2 || null,
         activo: sv.activo,
         pagado_mes_actual: false,
       });

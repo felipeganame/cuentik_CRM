@@ -10,6 +10,7 @@ const SERVICIO_NOMBRES_DEFAULT = ['Agua', 'Luz', 'Gas', 'Municipalidad', 'Rentas
 
 const emptyPersona = (): WizardPersonaInput => ({ nombre: '', dni: '', telefono: '', email: '', domicilio: '' });
 const emptyPropiedad = (): WizardPropiedadInput => ({ direccion: '', localidad: 'Nueva Córdoba', tipo: 'Departamento' });
+const emptyServicio = (): WizardServicioInput => ({ nombre: '', paga: 'locatario', referencia: '', referencia2: '', activo: true });
 
 function toISODate(date: Date) {
   return date.toISOString().slice(0, 10);
@@ -27,11 +28,39 @@ function fieldStyle() {
   return { padding: '9px 11px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 7, fontSize: 13.5, width: '100%' } as const;
 }
 
+function validatePropiedades(propiedades: WizardPropiedadInput[]): string | null {
+  if (propiedades.some((p) => !p.direccion.trim())) return 'Completá la dirección de todas las propiedades.';
+  return null;
+}
+
+function validatePartes(locador: WizardPersonaInput, locatario: WizardPersonaInput, garantes: WizardPersonaInput[]): string | null {
+  if (!locador.nombre.trim() || !locador.dni.trim()) return 'Completá nombre y DNI/CUIT del locador.';
+  if (!locatario.nombre.trim() || !locatario.dni.trim()) return 'Completá nombre y DNI/CUIT del locatario.';
+  if (garantes.some((g) => !g.nombre.trim() || !g.dni.trim())) return 'Completá nombre y DNI/CUIT de todos los garantes, o quitá los que no vayas a usar.';
+  return null;
+}
+
+function validatePago(monto: string, metodoPago: string, cuenta: string, fechaInicio: string, fechaFin: string): string | null {
+  if (!monto || Number(monto) <= 0) return 'Ingresá un monto de alquiler válido.';
+  if (!fechaInicio) return 'Ingresá la fecha de inicio.';
+  if (!fechaFin) return 'Ingresá la fecha de fin.';
+  if (metodoPago !== 'Efectivo' && !cuenta.trim()) {
+    return metodoPago === 'Otro' ? 'Completá el detalle del método de pago.' : 'Completá el CBU / Alias.';
+  }
+  return null;
+}
+
+function validateServicios(servicios: WizardServicioInput[]): string | null {
+  if (servicios.some((s) => !s.nombre.trim())) return 'Completá el nombre de todos los servicios, o quitá los que no vayas a usar.';
+  return null;
+}
+
 export default function NuevoAlquilerPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [stepError, setStepError] = useState<string | null>(null);
 
   const [propiedades, setPropiedades] = useState<WizardPropiedadInput[]>([emptyPropiedad()]);
   const [locador, setLocador] = useState<WizardPersonaInput>(emptyPersona());
@@ -50,12 +79,44 @@ export default function NuevoAlquilerPage() {
   const [fechaFin, setFechaFin] = useState(defaultFechaFin());
 
   const [servicios, setServicios] = useState<WizardServicioInput[]>(
-    SERVICIO_NOMBRES_DEFAULT.map((nombre, i) => ({ nombre, paga: i < 3 ? 'locatario' : 'locador', referencia: '', activo: true }))
+    SERVICIO_NOMBRES_DEFAULT.map((nombre, i) => ({ nombre, paga: i < 3 ? 'locatario' : 'locador', referencia: '', referencia2: '', activo: true }))
   );
 
   const isLastStep = step === 4;
 
+  function validateStep(s: number): string | null {
+    if (s === 0) return validatePropiedades(propiedades);
+    if (s === 1) return validatePartes(locador, locatario, garantes);
+    if (s === 2) return validatePago(monto, metodoPago, cuenta, fechaInicio, fechaFin);
+    if (s === 3) return validateServicios(servicios);
+    return null;
+  }
+
+  function goToStep(target: number) {
+    if (target <= step) {
+      setStepError(null);
+      setStep(target);
+      return;
+    }
+    const err = validateStep(step);
+    if (err) {
+      setStepError(err);
+      return;
+    }
+    setStepError(null);
+    setStep(target);
+  }
+
   async function handleSubmit() {
+    for (let s = 0; s <= 3; s++) {
+      const err = validateStep(s);
+      if (err) {
+        setStepError(err);
+        setStep(s);
+        return;
+      }
+    }
+    setStepError(null);
     setSubmitting(true);
     setErrorMsg(null);
     try {
@@ -100,7 +161,7 @@ export default function NuevoAlquilerPage() {
             <button
               key={nombre}
               type="button"
-              onClick={() => setStep(i)}
+              onClick={() => goToStep(i)}
               style={{ flex: 1, cursor: 'pointer', paddingBottom: 10, borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: `3px solid ${line}`, textAlign: 'center', background: 'none' }}
             >
               <div style={{ fontSize: 11, fontWeight: 700, color }}>PASO {i + 1}</div>
@@ -142,12 +203,13 @@ export default function NuevoAlquilerPage() {
         )}
       </div>
 
+      {stepError && <div style={{ marginTop: 14, fontSize: 13, color: 'oklch(56% 0.19 25)' }}>{stepError}</div>}
       {errorMsg && <div style={{ marginTop: 14, fontSize: 13, color: 'oklch(56% 0.19 25)' }}>{errorMsg}</div>}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
         <button
           type="button"
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          onClick={() => { setStepError(null); setStep((s) => Math.max(0, s - 1)); }}
           style={{ padding: '10px 18px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 8, background: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', visibility: step === 0 ? 'hidden' : 'visible' }}
         >
           ← Atrás
@@ -164,7 +226,7 @@ export default function NuevoAlquilerPage() {
         ) : (
           <button
             type="button"
-            onClick={() => setStep((s) => Math.min(4, s + 1))}
+            onClick={() => goToStep(Math.min(4, step + 1))}
             style={{ padding: '10px 20px', border: 'none', borderRadius: 8, background: 'oklch(55% 0.16 250)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
           >
             Siguiente →
@@ -175,18 +237,37 @@ export default function NuevoAlquilerPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+        {label}
+        {required && <span style={{ color: 'oklch(56% 0.19 25)' }}> *</span>}
+      </div>
       {children}
     </div>
+  );
+}
+
+function RemoveButton({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      style={{ border: 'none', background: 'none', color: 'oklch(56% 0.19 25)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', padding: '2px 6px' }}
+    >
+      Quitar
+    </button>
   );
 }
 
 function StepPropiedades({ propiedades, setPropiedades }: { propiedades: WizardPropiedadInput[]; setPropiedades: (p: WizardPropiedadInput[]) => void }) {
   function update(i: number, field: keyof WizardPropiedadInput, value: string) {
     setPropiedades(propiedades.map((p, idx) => (idx === i ? { ...p, [field]: value } : p)));
+  }
+  function remove(i: number) {
+    setPropiedades(propiedades.filter((_, idx) => idx !== i));
   }
   return (
     <div>
@@ -196,9 +277,12 @@ function StepPropiedades({ propiedades, setPropiedades }: { propiedades: WizardP
       </div>
       {propiedades.map((p, i) => (
         <div key={i} style={{ border: '1px solid oklch(90% 0.007 250)', borderRadius: 10, padding: 18, marginBottom: 14 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: 'oklch(52% 0.01 255)' }}>Propiedad {i + 1}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'oklch(52% 0.01 255)' }}>Propiedad {i + 1}</div>
+            {propiedades.length > 1 && <RemoveButton onClick={() => remove(i)} label={`Quitar propiedad ${i + 1}`} />}
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 12 }}>
-            <Field label="Dirección">
+            <Field label="Dirección" required>
               <input style={fieldStyle()} value={p.direccion} onChange={(e) => update(i, 'direccion', e.target.value)} placeholder="Ej: Bv. Illia 245, 3B" />
             </Field>
             <Field label="Localidad">
@@ -232,8 +316,8 @@ function StepPropiedades({ propiedades, setPropiedades }: { propiedades: WizardP
 function PersonaForm({ persona, onChange }: { persona: WizardPersonaInput; onChange: (p: WizardPersonaInput) => void }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <input style={fieldStyle()} placeholder="Nombre completo" value={persona.nombre} onChange={(e) => onChange({ ...persona, nombre: e.target.value })} />
-      <input style={fieldStyle()} placeholder="DNI / CUIT" value={persona.dni} onChange={(e) => onChange({ ...persona, dni: e.target.value })} />
+      <input style={fieldStyle()} placeholder="Nombre completo *" value={persona.nombre} onChange={(e) => onChange({ ...persona, nombre: e.target.value })} />
+      <input style={fieldStyle()} placeholder="DNI / CUIT *" value={persona.dni} onChange={(e) => onChange({ ...persona, dni: e.target.value })} />
       <input style={fieldStyle()} placeholder="Teléfono" value={persona.telefono} onChange={(e) => onChange({ ...persona, telefono: e.target.value })} />
       <input style={fieldStyle()} placeholder="Email" value={persona.email} onChange={(e) => onChange({ ...persona, email: e.target.value })} />
       <input style={fieldStyle()} placeholder="Domicilio" value={persona.domicilio} onChange={(e) => onChange({ ...persona, domicilio: e.target.value })} />
@@ -248,6 +332,9 @@ function StepPartes({
   locatario: WizardPersonaInput; setLocatario: (p: WizardPersonaInput) => void;
   garantes: WizardPersonaInput[]; setGarantes: (g: WizardPersonaInput[]) => void;
 }) {
+  function removeGarante(i: number) {
+    setGarantes(garantes.filter((_, idx) => idx !== i));
+  }
   return (
     <div>
       <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 18 }}>Locador y locatario</div>
@@ -263,7 +350,10 @@ function StepPartes({
       </div>
       {garantes.map((g, i) => (
         <div key={i} style={{ marginTop: 16 }}>
-          <div style={{ fontSize: 12.5, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', marginBottom: 12 }}>Garante {i + 1}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em' }}>Garante {i + 1}</div>
+            <RemoveButton onClick={() => removeGarante(i)} label={`Quitar garante ${i + 1}`} />
+          </div>
           <PersonaForm persona={g} onChange={(p) => setGarantes(garantes.map((gg, idx) => (idx === i ? p : gg)))} />
         </div>
       ))}
@@ -291,18 +381,27 @@ function StepPago(props: {
   fechaFin: string; setFechaFin: (v: string) => void;
 }) {
   const isPct = props.actualizacionTipo === 'porcentaje';
+  const isEfectivo = props.metodoPago === 'Efectivo';
+  const isOtro = props.metodoPago === 'Otro';
   return (
     <div>
       <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 18 }}>Condiciones de pago</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
-        <Field label="Monto del alquiler">
+        <Field label="Monto del alquiler" required>
           <input style={fieldStyle()} type="number" value={props.monto} onChange={(e) => props.setMonto(e.target.value)} placeholder="185000" />
         </Field>
         <Field label="Día de pago">
           <input style={fieldStyle()} type="number" min={1} max={31} value={props.diaPago} onChange={(e) => props.setDiaPago(e.target.value)} />
         </Field>
         <Field label="Método de pago">
-          <select style={fieldStyle()} value={props.metodoPago} onChange={(e) => props.setMetodoPago(e.target.value)}>
+          <select
+            style={fieldStyle()}
+            value={props.metodoPago}
+            onChange={(e) => {
+              props.setMetodoPago(e.target.value);
+              if (e.target.value === 'Efectivo') props.setCuenta('');
+            }}
+          >
             <option>Transferencia bancaria</option>
             <option>Efectivo</option>
             <option>Otro</option>
@@ -310,9 +409,18 @@ function StepPago(props: {
         </Field>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
-        <Field label="CBU / Alias">
-          <input style={fieldStyle()} value={props.cuenta} onChange={(e) => props.setCuenta(e.target.value)} />
-        </Field>
+        {isEfectivo ? (
+          <div />
+        ) : (
+          <Field label={isOtro ? 'Detalle del método de pago' : 'CBU / Alias'} required>
+            <input
+              style={fieldStyle()}
+              value={props.cuenta}
+              onChange={(e) => props.setCuenta(e.target.value)}
+              placeholder={isOtro ? 'Ej: cheque, Mercado Pago, etc.' : ''}
+            />
+          </Field>
+        )}
         <Field label="Frecuencia de pago">
           <select style={fieldStyle()} value={props.frecuenciaPago} onChange={(e) => props.setFrecuenciaPago(e.target.value)}>
             {['Mensual', 'Cada 2 meses', 'Cada 3 meses', 'Cada 4 meses', 'Anual'].map((f) => (
@@ -320,12 +428,12 @@ function StepPago(props: {
             ))}
           </select>
         </Field>
-        <Field label="Duración: fecha de fin">
+        <Field label="Duración: fecha de fin" required>
           <input style={fieldStyle()} type="date" value={props.fechaFin} onChange={(e) => props.setFechaFin(e.target.value)} />
         </Field>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
-        <Field label="Fecha de inicio">
+        <Field label="Fecha de inicio" required>
           <input style={fieldStyle()} type="date" value={props.fechaInicio} onChange={(e) => props.setFechaInicio(e.target.value)} />
         </Field>
         <Field label="Cada cuánto se actualiza">
@@ -366,34 +474,46 @@ function StepServicios({ servicios, setServicios }: { servicios: WizardServicioI
   function update(i: number, patch: Partial<WizardServicioInput>) {
     setServicios(servicios.map((sv, idx) => (idx === i ? { ...sv, ...patch } : sv)));
   }
+  function remove(i: number) {
+    setServicios(servicios.filter((_, idx) => idx !== i));
+  }
   return (
     <div>
       <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Servicios de las propiedades</div>
       <div style={{ fontSize: 12.5, color: 'oklch(50% 0.01 255)', marginBottom: 18 }}>
-        Definí qué servicios corresponden, quién los paga y el número de referencia para identificarlos.
+        Definí qué servicios corresponden, quién los paga y el/los número(s) de referencia para identificarlos.
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1.3fr 0.6fr', padding: '10px 4px', fontSize: 11, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', borderBottom: '1px solid oklch(92% 0.006 250)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.9fr 1fr 1fr 0.5fr 0.4fr', padding: '10px 4px', fontSize: 11, fontWeight: 700, color: 'oklch(52% 0.01 255)', textTransform: 'uppercase', letterSpacing: '.03em', borderBottom: '1px solid oklch(92% 0.006 250)' }}>
         <div>Servicio</div>
         <div>Paga</div>
-        <div>N° de referencia</div>
+        <div>N° de referencia 1</div>
+        <div>N° de referencia 2</div>
         <div>Aplica</div>
+        <div></div>
       </div>
       {servicios.map((sv, i) => (
-        <div key={i} style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1.3fr 0.6fr', alignItems: 'center', padding: '10px 4px', borderBottom: '1px solid oklch(94% 0.005 250)' }}>
-          <div style={{ fontSize: 13.5, fontWeight: 600 }}>{sv.nombre}</div>
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.9fr 1fr 1fr 0.5fr 0.4fr', alignItems: 'center', padding: '10px 4px', borderBottom: '1px solid oklch(94% 0.005 250)' }}>
+          <input
+            style={{ padding: '7px 9px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 6, fontSize: 13, fontWeight: 600 }}
+            placeholder="Nombre del servicio"
+            value={sv.nombre}
+            onChange={(e) => update(i, { nombre: e.target.value })}
+          />
           <select style={{ padding: '7px 9px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 6, fontSize: 12.5 }} value={sv.paga} onChange={(e) => update(i, { paga: e.target.value as 'locador' | 'locatario' })}>
             <option value="locador">Locador</option>
             <option value="locatario">Locatario</option>
           </select>
           <input style={{ padding: '7px 9px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 6, fontSize: 12.5 }} placeholder="N° de cuenta / cliente" value={sv.referencia} onChange={(e) => update(i, { referencia: e.target.value })} />
+          <input style={{ padding: '7px 9px', border: '1px solid oklch(87% 0.007 250)', borderRadius: 6, fontSize: 12.5 }} placeholder="Opcional" value={sv.referencia2} onChange={(e) => update(i, { referencia2: e.target.value })} />
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
             <input type="checkbox" checked={sv.activo} onChange={(e) => update(i, { activo: e.target.checked })} />
           </label>
+          <RemoveButton onClick={() => remove(i)} label={`Quitar servicio ${sv.nombre || i + 1}`} />
         </div>
       ))}
       <button
         type="button"
-        onClick={() => setServicios([...servicios, { nombre: '', paga: 'locatario', referencia: '', activo: true }])}
+        onClick={() => setServicios([...servicios, emptyServicio()])}
         style={{ marginTop: 14, padding: '9px 14px', border: '1px dashed oklch(80% 0.01 250)', borderRadius: 8, background: 'none', fontSize: 12.5, fontWeight: 600, color: 'oklch(52% 0.01 255)', cursor: 'pointer' }}
       >
         + Agregar servicio personalizado

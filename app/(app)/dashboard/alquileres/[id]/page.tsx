@@ -5,6 +5,7 @@ import { getAlquilerDetail } from '@/lib/queries';
 import { estadoPagoLabel, statusStyle } from '@/lib/types';
 import { cambiarPagaServicio, toggleMesActual, toggleServicioActivo, toggleServicioPagado, updateCondiciones } from '@/lib/actions/alquileres';
 import { ContratoUploader, FotosUploader } from './fotos-uploader';
+import { DeleteAlquilerButton } from './delete-button';
 
 const TABS = [
   { key: 'resumen', label: 'Resumen' },
@@ -46,6 +47,7 @@ export default async function AlquilerDetailPage({
             {propiedadPrincipal?.localidad ?? ''} · {propiedadPrincipal?.tipo ?? ''}
           </div>
         </div>
+        <DeleteAlquilerButton alquilerId={id} direccion={propiedadPrincipal?.direccion ?? 'sin dirección'} />
       </div>
 
       <div style={{ display: 'flex', gap: 4, borderBottom: '1px solid oklch(90% 0.007 250)', marginBottom: 24 }}>
@@ -195,7 +197,7 @@ function TabServicios({ alquilerId, detalle }: { alquilerId: string; detalle: Aw
               {sv.paga === 'locador' ? 'Locador' : 'Locatario'}
             </button>
           </form>
-          <div>{sv.referencia ?? '—'}</div>
+          <div>{[sv.referencia, sv.referencia2].filter(Boolean).join(' · ') || '—'}</div>
           <form action={toggleServicioActivo.bind(null, sv.id, alquilerId)}>
             <button
               type="submit"

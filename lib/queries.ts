@@ -114,21 +114,28 @@ export async function getAlquilerDetail(supabase: SupabaseClient, alquilerId: st
   const mesActual = mesActualLabel();
   const historialActual = (historial ?? []).find((h) => h.mes === mesActual);
 
-  const { data: fotoRows } = propiedadIds.length
-    ? await supabase.from('propiedad_fotos').select('*').in('propiedad_id', propiedadIds)
-    : { data: [] as { id: string; propiedad_id: string; storage_path: string }[] };
+  const [{ data: fotoRows }, { data: contratoSigned }] = await Promise.all([
+    propiedadIds.length
+      ? supabase.from('propiedad_fotos').select('*').in('propiedad_id', propiedadIds)
+      : Promise.resolve({ data: [] as { id: string; propiedad_id: string; storage_path: string }[] }),
+    alquiler.contrato_pdf_path
+      ? supabase.storage.from('contratos').createSignedUrl(alquiler.contrato_pdf_path, 3600)
+      : Promise.resolve({ data: null }),
+  ]);
 
   const fotos: FotoConUrl[] = [];
-  for (const foto of fotoRows ?? []) {
-    const { data: signed } = await supabase.storage.from('propiedad-fotos').createSignedUrl(foto.storage_path, 3600);
-    if (signed?.signedUrl) fotos.push({ id: foto.id, propiedadId: foto.propiedad_id, url: signed.signedUrl });
+  if (fotoRows && fotoRows.length > 0) {
+    const { data: signedList } = await supabase.storage
+      .from('propiedad-fotos')
+      .createSignedUrls(fotoRows.map((f) => f.storage_path), 3600);
+    const urlByPath = new Map((signedList ?? []).map((s) => [s.path, s.signedUrl]));
+    for (const foto of fotoRows) {
+      const url = urlByPath.get(foto.storage_path);
+      if (url) fotos.push({ id: foto.id, propiedadId: foto.propiedad_id, url });
+    }
   }
 
-  let contratoUrl: string | null = null;
-  if (alquiler.contrato_pdf_path) {
-    const { data: signed } = await supabase.storage.from('contratos').createSignedUrl(alquiler.contrato_pdf_path, 3600);
-    contratoUrl = signed?.signedUrl ?? null;
-  }
+  const contratoUrl = contratoSigned?.signedUrl ?? null;
 
   return {
     ...alquiler,

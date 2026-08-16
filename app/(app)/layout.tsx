@@ -13,19 +13,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('nombre, inmobiliaria_id')
+    .select('nombre, inmobiliaria_id, inmobiliarias(nombre)')
     .eq('id', user.id)
     .single();
 
-  let inmobiliariaNombre = '';
-  if (profile?.inmobiliaria_id) {
-    const { data: inmobiliaria } = await supabase
-      .from('inmobiliarias')
-      .select('nombre')
-      .eq('id', profile.inmobiliaria_id)
-      .single();
-    inmobiliariaNombre = inmobiliaria?.nombre ?? '';
-  }
+  const inmobiliariaRel = profile?.inmobiliarias as unknown as { nombre: string } | { nombre: string }[] | null;
+  const inmobiliariaNombre = (Array.isArray(inmobiliariaRel) ? inmobiliariaRel[0]?.nombre : inmobiliariaRel?.nombre) ?? '';
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
